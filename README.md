@@ -29,14 +29,43 @@ Ein striktes, domain-neutrales, kopierfertiges Markdown-Skelett fuer beliebige P
 
 Alle internen Workspace-Artefakte sind `.md`. Externe Binaerdateien (PDF, DOCX, PPTX, XLSX, Bilder, Audio, Video) duerfen referenziert werden, niemals zur kanonischen Arbeitsfassung. Wenn ein Projekt Binaerdateien als Kunden-Export benoetigt, bleibt die `.md`-Quelle kanonisch; der Export wird nur in `state/artifact-index.md` referenziert und ersetzt niemals die `.md`-Quelle.
 
-## Quickstart (in ein neues Projekt kopieren)
+## Quickstart (Prompt in den Chat eines neuen Projektes kopieren)
 
-1. Lege ein leeres Projektverzeichnis an.
-2. Kopiere den Inhalt dieses Foundation-Tree in das Projektverzeichnis.
-3. Folge `install-checklist.md` Schritt fuer Schritt.
-4. Lies `AGENTS.md` als Tool-agnostischen Root-Contract.
-5. Initialisiere `state/project-index.md` und `state/current-session.md` aus den Templates.
-6. Beantworte die vier Setup-Fragen aus `.ai-workspace/setup-protocol.md` (Knowledge-Graph, Project Data Space, Maintenance Routines, Document Normalization).
+Du arbeitest in meinem aktuellen Projekt.
+
+Bitte analysiere zuerst die vorhandene Projektstruktur:
+- Welche Ordner gibt es schon?
+- Wo liegen Notizen, Prompts, Agents, Docs, Wissen, Sessions oder temporäre Dateien?
+- Gibt es doppelte oder unklare Strukturen?
+
+Nutze danach dieses öffentliche GitHub-Repo als Referenz:
+https://github.com/Luis247911/universal-ai-workspace-foundation
+
+Lies besonders:
+- README.md
+- AGENTS.md
+- install-checklist.md
+- .ai-workspace/setup-protocol.md
+
+Ziel:
+Prüfe, welche Teile dieser Struktur für dieses Projekt sinnvoll sind.
+
+Wichtig:
+- Übernimm nicht blind alles.
+- Lösche nichts ohne Rückfrage.
+- Erstelle keine neuen Top-Level-Ordner ohne Rückfrage.
+- Passe alles an die vorhandene Struktur an.
+- Wenn es schon Ordner wie agents, prompts, notes, docs, wiki, skills oder tasks gibt, schlage eine saubere Migration vor.
+- Erkläre erst deinen Plan, bevor du Dateien änderst.
+
+Liefere zuerst:
+1. Kurze Analyse der aktuellen Struktur.
+2. Was aus dem Referenz-Repo sinnvoll übernommen werden sollte.
+3. Was nicht nötig ist.
+4. Einen kleinen Migrationsplan.
+5. Eine Liste aller Dateien und Ordner, die du neu anlegen oder ändern würdest.
+
+Warte danach auf meine Bestätigung.
 
 ## Mount-Point-Uebersicht
 

@@ -30,10 +30,9 @@ Ein striktes, domain-neutrales, kopierfertiges Markdown-Skelett fuer beliebige P
 Alle internen Workspace-Artefakte sind `.md`. Externe Binaerdateien (PDF, DOCX, PPTX, XLSX, Bilder, Audio, Video) duerfen referenziert werden, niemals zur kanonischen Arbeitsfassung. Wenn ein Projekt Binaerdateien als Kunden-Export benoetigt, bleibt die `.md`-Quelle kanonisch; der Export wird nur in `state/artifact-index.md` referenziert und ersetzt niemals die `.md`-Quelle.
 
 ## Quickstart (Prompt in den Chat eines neuen Projektes kopieren)
+------
+PROMPT:
 
------
-PROMPT
------
 ,,Du arbeitest in meinem aktuellen Projekt.
 
 Bitte analysiere zuerst die vorhandene Projektstruktur:
@@ -69,10 +68,8 @@ Liefere zuerst:
 5. Eine Liste aller Dateien und Ordner, die du neu anlegen oder ändern würdest.
 
 Warte danach auf meine Bestätigung."
-----
-PROMPT ENDE
-----
 
+-----
 ## Mount-Point-Uebersicht
 
 | Pfad | Zweck |

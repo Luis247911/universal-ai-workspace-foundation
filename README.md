@@ -31,7 +31,10 @@ Alle internen Workspace-Artefakte sind `.md`. Externe Binaerdateien (PDF, DOCX, 
 
 ## Quickstart (Prompt in den Chat eines neuen Projektes kopieren)
 
-Du arbeitest in meinem aktuellen Projekt.
+-----
+PROMPT
+-----
+,,Du arbeitest in meinem aktuellen Projekt.
 
 Bitte analysiere zuerst die vorhandene Projektstruktur:
 - Welche Ordner gibt es schon?
@@ -65,7 +68,10 @@ Liefere zuerst:
 4. Einen kleinen Migrationsplan.
 5. Eine Liste aller Dateien und Ordner, die du neu anlegen oder ändern würdest.
 
-Warte danach auf meine Bestätigung.
+Warte danach auf meine Bestätigung."
+----
+PROMPT ENDE
+----
 
 ## Mount-Point-Uebersicht
 

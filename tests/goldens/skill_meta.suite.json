@@ -1,0 +1,43 @@
+{
+  "suite": "skill-meta",
+  "threshold": 0.9,
+  "cases": [
+    {
+      "id": "all-skills-lint-clean",
+      "input": {
+        "kind": "cmd",
+        "run": ["python", "-m", "harness.skills", "lint", ".claude/skills"]
+      },
+      "assertions": [{ "type": "contains", "value": "0 error(s)" }]
+    },
+    {
+      "id": "all-skills-audit-clean",
+      "input": {
+        "kind": "cmd",
+        "run": ["python", "-m", "harness.skills", "audit", ".claude/skills"]
+      },
+      "assertions": [{ "type": "contains", "value": "0 high finding(s)" }]
+    },
+    {
+      "id": "selector-is-the-entry-point",
+      "input": { "kind": "file", "path": ".claude/skills/agent-pattern-selector/SKILL.md" },
+      "assertions": [
+        { "type": "regex", "pattern": "[Tt]riage" },
+        { "type": "contains", "value": "simplest thing that works" }
+      ]
+    },
+    {
+      "id": "eval-loop-owns-the-gate",
+      "input": { "kind": "file", "path": ".claude/skills/eval-loop-builder/SKILL.md" },
+      "assertions": [{ "type": "contains", "value": "threshold" }]
+    },
+    {
+      "id": "every-runnable-skill-documents-its-command",
+      "input": {
+        "kind": "cmd",
+        "run": ["python", "-m", "harness.skills", "lint", ".claude/skills/eval-judge"]
+      },
+      "assertions": [{ "type": "contains", "value": "[ok ]" }]
+    }
+  ]
+}

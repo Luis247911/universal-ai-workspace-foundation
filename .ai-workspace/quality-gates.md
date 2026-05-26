@@ -67,7 +67,18 @@ Vor Promotion einer Normalized-Markdown-Datei in `knowledge/` muss `verification
 
 ## 10. Tool- und Command-Begriffe
 
-Tool-/Command-Namen erscheinen in dieser Foundation **ausschliesslich** in `security-policy.md` als Beispiele fuer verbotene oder genehmigungspflichtige Ausfuehrung. Sie erscheinen nicht in `quality-gates.md` als Lint-Tool-Empfehlung, nicht in anderen Policies als Setup-/Workflow-Default. Domain-spezifische Tool-Empfehlungen leben in Adaptern.
+In der **Governance-Schicht** erscheinen Tool-/Command-Namen **ausschliesslich** in `security-policy.md` als Beispiele fuer verbotene oder genehmigungspflichtige Ausfuehrung. Sie erscheinen nicht in `quality-gates.md` als Lint-Tool-Empfehlung, nicht in anderen Governance-Policies als Setup-/Workflow-Default. Domain-spezifische Tool-Empfehlungen leben in Adaptern. **Ausnahme: die mitgelieferte Harness-Schicht** (`pyproject.toml`, `src/`, `.claude/`, `tests/`, `.github/`, `install-harness.md`) — dort sind Tool-Namen legitim, weil es ein echtes Paket ist (siehe `security-policy.md` §12).
+
+## 11. CI als Verification-Gate (Harness-Schicht)
+
+Liefert das Repo den lauffaehigen Harness mit, ist die CI-Pipeline (`.github/workflows/`) das objektive Verification-Gate fuer Code und Skills — analog zu den Stufen in §1:
+
+- **Lint + Tests gruen** = Basis-Verifikation des Codes.
+- **Eval-Gate** (`python -m harness.eval run --suite ... --threshold ...`) gated *load-bearing*: faellt der Score unter die Schwelle, ist der Exit-Code ≠ 0 und der Merge blockiert. Das ist die Code-Entsprechung von "ein Artefakt verliert seinen Status".
+- **Skill-Status-Promotion**: ein Skill geht erst von `status: experimental` auf `stable`, wenn seine `evaluate.md`-Szenarien im Eval-Gate gruen sind (siehe `skills-authoring-policy.md` §5). `experimental` ≙ `unverified`, `stable` ≙ `verified`/`trusted`.
+- **Dogfood**: die Skills bestehen die repo-eigene Pruefung (`tests/test_skills_dogfood.py` — Lint + Supply-Chain-Audit). Drift macht das Gate rot.
+
+Foundation-Core ohne mitgelieferten Harness hat keine CI — dann gelten nur die Markdown-Stufen §1–§10.
 
 ## Cross-Links
 

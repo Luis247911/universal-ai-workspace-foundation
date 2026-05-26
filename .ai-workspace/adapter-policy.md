@@ -107,10 +107,22 @@ Wenn ein Adapter ein RAG-System einbringt:
 
 Adapter duerfen domain-spezifische MOC-Strukturen oder Topic-Hierarchien einbringen. Foundation-Templates bleiben generisch. Wenn ein Adapter neue MOCs erzeugt, sind sie ueber `[[wiki-links]]` aus dem Root-MOC (`knowledge/_index.md`) erreichbar oder explizit als "adapter-specific MOC" markiert (Frontmatter-Hinweis).
 
+## 11. Harness-Skills (Core) vs. Domain-Skills (Adapter)
+
+Mit der Execution-Schicht (`AGENTS.md` §2.5) gibt es zwei Sorten Skills — die Trennlinie ist **domain-neutral vs. domain-spezifisch**, nicht "wo liegt die Datei":
+
+- **Core-Harness-Skills** sind die framework-weiten, domain-neutralen Skills, die die Foundation selbst mitliefert (`.claude/skills/<slug>/`, z.B. Eval-, Guardrail-, Observability-, HITL-, Memory-, Orchestrator-Skills). Sie sind **kein Adapter** — sie sind Teil des Foundation-Core und werden von `.ai-workspace/skills-authoring-policy.md` regiert. Adapter duerfen sie nicht ueberschreiben (vgl. §2), nur ergaenzen.
+- **Domain-Skills** sind kunden-, persona- oder projektspezifisch. Sie sind **Adapter** und leben unter `adapters/<slug>/` (Spezifikation in `adapter.md`; lauffaehige Claude-Code-Skill-Dateien pro Tool-Konvention). Sie erben `skills-authoring-policy.md` und das Sicherheitsmodell. Ein Domain-Skill darf sich **nicht** als Core-Harness-Skill tarnen oder unter `.claude/skills/` einnisten, um die Adapter-Registrierung (§4) zu umgehen.
+
+Faustregel: Wuerde der Skill in *jedem* Projekt Sinn ergeben (domain-neutral)? → Core-Kandidat, folgt `skills-authoring-policy.md`. Traegt er Domain-/Kunden-/Personen-Spezifika? → Adapter unter `adapters/<slug>/`.
+
+Die in §1 erlaubten Adapter-Skills/-Hooks/-Commands bleiben zulaessig; sie folgen jetzt zusaetzlich `skills-authoring-policy.md` fuer Frontmatter, Versionierung und Test-Pflicht.
+
 ## Cross-Links
 
 - Setup: `setup-protocol.md`.
 - Behavior: `protocol.md`.
+- Skill-Authoring: `skills-authoring-policy.md`.
 - Adapters-README: `adapters/README.md`.
 - Maintenance-Routine-Template: `templates/maintenance-routine.md`.
 - Delegation: `delegation-policy.md`.

@@ -1,8 +1,46 @@
 # Universal AI Workspace Foundation
 
-Ein striktes, domain-neutrales, kopierfertiges Markdown-Skelett fuer beliebige Projekte, die mit AI-Assistants bearbeitet werden.
+Ein lauffaehiges, domain-neutrales Starter-Harness fuer Projekte, die mit AI-Assistants (Claude
+Code zuerst) bearbeitet werden. Zwei Schichten in einem Repo: eine **Governance-Schicht** aus
+striktem Markdown und eine **Execution-Schicht** aus echtem, getestetem Python.
 
-## Was diese Foundation ist
+> **v3.0** — Diese Version macht aus dem fruheren reinen Markdown-Regelwerk ein echtes Harness:
+> 12 Claude-Code-Skills ueber einer pip-installierbaren Engine (`src/harness/`), die offline im
+> Mock-Modus laeuft — kein API-Key, keine Netzwerkverbindung, keine schwere Agent-Library.
+> Migration von v2.0: siehe [`CHANGELOG.md`](CHANGELOG.md) und Abschnitt *Upgrade von v2.0* unten.
+
+## Das Zwei-Schichten-Modell
+
+Die Foundation trennt sauber, was *persistiert*, von dem, was *laeuft*:
+
+| Schicht | Pfad | Rolle | Format |
+|---------|------|-------|--------|
+| **Governance + State + Memory** | `.ai-workspace/` | Regeln, Zustand, Wissen — die Wahrheit, die persistiert | Markdown-only (strikt) |
+| **Execution** | `.claude/` + `src/harness/` | tool-nativer Code, der laeuft — Skills + Engine | Code |
+
+Die Grenze ist scharf: **Code, der laeuft, lebt in `.claude/` und `src/`. Wahrheit, die
+persistiert, lebt in `.ai-workspace/`.** Keine Schicht schreibt die kanonischen Dateien der
+anderen. Skill-*Outputs* sind delegierte Arbeit (untrusted bis verifiziert) und folgen dem
+`scratch/`/`research/`-Lifecycle — sie mutieren `state/` nur ueber den deklarierten
+State-Write-Contract (`.ai-workspace/skills-authoring-policy.md`). Details: `AGENTS.md` §2.5.
+
+`.ai-workspace/` und `AGENTS.md` bleiben tool-neutral. `.claude/` ist Claude-Code-spezifisch; die
+Engine `src/harness/` ist tool-unabhaengig und auch ohne `.claude/` nutzbar
+(`python -m harness.<area>`).
+
+## Was diese Foundation IST
+
+**Execution-Schicht (neu in v3.0):**
+
+- Eine lauffaehige Engine `src/harness/` mit acht Bereichen: `eval`, `router`, `hitl`,
+  `guardrails`, `observability`, `memory`, `orchestrator`, `skills`.
+- 12 echte Claude-Code-Skills unter `.claude/skills/<slug>/` mit offiziellem SKILL.md-Frontmatter.
+- **stdlib-first**: ein nacktes `pip install -e .` zieht **null** Third-Party-Wheels.
+- **mock-offline by default** (`UAW_LLM=mock`): deterministisch, ohne Netz/Key → gruene CI.
+- Ein Eval-Gate mit Exit-Code-Semantik (nicht-null unter Schwelle) — CI-tauglich, dogfoodet die
+  eigenen Skills.
+
+**Governance-Schicht (unveraendert aus v2.0):**
 
 - Eine Mount-Point-Disziplin gegen Parallelstrukturen.
 - Ein Setup-Protokoll fuer saubere Adapter-Anbindung.
@@ -12,100 +50,135 @@ Ein striktes, domain-neutrales, kopierfertiges Markdown-Skelett fuer beliebige P
 - Ein File-Lifecycle-Modell mit expliziten Retention-Regeln.
 - Ein Markdown-Knowledge-Graph-Protokoll mit Obsidian-kompatiblen Konventionen.
 - Eine Document-Normalization-Pipeline fuer externe Binaerdateien.
-- Maintenance-Routine-Blueprints als optionale Spezifikationen.
-- Eine Kontroll- und Managementschicht (kein Datenspeicher fuer Rohdaten).
 
 ## Was diese Foundation NICHT ist
 
-- Kein Agent-Harness, kein Skill-Pack.
-- Keine MCP-Default-Bundle, keine Hook-Sammlung.
-- Kein Coding-, HR-, Legal- oder Sales-Harness.
-- Kein Automatisierungs-Framework.
-- Kein RAG-System, keine Vector-Datenbank, kein Crawler.
-- Kein automatisiertes Binary-Parsing (kein PDF-Parser, kein OCR, kein Office-Reader, kein Bild-zu-Text-Modell).
+- Kein Coding-, HR-, Legal- oder Sales-Harness — die Skills sind domain-neutrale
+  Agent-Engineering-Bausteine, kein fertiges Fachsystem.
+- Keine schwere Agent-Library und kein Wrapper um eine — die Patterns sind aus oeffentlichen
+  OSS-Ideen **nachgebaut**, nicht eingebunden (siehe [`NOTICE`](NOTICE)).
+- Kein RAG-System, keine Vector-Datenbank, kein Crawler (ein optionaler Vector-Memory-Backend ist
+  ein opt-in Extra, niemals Source of Truth).
+- Kein automatisiertes Binary-Parsing (kein PDF-Parser, kein OCR, kein Office-Reader).
 - Kein Datenspeicher fuer sensible Rohdaten.
+- Kein MCP-Default-Bundle. Hooks sind present-but-advisory (opt-in via `.claude/settings.json`).
 
-## Markdown-first-Prinzip
+## Quickstart — Execution-Schicht (lauffaehig)
 
-Alle internen Workspace-Artefakte sind `.md`. Externe Binaerdateien (PDF, DOCX, PPTX, XLSX, Bilder, Audio, Video) duerfen referenziert werden, niemals zur kanonischen Arbeitsfassung. Wenn ein Projekt Binaerdateien als Kunden-Export benoetigt, bleibt die `.md`-Quelle kanonisch; der Export wird nur in `state/artifact-index.md` referenziert und ersetzt niemals die `.md`-Quelle.
+```bash
+# bare install — zieht ZERO Third-Party-Wheels, alles laeuft im Mock-Modus
+pip install -e .
 
-## Quickstart (Prompt in den Chat eines neuen Projektes kopieren)
-------
-PROMPT:
+# Offline-Demo: ein gewichtetes Eval-Gate
+python examples/eval_demo.py
 
-,,Du arbeitest in meinem aktuellen Projekt.
+# Eval-Gate gegen die Repo-Invarianten (exit 0 = bestanden)
+python -m harness.eval run --suite tests/goldens/repo.suite.json --threshold 0.9
+```
 
-Bitte analysiere zuerst die vorhandene Projektstruktur:
-- Welche Ordner gibt es schon?
-- Wo liegen Notizen, Prompts, Agents, Docs, Wissen, Sessions oder temporäre Dateien?
-- Gibt es doppelte oder unklare Strukturen?
+Python >= 3.10. Identisch auf Windows, macOS, Linux (Aufruf immer `python -m harness.<area>`, nie
+ein Shell-Skript). Vollstaendige Anleitung inkl. Extras und Mock-vs-Live:
+[`install-harness.md`](install-harness.md).
 
-Nutze danach dieses öffentliche GitHub-Repo als Referenz:
-https://github.com/Luis247911/universal-ai-workspace-foundation
+In Claude Code laden die 12 Skills bei Bedarf ueber ihre `description` — **nicht** in den
+4-File-Boot-Context. Einstieg/Triage: der Skill `agent-pattern-selector` mappt ein Problem auf den
+richtigen Skill.
 
-Lies besonders:
-- README.md
-- AGENTS.md
-- install-checklist.md
-- .ai-workspace/setup-protocol.md
+## Quickstart — Governance-Schicht (in ein neues Projekt kopieren)
 
-Ziel:
-Prüfe, welche Teile dieser Struktur für dieses Projekt sinnvoll sind.
+1. Lege ein leeres Projektverzeichnis an.
+2. Kopiere den Inhalt dieses Foundation-Tree in das Projektverzeichnis.
+3. Folge [`install-checklist.md`](install-checklist.md) Schritt fuer Schritt (entscheide dort, ob
+   das Projekt die optionale Harness-Schicht mitnimmt).
+4. Lies `AGENTS.md` als tool-agnostischen Root-Contract.
+5. Initialisiere `.ai-workspace/state/project-index.md` und `current-session.md` aus den Templates.
+6. Beantworte die vier Setup-Fragen aus `.ai-workspace/setup-protocol.md` (Knowledge-Graph,
+   Project Data Space, Maintenance Routines, Document Normalization).
 
-Wichtig:
-- Übernimm nicht blind alles.
-- Lösche nichts ohne Rückfrage.
-- Erstelle keine neuen Top-Level-Ordner ohne Rückfrage.
-- Passe alles an die vorhandene Struktur an.
-- Wenn es schon Ordner wie agents, prompts, notes, docs, wiki, skills oder tasks gibt, schlage eine saubere Migration vor.
-- Erkläre erst deinen Plan, bevor du Dateien änderst.
+Reine Governance-Nutzung (nur `.ai-workspace/` + die Root-Boot-Dateien, ohne `.claude/`/`src/`)
+ist weiterhin moeglich.
 
-Liefere zuerst:
-1. Kurze Analyse der aktuellen Struktur.
-2. Was aus dem Referenz-Repo sinnvoll übernommen werden sollte.
-3. Was nicht nötig ist.
-4. Einen kleinen Migrationsplan.
-5. Eine Liste aller Dateien und Ordner, die du neu anlegen oder ändern würdest.
+## Skill-Katalog (12)
 
-Warte danach auf meine Bestätigung."
+| Skill | Bereich | Engine-Modul |
+|-------|---------|--------------|
+| `eval-loop-builder` | Eval-Suiten + Gate | `harness.eval` |
+| `eval-judge` | LLM-as-judge (Rubrik) | `harness.eval` |
+| `guardrail-designer` | Input/Output-Validierung, `on_fail`-Enum | `harness.guardrails` |
+| `observability-tracer` | Tracing mit `gen_ai.*`-Semconv | `harness.observability` |
+| `hitl-gate` | Human-in-the-loop Approval-Pause | `harness.hitl` |
+| `cost-latency-optimizer` | Caching / Batch / Streaming / Routing | `harness.router` |
+| `multi-agent-topology` | Supervisor / Hierarchie / Network / Swarm | — (Text + reference) |
+| `orchestrator-patterns` | 5 Workflow-Muster + ReAct | `harness.orchestrator` |
+| `memory-architect` | Memory scope × type | `harness.memory` |
+| `agent-pattern-selector` | Triage / Einstieg (read-only) | — (Router) |
+| `skill-author` | Skills schreiben + linten | `harness.skills` |
+| `skill-supply-chain-check` | Supply-Chain-Audit von Skill-Code | `harness.skills` |
 
------
-## Mount-Point-Uebersicht
+Jeder Script-Skill ist ein duenner Wrapper: `.claude/skills/<slug>/scripts/run.py` forwarded an
+`harness.<area>.__main__` — **keine duplizierte Logik**. Skills schreiben/aendern:
+`.ai-workspace/skills-authoring-policy.md` + `python -m harness.skills lint .claude/skills`.
 
-| Pfad | Zweck |
-|------|-------|
-| `AGENTS.md`, `CLAUDE.md` | Boot-Dateien (Verhaltens-Contract) |
-| `install-checklist.md` | Manuelle Setup-Anleitung |
-| `.ai-workspace/` | Foundation-Kern |
-| `.ai-workspace/state/` | Operativer kanonischer Zustand |
-| `.ai-workspace/templates/` | Markdown-Vorlagen |
-| `.ai-workspace/knowledge/` | Markdown-Knowledge-Graph |
-| `.ai-workspace/data-space/` | Manifest-only Mount Point fuer externe Datenraeume |
-| `.ai-workspace/research/` | Geprueftes oder zu pruefendes Material |
-| `.ai-workspace/deliverables/` | Kuratierte `.md`-Outputs |
-| `.ai-workspace/scratch/` | Ephemere, untrusted Arbeit |
-| `.ai-workspace/archive/` | Inerte Historie |
-| `.ai-workspace/adapters/` | Projektspezifische Erweiterungen |
+## Repo-Layout (Top-Ebenen)
 
-## KG-Konzept-Kurzbeschreibung
+```text
+AGENTS.md / CLAUDE.md          Boot-Dateien (tool-neutraler Contract + Claude-Delta)
+README.md / CHANGELOG.md       diese Datei + v2→v3-Migration
+LICENSE / NOTICE               MIT + Attributions-Hinweis
+install-checklist.md           manueller Governance-Copy-Flow
+install-harness.md             pip install + Demos ausfuehren
+pyproject.toml                 Paket "uaw-harness", deps=[] (stdlib-first)
+.ai-workspace/                 GOVERNANCE — Markdown-only (Kern unveraendert)
+.claude/                       EXECUTION — Skills, settings.json (gesegneter Mount)
+src/harness/                   die importierbare Engine (8 Bereiche, getestet)
+examples/                      eine Offline-Demo pro Bereich
+tests/                         pytest + goldene Eval-Suiten (Repo dogfoodet sein Gate)
+sources/credits.md             jede geliehene Struktur-Idee attribuiert
+.github/workflows/ci.yml       lint + test + Eval-Gate (Windows + Linux)
+```
 
-Markdown ist das Gedaechtnis dieses Workspaces. Dauerhaftes Wissen lebt unter `knowledge/`, verbunden ueber `[[wiki-links]]`, navigierbar ueber Map-of-Content-Dateien (`_moc.md`), durch YAML-Frontmatter maschinenlesbar.
+## Anti-Sprawl bleibt strikt
 
-Verifiziertes normalisiertes Markdown ist die bevorzugte Arbeitsfassung. Bei kritischen Aussagen (Zahlen, Daten, Fristen, Namen, Tabellenwerte, Definitionen, Negationen, Vertragsaussagen, entscheidungsrelevante Inhalte) muss auf das Originaldokument oder die Normalization Review zurueckverwiesen werden.
+Die verbotenen Top-Level-Namen (`skills/`, `agents/`, `hooks/`, `harness/`, `mcp/`, …) bleiben
+verboten — mit **zwei begruendeten Ausnahmen**: `.claude/` ist der einzige gesegnete Execution-Mount
+(`.claude/skills/`, nicht nacktes `skills/`), und Standard-Projekt-Infrastruktur (`src/`, `tests/`,
+`examples/`, `sources/`, `.github/`, `pyproject.toml`) ist Allowlist. Innerhalb `.ai-workspace/`
+bleibt die Markdown-only-Regel **unveraendert** streng. Details: `AGENTS.md` §3.
+
+## Markdown-first (Governance-Schicht)
+
+Alle Dateien der Governance-Schicht (`.ai-workspace/**`) sind `.md`. Die Execution-Schicht ist Code
+und davon ausgenommen. Externe Binaerdateien (PDF, DOCX, PPTX, XLSX, Bilder, Audio, Video) duerfen
+referenziert werden, niemals als kanonische Arbeitsfassung. Bei kritischen Aussagen (Zahlen, Daten,
+Fristen, Namen, Tabellenwerte, Definitionen, Negationen, Vertragsaussagen) muss auf das
+Originaldokument oder die Normalization Review zurueckverwiesen werden.
+
+## Upgrade von v2.0
+
+v2.0 war eine reine Markdown-Kontroll-/Policy-Schicht („kein Agent-Harness, kein Skill-Pack"). v3.0
+behaelt diese Schicht **unveraendert in ihrer Rolle** und legt die Execution-Schicht daneben.
+
+- **Nichts Bestehendes bricht.** `.ai-workspace/` und die Boot-Dateien funktionieren wie zuvor; die
+  Markdown-only-Disziplin im Governance-Kern ist unveraendert strikt.
+- **Neu hinzugekommen:** `.claude/`, `src/harness/`, `tests/`, `examples/`, `sources/`,
+  `pyproject.toml`, `.github/`, aktive `.gitignore`/`.claudeignore`, `NOTICE`, `CHANGELOG.md`.
+- **Die Verfassung wurde nachgezogen:** `AGENTS.md` (§2.5 Zwei-Schichten-Modell, §3 Carve-outs),
+  `setup-protocol.md`, `security-policy.md`, `adapter-policy.md` und die neue
+  `skills-authoring-policy.md` legitimieren den Execution-Mount, ohne die Anti-Sprawl-Disziplin
+  aufzugeben.
+- **Migration eines bestehenden v2.0-Projekts:** Du kannst rein bei der Governance-Schicht bleiben
+  (nichts zu tun) oder die Harness-Schicht als Einheit uebernehmen — siehe
+  [`CHANGELOG.md`](CHANGELOG.md) und [`install-harness.md`](install-harness.md).
 
 ## Naechste Schritte
 
-- Lies `AGENTS.md`.
-- Folge `install-checklist.md`.
-- Konsultiere `.ai-workspace/README.md` fuer die vollstaendige Mount-Point-Map.
-- Lies `.ai-workspace/knowledge-graph-policy.md` fuer das KG-Protokoll.
+- Code ausfuehren: [`install-harness.md`](install-harness.md).
+- Governance verstehen: `AGENTS.md`, dann `.ai-workspace/README.md` (vollstaendige Mount-Point-Map).
+- Skills schreiben: `.ai-workspace/skills-authoring-policy.md`.
+- Knowledge-Graph: `.ai-workspace/knowledge-graph-policy.md`.
+- Attribution: [`NOTICE`](NOTICE) + [`sources/credits.md`](sources/credits.md).
 
-## Source-of-Truth-Hierarchie
+## Lizenz
 
-1. Originaldokument (als Referenzquelle, in `state/source-registry.md` referenziert).
-2. Deklarierter Project Data Space (extern, projektspezifisch — Foundation enthaelt nur Manifeste).
-3. Verifiziertes normalisiertes Markdown (`verification_status: verified`).
-4. `state/source-registry.md` und `state/artifact-index.md`.
-5. Verifizierte `.md`-Knowledge-Notes und Research-Reports.
-
-Ein optionales RAG-System ist niemals Source of Truth.
+MIT — siehe [`LICENSE`](LICENSE). Patterns sind aus oeffentlichen OSS-Ideen nachgebaut; kein
+Upstream-Code oder -Prosa wurde kopiert ([`NOTICE`](NOTICE)).

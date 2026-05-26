@@ -1,0 +1,57 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "uaw-harness"
+version = "3.0.0"
+description = "Runnable reference implementations of agent-engineering patterns — the executable layer of the universal-ai-workspace-foundation."
+readme = "install-harness.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Luis Hornburg" }]
+keywords = ["agents", "llm", "claude", "evals", "guardrails", "observability", "orchestration", "memory", "hitl"]
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Intended Audience :: Developers",
+]
+dependencies = []  # stdlib-first: a bare install pulls in zero third-party wheels.
+
+[project.optional-dependencies]
+yaml = ["pyyaml>=6"]
+vector = ["numpy>=1.24"]
+llm = ["anthropic>=0.40"]
+test = ["pytest>=8", "pyyaml>=6"]
+lint = ["ruff>=0.5"]
+types = ["mypy>=1.8"]
+dev = ["pytest>=8", "pyyaml>=6", "ruff>=0.5", "mypy>=1.8"]
+all = ["pyyaml>=6", "numpy>=1.24", "anthropic>=0.40", "pytest>=8", "ruff>=0.5", "mypy>=1.8"]
+
+[project.urls]
+Homepage = "https://github.com/Luis247911/universal-ai-workspace-foundation"
+
+[project.scripts]
+uaw-eval = "harness.eval.__main__:main"
+uaw-guardrails = "harness.guardrails.__main__:main"
+uaw-hitl = "harness.hitl.__main__:main"
+uaw-memory = "harness.memory.__main__:main"
+uaw-obs = "harness.observability.__main__:main"
+uaw-orchestrator = "harness.orchestrator.__main__:main"
+uaw-router = "harness.router.__main__:main"
+uaw-skills = "harness.skills.__main__:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/harness"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]

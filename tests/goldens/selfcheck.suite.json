@@ -1,0 +1,11 @@
+{
+  "suite": "selfcheck",
+  "threshold": 0.5,
+  "cases": [
+    {
+      "id": "trivially-true",
+      "input": { "kind": "inline", "output": "ok" },
+      "assertions": [{ "type": "contains", "value": "ok" }]
+    }
+  ]
+}

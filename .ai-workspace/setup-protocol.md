@@ -47,6 +47,11 @@ Diese vier Fragen werden im Setup beantwortet. Die Antworten landen in `state/de
 Bevor irgendein neues Verzeichnis oder eine neue Datei ausserhalb bestehender Mount-Points angelegt wird, durchlaufe diese Reihenfolge:
 
 ```text
+Frage 0: Ist es lauffaehiger, tool-nativer Harness-Code (Skill, Hook, Command,
+         Agent-Definition) oder Engine-Code/Tests?
+         -> Skill/Hook/Command/Agent: nach .claude/ (z.B. .claude/skills/<slug>/). Stop.
+         -> Engine/Tests/Beispiele: nach src/ , tests/ , examples/ (Infra-Allowlist). Stop.
+         -> NUR wenn das Repo den Harness mitliefert; sonst gehoert Code in einen Adapter.
 Frage 1: Gehoert das nach state/?              -> Ja: dorthin. Stop.
 Frage 2: Gehoert das nach adapters/<slug>/?    -> Ja: dort einbauen. Stop.
 Frage 3: Gehoert das nach research/?           -> Ja: dorthin. Stop.
@@ -69,11 +74,15 @@ Diese Verzeichnisnamen duerfen nicht als Foundation-Top-Level-Ordner entstehen:
 
 Falls solche Konzepte trotzdem noetig sind: gehoeren in `adapters/<slug>/` als Substruktur, nicht als Projekt-Top-Level-Ordner.
 
+**Ausnahme bei mitgeliefertem Harness.** Wenn das Repo die lauffaehige Harness-Schicht enthaelt (siehe `AGENTS.md` §2.5), sind genau diese Top-Level-Eintraege erlaubt: `.claude/` (Execution-Mount; `skills/`, `hooks/`, `commands/`, `agents/` leben *darunter*, nie nackt im Root) sowie die Infra-Allowlist `src/`, `tests/`, `examples/`, `sources/`, `.github/`, `pyproject.toml`. Alle anderen Namen oben bleiben verboten. `harness/` bleibt als *nackter* Top-Level-Name verboten — die Engine lebt unter `src/harness/`.
+
 ## 5. Anti-Parallelstruktur-Pflichtregel
 
 > **Erstelle kein zweites Workspace-System.**
 >
-> Wenn der Drang aufkommt, einen neuen Top-Level-Ordner anzulegen, ist der Drang ein Signal, zuerst zu fragen — niemals zuerst zu erstellen. Bevor ein neuer Top-Level-Ordner ausserhalb der Foundation-Mount-Points entsteht, muss explizit beim User angefragt werden. Die Begruendung wird in `state/decisions.md` festgehalten.
+> Wenn der Drang aufkommt, einen neuen Top-Level-Ordner anzulegen, ist der Drang ein Signal, zuerst zu fragen — niemals zuerst zu erstellen. Bevor ein neuer Top-Level-Ordner ausserhalb der Foundation-Mount-Points (inkl. der Harness-Ausnahme in §4) entsteht, muss explizit beim User angefragt werden. Die Begruendung wird in `state/decisions.md` festgehalten.
+>
+> Die Regel zielt auf **Workspace-Content-Sprawl** innerhalb `.ai-workspace/`. Sie verbietet nicht das normale Scaffolding eines Python-Pakets, wenn der Harness Teil des Repos ist.
 
 ## 6. First-Session-Setup-Summary-Format
 

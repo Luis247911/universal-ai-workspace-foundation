@@ -1,0 +1,17 @@
+{
+  "//": "Copy this file to .claude/settings.local.json for your personal, machine-local overrides. The real settings.local.json is gitignored and must NEVER contain secrets — put API keys in the environment (e.g. ANTHROPIC_API_KEY), not here. Keys set here merge over and take precedence above .claude/settings.json.",
+  "//permissions": "Example: pre-allow the offline harness commands you trust locally so you are not re-prompted. These are safe, read-only/deterministic mock-mode invocations.",
+  "permissions": {
+    "allow": [
+      "Bash(python -m harness.eval run:*)",
+      "Bash(python -m harness.skills lint:*)",
+      "Bash(python -m harness.skills audit:*)",
+      "Bash(python -m pytest:*)",
+      "Bash(python -m ruff check:*)"
+    ]
+  },
+  "//env": "Example: opt into live LLM calls locally. Requires the [llm] extra and ANTHROPIC_API_KEY in your environment. Leave unset to stay in deterministic mock mode.",
+  "env": {
+    "UAW_LLM": "mock"
+  }
+}

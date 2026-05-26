@@ -1,0 +1,40 @@
+# Active .claudeignore for the foundation repo itself.
+# Derived from .ai-workspace/templates/claudeignore-template.md, three-header structure.
+# NEVER ignore all of .ai-workspace/ — the boot files and state/ must stay readable.
+# Do NOT ignore src/ or .claude/skills/ — the harness layer must stay readable so
+# Claude can run, lint, and edit it.
+
+# === 1. SECRETS (always ignore, non-negotiable) ===
+.env
+.env.*
+*.key
+*.pem
+*.pfx
+*.p12
+secrets/
+credentials/
+**/password*
+**/api-key*
+**/auth-token*
+.claude/settings.local.json
+
+# === 2. PRIVACY / PII (project-specific; add via adapter) ===
+# Foundation default ships no PII patterns from real projects.
+# Adapters working with sensitive content add patterns here.
+
+# === 3. TOKEN-SAVING (foundation default) ===
+.ai-workspace/scratch/
+.ai-workspace/archive/
+.ai-workspace/research/_raw/
+.ai-workspace/adapters/*/private/
+# Harness build/run noise — code stays readable, only generated bulk is hidden:
+__pycache__/
+*.egg-info/
+.venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.uaw-runs/
+
+# === 4. DO NOT ignore the rest of .ai-workspace/ or the harness ===
+# The four boot files, state/, src/harness/, and .claude/skills/ must remain visible.

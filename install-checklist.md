@@ -14,8 +14,16 @@ Diese Checkliste ist fuer den Menschen gedacht, der die Foundation kopiert und e
 - [ ] Verzeichnisstruktur:
   - `AGENTS.md`, `CLAUDE.md`, `README.md`, `install-checklist.md` im Root.
   - `.ai-workspace/` mit Subdirektoren `state/`, `templates/`, `knowledge/`, `data-space/`, `research/`, `deliverables/`, `scratch/`, `archive/`, `adapters/`.
-  - Alle Dateien innerhalb `.ai-workspace/` haben `.md`-Endung.
-- [ ] Keine Datei mit Endung `.json`, `.yaml`, `.yml`, `.txt`, `.template`, `.sh`, `.ps1`, `.py`, `.js`, `.ts`, `.exe` aus dem Foundation-Tree mitgenommen.
+  - **Alle Dateien innerhalb `.ai-workspace/` haben `.md`-Endung** (die Governance-Schicht ist markdown-only — diese Regel ist unveraendert strikt).
+- [ ] Keine Nicht-Markdown-Datei (`.json`, `.yaml`, `.py`, `.sh`, ...) **innerhalb `.ai-workspace/`**. Solche Dateien gehoeren nie in die Governance-Schicht.
+
+### Optional: die lauffaehige Harness-Schicht
+
+Dieses Repo kann die Execution-Schicht mitliefern (siehe `AGENTS.md` §2.5): `.claude/` (Skills/Hooks/Commands), die Engine `src/harness/`, `tests/`, `examples/`, `pyproject.toml`, `.github/`. Das ist **echter Code** und damit bewusst **nicht** markdown-only.
+
+- [ ] Entscheide, ob das neue Projekt den Harness mitnimmt. Reine Governance-Nutzung (nur `.ai-workspace/`) ist weiterhin moeglich.
+- [ ] Falls ja: die Harness-Schicht als Einheit kopieren und gemaess `install-harness.md` installieren (`pip install -e .` zieht null Third-Party-Wheels; Extras sind opt-in).
+- [ ] Falls nein: nur `.ai-workspace/` + die Root-Governance-Dateien kopieren — die o.g. Markdown-only-Pruefung gilt dann fuer das gesamte kopierte Set.
 
 ## Initiale Befuellung
 
@@ -83,9 +91,9 @@ Diese Checkliste ist fuer den Menschen gedacht, der die Foundation kopiert und e
 
 - [ ] `AGENTS.md` und `CLAUDE.md` als Boot-Dateien vorhanden.
 - [ ] `state/project-index.md` und `state/current-session.md` befuellt.
-- [ ] Keine Parallelstruktur ausserhalb der Foundation-Mount-Points entstanden.
-- [ ] Alle Foundation-Dateien haben `.md`-Endung.
-- [ ] Keine Originalbinaerdateien im Foundation-Tree (Originale leben extern oder im deklarierten Project Data Space).
-- [ ] Keine Secrets im Foundation-Tree.
+- [ ] Keine Parallelstruktur ausserhalb der Foundation-Mount-Points entstanden (Harness-Ausnahme `.claude/` + Infra-Allowlist siehe `setup-protocol.md` §4).
+- [ ] Alle Dateien innerhalb `.ai-workspace/` haben `.md`-Endung (Governance-Schicht markdown-only).
+- [ ] Keine Originalbinaerdateien im `.ai-workspace/`-Tree (Originale leben extern oder im deklarierten Project Data Space).
+- [ ] Keine Secrets im gesamten Tree (auch nicht in `.claude/` oder `src/`).
 
 Setup abgeschlossen, sobald alle Boxen oben angekreuzt sind. Naechste reale Arbeitssession kann starten und mit dem Boot-Order aus `AGENTS.md` beginnen.

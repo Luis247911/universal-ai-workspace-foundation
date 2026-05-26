@@ -13,9 +13,9 @@ Definiert die sechs Lifecycle-Zonen, Naming-Konventionen, Promotion-Pfade, Reten
 | Knowledge | `knowledge/` | durable, KG-verbunden | keine; Stale-Trigger nach 180 Tagen | nicht promoted; updated; bei Veraltung nach `archive/` |
 | Data-Space | `data-space/` | durable Manifest, Pointer auf externe Originale | keine; Stale-Trigger nach 180 Tagen | bei Deaktivierung `archive/` |
 
-## 2. Markdown-only im Foundation-Tree
+## 2. Markdown-only in der Governance-Schicht
 
-Alle Foundation-Dateien sind `.md`. Keine Pflichtstruktur `_generated/`. Keine Binaer-Speicherbereiche. Wenn ein Projekt Nicht-Markdown-Outputs als finalen Kunden-Export benoetigt (PDF/PPTX/DOCX/XLSX), gilt:
+Alle Dateien der Governance-Schicht (`.ai-workspace/**`) sind `.md`. Keine Pflichtstruktur `_generated/`. Keine Binaer-Speicherbereiche. (Die optionale Harness-Schicht ist Code und ausgenommen — siehe §10.) Wenn ein Projekt Nicht-Markdown-Outputs als finalen Kunden-Export benoetigt (PDF/PPTX/DOCX/XLSX), gilt:
 
 1. Die kanonische Arbeitsversion bleibt `.md`.
 2. Der Export wird nur in `state/artifact-index.md` referenziert.
@@ -86,6 +86,14 @@ Original Binary
 ## 9. Foundation-Self-Limit
 
 Foundation-Core-Dateien werden nur ueber `setup-protocol.md` oder einen explizit dokumentierten Foundation-Update-Prozess modifiziert. Aenderungen am Core ausserhalb dieses Pfads sind verboten — Adapter sind der richtige Ort fuer Erweiterungen.
+
+## 10. Harness-Schicht: Code-Lifecycle statt Markdown-Zonen
+
+Die Execution-Schicht (`AGENTS.md` §2.5) folgt **nicht** den sechs Markdown-Zonen (§1) — sie ist Code und folgt dem Code-Lifecycle:
+
+- `src/harness/**`, `.claude/skills/**`, `tests/**`, `examples/**`, `pyproject.toml` werden ueber Versionskontrolle, Review, CI und SemVer gepflegt (siehe `skills-authoring-policy.md`, `quality-gates.md` §11). Sie sind **keine** `.md`-Workspace-Artefakte und unterliegen nicht der Markdown-only-Regel (§2), die weiterhin strikt fuer `.ai-workspace/**` gilt.
+- **Skill-Outputs** dagegen folgen sehr wohl dem Zonen-Lifecycle: Run-Artefakte der Engine liegen in `./.uaw-runs/<run-id>/` (ephemer, gitignored), inhaltliche Vorschlaege landen in `scratch/`/`research/` als untrusted und werden nur via Hauptsession + Quality-Gates promoted (State-Write-Contract, `skills-authoring-policy.md` §6).
+- Aenderungen an der Harness-Schicht sind ein legitimer **Foundation-Update-Prozess** im Sinne von §9 — versioniert, getestet, dokumentiert (z.B. `CHANGELOG.md`).
 
 ## Cross-Links
 

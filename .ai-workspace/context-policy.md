@@ -28,6 +28,7 @@ Diese Datei definiert pro Pfad die Lade-Regel. Ziel: kleiner stabiler Kontext be
 | `security-policy.md` | Load on Relevance | Bei Security-Frage; ueberlagert sonst alles. |
 | `delegation-policy.md` | Load on Relevance | Bei Subagent-Spawn, Maintenance-Routine, externer Analyse. |
 | `adapter-policy.md` | Load on Relevance | Bei Adapter-Aktivierung/Deaktivierung. |
+| `skills-authoring-policy.md` | Load on Relevance | Beim Schreiben/Editieren eines Skills. |
 | `quality-gates.md` | Load on Relevance | Bei Promotion-Entscheidungen. |
 | `knowledge-graph-policy.md` | Load on Relevance | Bei KG-Aktion oder Document-Normalization. |
 | `state/open-questions.md` | Load on Relevance | Bei offener Frage oder Resume. |
@@ -50,6 +51,8 @@ Diese Datei definiert pro Pfad die Lade-Regel. Ziel: kleiner stabiler Kontext be
 | `adapters/<inaktiv>/**` | Never Auto-Load | Inaktive Adapter werden ignoriert. |
 | Quellen mit `do_not_load: true` in `state/source-registry.md` | Never Auto-Load | Direktive blockiert Auto-Inject. |
 | Original-Binaerdateien | Never Auto-Load | Werden nie automatisch geladen — Document-Normalization-Pipeline siehe `knowledge-graph-policy.md`. |
+| `.claude/**` (Skills, Hooks, Commands, Agents) | Never Auto-Load | Tool-nativer Execution-Mount. Claude Code laedt einen Skill ueber sein eigenes Trigger-/Description-Mechanik bei Bedarf — **nicht** in den 4-File-Boot-Context. |
+| `src/**`, `tests/**`, `examples/**`, `sources/**`, `.github/**`, `pyproject.toml` | Never Auto-Load / On Explicit Request | Harness-Engine + Infra. Bei Code-Arbeit gezielt lesen, nie automatisch in den Governance-Boot-Context. |
 
 ## 3. KG-Navigations-Regel
 
@@ -83,6 +86,14 @@ Wenn ein Adapter ein RAG-System anbindet:
 ## 7. Lazy-Load-Default
 
 Alles, was nicht in "Always Load" steht, ist Lazy-Load. Beim Session-Start werden ausschliesslich die vier Boot-Dateien wahrgenommen. Alles weitere wird ueber explizite Pfad-Referenzen oder ueber den Workflow erschlossen.
+
+## 8. Harness-Schicht-Lade-Regel (Boot-Context schlank halten)
+
+Die Execution-Schicht (`AGENTS.md` §2.5) bleibt **ausserhalb** des automatischen Boot-Contexts — das ist eine harte Invariante, kein Komfort:
+
+- Die 12+ Skills, ihre `reference.md`/`evaluate.md`, die Hooks und die Engine unter `src/harness/` werden **nie** zusammen geladen. Claude Code aktiviert einen Skill anhand seiner `description` bei Bedarf; die Engine wird nur gelesen, wenn an ihr gearbeitet wird.
+- So bleibt der Start-Context auf die vier Boot-Dateien begrenzt, egal wie gross die Harness-Schicht waechst. Ein Skill-Body ist per Vertrag < 500 Zeilen (`skills-authoring-policy.md` §2), damit eine Aktivierung den Context nicht sprengt.
+- Niemals den gesamten `.claude/skills/`-Baum "zur Sicherheit" vorladen — das ist das Gegenstueck zur "Knowledge-Graph nicht blind laden"-Regel (§3).
 
 ## Cross-Links
 

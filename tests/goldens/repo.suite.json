@@ -1,0 +1,78 @@
+{
+  "suite": "repo-invariants",
+  "threshold": 0.9,
+  "cases": [
+    {
+      "id": "pyproject-declares-package",
+      "input": { "kind": "file", "path": "pyproject.toml" },
+      "assertions": [{ "type": "regex", "pattern": "name\\s*=\\s*\"uaw-harness\"" }]
+    },
+    {
+      "id": "pyproject-has-zero-runtime-deps",
+      "input": { "kind": "file", "path": "pyproject.toml" },
+      "assertions": [{ "type": "regex", "pattern": "dependencies\\s*=\\s*\\[\\]" }]
+    },
+    {
+      "id": "agents-contract-present",
+      "input": { "kind": "file", "path": "AGENTS.md" },
+      "assertions": [{ "type": "regex", "pattern": "Mount-Point" }]
+    },
+    {
+      "id": "agents-declares-harness-carveout",
+      "input": { "kind": "file", "path": "AGENTS.md" },
+      "assertions": [
+        { "type": "regex", "pattern": "Zwei-Schichten" },
+        { "type": "contains", "value": ".claude/" }
+      ]
+    },
+    {
+      "id": "skills-authoring-policy-exists",
+      "input": { "kind": "file", "path": ".ai-workspace/skills-authoring-policy.md" },
+      "assertions": [{ "type": "contains", "value": "State-Write-Contract" }]
+    },
+    {
+      "id": "install-harness-doc-exists",
+      "input": { "kind": "file", "path": "install-harness.md" },
+      "assertions": [{ "type": "regex", "pattern": "harness" }]
+    },
+    {
+      "id": "readme-repositioned-to-harness",
+      "input": { "kind": "file", "path": "README.md" },
+      "assertions": [
+        { "type": "contains", "value": "Zwei-Schichten-Modell" },
+        { "type": "contains", "value": "Upgrade von v2.0" }
+      ]
+    },
+    {
+      "id": "notice-attributes-sources",
+      "input": { "kind": "file", "path": "NOTICE" },
+      "assertions": [
+        { "type": "contains", "value": "Attribution" },
+        { "type": "contains", "value": "No upstream code or prose was copied" }
+      ]
+    },
+    {
+      "id": "credits-disclaims-code-copy",
+      "input": { "kind": "file", "path": "sources/credits.md" },
+      "assertions": [
+        { "type": "contains", "value": "vendor, fork, or copy any upstream code or prose" }
+      ]
+    },
+    {
+      "id": "changelog-documents-v3",
+      "input": { "kind": "file", "path": "CHANGELOG.md" },
+      "assertions": [
+        { "type": "contains", "value": "[3.0.0]" },
+        { "type": "contains", "value": "Migration from v2.0" }
+      ]
+    },
+    {
+      "id": "eval-cli-runs",
+      "input": {
+        "kind": "cmd",
+        "run": ["python", "-m", "harness.eval", "run", "--suite", "tests/goldens/selfcheck.suite.json", "--quiet"]
+      },
+      "assertions": [{ "type": "exact", "value": "" }]
+    }
+  ]
+}

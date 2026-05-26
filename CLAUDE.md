@@ -11,9 +11,18 @@ Sie enthaelt nur Claude-spezifische Hinweise. Operative Regeln, Boot-Order, Anti
 - Bei Subagent-Spawn: folge `.ai-workspace/delegation-policy.md`. Outputs sind delegierte Arbeit (untrusted bis verifiziert).
 - Skills/Hooks aus globalen User-Pfaden (z.B. `~/.claude/skills/`, `~/.claude/hooks/`) gelten **nicht** als Projektpolitik. Projektpolitik lebt in `.ai-workspace/` und in registrierten Adaptern.
 
+## Live-Harness in `.claude/`
+
+Dieses Repo liefert die lauffaehige Execution-Schicht mit (siehe `AGENTS.md` §2.5): echte Claude-Code-Skills unter `.claude/skills/<slug>/` (offizielles SKILL.md-Frontmatter) ueber der pip-installierbaren Engine `src/harness/`.
+
+- Skills laden ueber ihre `description` bei Bedarf — **nicht** in den 4-File-Boot-Context (siehe `.ai-workspace/context-policy.md` §8).
+- Einstieg/Triage: der Skill `agent-pattern-selector` mappt ein Problem auf den richtigen Skill.
+- Skills ausfuehren ist erlaubt (versionierter In-Repo-Code, `security-policy.md` §4.5); ihre Outputs bleiben untrusted bis verifiziert.
+- Skills schreiben/editieren: folge `.ai-workspace/skills-authoring-policy.md` und linte mit `python -m harness.skills lint .claude/skills`.
+
 ## Setup-Protokoll bei neuen Projekten
 
-Folge `.ai-workspace/setup-protocol.md`. Bevor irgendetwas ausserhalb der Foundation-Mount-Points entsteht, durchlaufe den Mount-Point-Decision-Tree (Section 6.2 dort).
+Folge `.ai-workspace/setup-protocol.md`. Bevor irgendetwas ausserhalb der Foundation-Mount-Points entsteht, durchlaufe den Mount-Point-Decision-Tree (Section 3 dort) — die neue **Frage 0** routet lauffaehigen Harness-Code nach `.claude/` bzw. `src/`.
 
 ## Context-Lade-Disziplin
 
@@ -54,3 +63,5 @@ Wenn die normalisierte Markdown-Version den `verification_status` `unverified` o
 - Context-Loading: `.ai-workspace/context-policy.md`
 - Session-Lifecycle: `.ai-workspace/session-contract.md`
 - Knowledge-Graph + Normalization + Maintenance: `.ai-workspace/knowledge-graph-policy.md`
+- Harness installieren/ausfuehren: `install-harness.md`
+- Skills schreiben: `.ai-workspace/skills-authoring-policy.md`

@@ -1,0 +1,43 @@
+Universal AI Workspace Foundation
+Copyright (c) 2026 Luis Hornburg
+Licensed under the MIT License (see LICENSE).
+
+================================================================================
+Attribution
+================================================================================
+
+The executable layer of this project (src/harness/ and .claude/skills/)
+reimplements STRUCTURAL IDEAS from public agent-engineering projects, research
+papers, and open standards. No upstream code or prose was copied, vendored, or
+forked, and this project takes no runtime dependency on any of them. Where a
+source is the canonical origin of a NAME (e.g. an OpenTelemetry attribute key),
+only the name is reused, as a string constant for interoperability.
+
+Ideas reimplemented, with attribution (full mapping in sources/credits.md):
+
+  promptfoo                  MIT             eval suite-as-config + threshold gate
+  DeepEval                   Apache-2.0      assertion taxonomy, eval-as-test
+  Guardrails AI              Apache-2.0      validator on_fail-action shape
+  NeMo Guardrails            Apache-2.0      input/output rail separation
+  OpenTelemetry semconv      Apache-2.0      gen_ai.* attribute names (names only)
+  Langfuse                   MIT             span-per-LLM-call tracing model
+  Arize Phoenix              Elastic License 2.0 (source-available, not OSI-open)
+                                             high-level observability concept only
+  LangGraph                  MIT             interrupt()-style HITL pause/resume;
+                                             topology vocabulary
+  HumanLayer                 Apache-2.0      human-approval-as-a-gate
+  LiteLLM                    MIT             router + fallback-chain shape
+  mem0                       Apache-2.0      memory scope dimension
+  Letta / MemGPT             Apache-2.0      memory type dimension
+  AutoGen                    MIT             multi-agent topology vocabulary
+  CrewAI                     MIT             multi-agent topology vocabulary
+  OpenAI Agents SDK          MIT             multi-agent topology vocabulary
+  ReAct (Yao et al., 2022)   arXiv:2210.03629  reason-act-observe loop (concept)
+
+Anthropic concepts (proprietary docs) are referenced by NAME ONLY -- the
+"Building Effective Agents" workflow shape names (prompt-chaining, routing,
+parallelization, orchestrator-workers, evaluator-optimizer) and the Agent Skills
+SKILL.md frontmatter conventions. No Anthropic prose or code was reproduced.
+
+License tags above are stated as of this writing; verify at the source before
+relying on them. They describe the upstream projects, not this project.

@@ -40,7 +40,16 @@
       "input": { "kind": "file", "path": "README.md" },
       "assertions": [
         { "type": "contains", "value": "Zwei-Schichten-Modell" },
-        { "type": "contains", "value": "Upgrade von v2.0" }
+        { "type": "contains", "value": "Upgrade von v2.0" },
+        { "type": "contains", "value": "/onboard" }
+      ]
+    },
+    {
+      "id": "onboard-command-present",
+      "input": { "kind": "file", "path": ".claude/commands/onboard.md" },
+      "assertions": [
+        { "type": "regex", "pattern": "description\\s*:" },
+        { "type": "contains", "value": "Governance + Execution" }
       ]
     },
     {

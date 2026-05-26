@@ -84,7 +84,52 @@ In Claude Code laden die 12 Skills bei Bedarf ueber ihre `description` — **nic
 4-File-Boot-Context. Einstieg/Triage: der Skill `agent-pattern-selector` mappt ein Problem auf den
 richtigen Skill.
 
-## Quickstart — Governance-Schicht (in ein neues Projekt kopieren)
+## Quickstart — Governance-Schicht (in ein Projekt uebernehmen)
+
+Zwei Wege zum selben Ziel — die Governance-Schicht sauber in dein Projekt bringen.
+
+### Variante A (empfohlen): gefuehrtes Onboarding
+
+Besonders fuer ein **bestehendes Projekt** mit eigener Ordnerstruktur, die migriert werden soll.
+
+- **Foundation schon kopiert / `.claude/` vorhanden?** Fuehre in deinem Projekt `/onboard` aus
+  ([`.claude/commands/onboard.md`](.claude/commands/onboard.md)). Der Befehl analysiert deine
+  Struktur, entscheidet mit dir Governance-only vs. +Execution, liefert einen Migrationsplan und
+  wartet auf deine Bestaetigung, bevor er irgendetwas aendert.
+- **Noch nichts installiert? Kalt-Start ohne Klonen:** Oeffne dein Projekt in Claude Code und gib
+  diesen Prompt ein — er liest dieses oeffentliche Repo nur als Referenz, kopiert/installiert nichts:
+
+  ```text
+  Du arbeitest in meinem aktuellen Projekt und sollst pruefen, ob und wie es sich an der
+  Universal AI Workspace Foundation (v3.0) ausrichten laesst.
+
+  Die Foundation hat ZWEI Schichten — wir entscheiden gemeinsam, welche dieses Projekt braucht:
+  - Governance (.ai-workspace/, reines Markdown): Regeln, Zustand, Wissen. Fast immer sinnvoll.
+  - Execution (.claude/ + src/harness/, Python): 12 Claude-Code-Skills ueber einer
+    pip-installierbaren Engine (Evals, Guardrails, Tracing, HITL, Routing, Memory,
+    Orchestrierung). Nur wenn das Projekt sie wirklich nutzt.
+
+  Schritt 1 — Analysiere die vorhandene Projektstruktur (Ordner; wo Notizen/Prompts/Agents/Docs/
+  Wissen/Sessions/Code/Temp liegen; doppelte oder unklare Strukturen).
+  Schritt 2 — Nutze dieses oeffentliche Repo als Referenz (nur lesen, nichts klonen/installieren):
+  https://github.com/Luis247911/universal-ai-workspace-foundation
+  Lies: README.md, AGENTS.md (§2.5, §3), install-checklist.md, install-harness.md (nur falls
+  relevant), .ai-workspace/setup-protocol.md (§3 Frage 0 + §2 vier Setup-Fragen).
+  Schritt 3 — Entscheide MIT MIR: nur Governance, oder auch Execution? Begruende anhand Schritt 1.
+
+  Regeln (nicht verhandelbar): nichts blind uebernehmen; nichts ohne Rueckfrage loeschen; keine
+  neuen Top-Level-Ordner ohne Rueckfrage (Anti-Sprawl — einziger Code-Mount .claude/, sonst
+  src/tests/examples); vorhandene Ordner (agents/prompts/notes/docs/wiki/skills/tasks) sauber
+  migrieren statt Parallelstruktur; erst Plan erklaeren, dann aendern.
+
+  Liefere zuerst (noch nichts anlegen): 1. Analyse. 2. Empfehlung Governance-only vs. +Execution
+  (begruendet). 3. Was uebernehmen. 4. Was nicht. 5. Schrittweiser Migrationsplan (Governance
+  zuerst, Execution optional). 6. Liste neu/geaendert. Warte danach auf meine Bestaetigung.
+  ```
+
+### Variante B: manuell (sechs Schritte)
+
+Fuer einen sauberen Start in einem leeren oder neuen Projektverzeichnis.
 
 1. Lege ein leeres Projektverzeichnis an.
 2. Kopiere den Inhalt dieses Foundation-Tree in das Projektverzeichnis.

@@ -11,18 +11,53 @@ Du nimmst beide Schichten oder nur die Regeln. Die Werkzeuge laufen offline: ohn
 
 ## Schnellstart
 
-Voraussetzung: Python >= 3.10. Empfohlen ist ein virtuelles Environment, damit nichts global installiert wird.
+Zwei Wege - der erste braucht kein Klonen.
 
-```bash
-python -m venv .venv
-. .venv/bin/activate          # Windows: .venv\Scripts\activate
-pip install -e .              # installiert das Paket "uaw-harness", zieht KEINE Fremd-Pakete
-python examples/eval_demo.py  # Offline-Demo eines bewerteten Eval-Gates -> endet mit "PASS" (exit 0)
+### 1. An ein bestehendes Projekt anbinden (der eigentliche Einstieg, kein Klonen)
+
+Öffne dein Projekt in Claude Code und gib diesen Prompt ein. Er liest dieses Repo nur als Referenz, analysiert deine Struktur und schlägt einen Plan vor, bevor er etwas ändert - er installiert oder kopiert nichts:
+
+```text
+Du arbeitest in meinem aktuellen Projekt und sollst prüfen, ob und wie es sich an der
+Universal AI Workspace Foundation (v3.0) ausrichten lässt.
+
+Die Foundation hat ZWEI Schichten - wir entscheiden gemeinsam, welche dieses Projekt braucht:
+- Governance (.ai-workspace/, reines Markdown): Regeln, Zustand, Wissen. Fast immer sinnvoll.
+- Execution (.claude/ + src/harness/, Python): 12 Claude-Code-Skills über einer
+  pip-installierbaren Engine (Evals, Guardrails, Tracing, HITL, Routing, Memory,
+  Orchestrierung). Nur wenn das Projekt sie wirklich nutzt.
+
+Schritt 1 - Analysiere die vorhandene Projektstruktur (Ordner; wo Notizen/Prompts/Agents/Docs/
+Wissen/Sessions/Code/Temp liegen; doppelte oder unklare Strukturen).
+Schritt 2 - Nutze dieses öffentliche Repo als Referenz (nur lesen, nichts klonen/installieren):
+https://github.com/Luis247911/universal-ai-workspace-foundation
+Lies: README.md, AGENTS.md (Paragraph 2.5, 3), install-checklist.md, install-harness.md (nur falls
+relevant), .ai-workspace/setup-protocol.md (Paragraph 3 Frage 0 + Paragraph 2 vier Setup-Fragen).
+Schritt 3 - Entscheide MIT MIR: nur Governance, oder auch Execution? Begründe anhand Schritt 1.
+
+Regeln (nicht verhandelbar): nichts blind übernehmen; nichts ohne Rückfrage löschen; keine
+neuen Top-Level-Ordner ohne Rückfrage (Anti-Sprawl - einziger Code-Mount .claude/, sonst
+src/tests/examples); vorhandene Ordner (agents/prompts/notes/docs/wiki/skills/tasks) sauber
+migrieren statt Parallelstruktur; erst Plan erklären, dann ändern.
+
+Liefere zuerst (noch nichts anlegen): 1. Analyse. 2. Empfehlung Governance-only vs. +Execution
+(begründet). 3. Was übernehmen. 4. Was nicht. 5. Schrittweiser Migrationsplan (Governance
+zuerst, Execution optional). 6. Liste neu/geändert. Warte danach auf meine Bestätigung.
 ```
 
-Aufrufe der Engine laufen über `python -m harness.<bereich>` (CLI-Name `harness`, Paketname `uaw-harness`). Identisch auf Windows, macOS, Linux. Volle Anleitung inkl. Extras und echtem LLM statt Mock: [`install-harness.md`](install-harness.md).
+Hat dein Projekt die Foundation schon (oder ist `.claude/` vorhanden)? Dann führe stattdessen `/onboard` aus.
 
-Nur die Regeln in ein Projekt holen: folge [`install-checklist.md`](install-checklist.md). Hat dein Projekt schon `.claude/`, führe `/onboard` aus; der Befehl analysiert deine Struktur und fragt nach, bevor er etwas ändert.
+### 2. Engine selbst ausprobieren (klonen + installieren)
+
+```bash
+git clone https://github.com/Luis247911/universal-ai-workspace-foundation
+cd universal-ai-workspace-foundation
+python -m venv .venv && . .venv/bin/activate   # Windows: .venv\Scripts\activate
+pip install -e .                               # Paket "uaw-harness", zieht KEINE Fremd-Pakete
+python examples/eval_demo.py                    # Offline-Demo, endet mit "PASS" (exit 0)
+```
+
+Python >= 3.10. Engine-Aufrufe laufen über `python -m harness.<bereich>` (CLI-Name `harness`, Paketname `uaw-harness`), identisch auf Windows, macOS, Linux. Nur die Governance-Regeln manuell in ein bestehendes Projekt holen: [`install-checklist.md`](install-checklist.md). Volle Anleitung inkl. Extras und echtem LLM statt Mock: [`install-harness.md`](install-harness.md).
 
 ## Das Zwei-Schichten-Modell
 
@@ -92,7 +127,7 @@ In Claude Code laden die Skills bei Bedarf über ihre `description`, **nicht** i
 AGENTS.md / CLAUDE.md          Boot-Dateien (tool-neutraler Contract + Claude-Delta)
 README.md / CHANGELOG.md       diese Datei + v2->v3-Migration
 LICENSE / NOTICE               MIT + Attributions-Hinweis
-install-checklist.md           manueller Governance-Copy-Flow (inkl. Onboarding-Prompt)
+install-checklist.md           manueller Governance-Copy-Flow
 install-harness.md             pip install + Demos ausführen
 pyproject.toml                 Paket "uaw-harness", deps=[] (stdlib-first)
 .ai-workspace/                 GOVERNANCE: Markdown-only (Kern unverändert)

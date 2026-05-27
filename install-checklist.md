@@ -2,43 +2,6 @@
 
 Diese Checkliste ist für den Menschen gedacht, der die Foundation kopiert und ein neues Projekt initialisiert. Sie enthält keinen ausführbaren Code. Jeder Schritt wird manuell ausgeführt und bestätigt.
 
-## Geführtes Onboarding mit Claude Code (Alternative)
-
-Statt die Schritte unten manuell abzuarbeiten, kannst du die Foundation auch von Claude Code anbinden lassen. Besonders für ein **bestehendes Projekt** mit eigener Ordnerstruktur.
-
-- **Foundation schon kopiert / `.claude/` vorhanden?** Führe in deinem Projekt `/onboard` aus (`.claude/commands/onboard.md`). Der Befehl analysiert deine Struktur, entscheidet mit dir Governance-only vs. +Execution, liefert einen Migrationsplan und fragt nach, bevor er etwas ändert.
-- **Noch nichts installiert (Kalt-Start ohne Klonen)?** Öffne dein Projekt in Claude Code und gib diesen Prompt ein. Er liest dieses öffentliche Repo nur als Referenz und kopiert/installiert nichts:
-
-```text
-Du arbeitest in meinem aktuellen Projekt und sollst prüfen, ob und wie es sich an der
-Universal AI Workspace Foundation (v3.0) ausrichten lässt.
-
-Die Foundation hat ZWEI Schichten - wir entscheiden gemeinsam, welche dieses Projekt braucht:
-- Governance (.ai-workspace/, reines Markdown): Regeln, Zustand, Wissen. Fast immer sinnvoll.
-- Execution (.claude/ + src/harness/, Python): 12 Claude-Code-Skills über einer
-  pip-installierbaren Engine (Evals, Guardrails, Tracing, HITL, Routing, Memory,
-  Orchestrierung). Nur wenn das Projekt sie wirklich nutzt.
-
-Schritt 1 - Analysiere die vorhandene Projektstruktur (Ordner; wo Notizen/Prompts/Agents/Docs/
-Wissen/Sessions/Code/Temp liegen; doppelte oder unklare Strukturen).
-Schritt 2 - Nutze dieses öffentliche Repo als Referenz (nur lesen, nichts klonen/installieren):
-https://github.com/Luis247911/universal-ai-workspace-foundation
-Lies: README.md, AGENTS.md (Paragraph 2.5, 3), install-checklist.md, install-harness.md (nur falls
-relevant), .ai-workspace/setup-protocol.md (Paragraph 3 Frage 0 + Paragraph 2 vier Setup-Fragen).
-Schritt 3 - Entscheide MIT MIR: nur Governance, oder auch Execution? Begründe anhand Schritt 1.
-
-Regeln (nicht verhandelbar): nichts blind übernehmen; nichts ohne Rückfrage löschen; keine
-neuen Top-Level-Ordner ohne Rückfrage (Anti-Sprawl - einziger Code-Mount .claude/, sonst
-src/tests/examples); vorhandene Ordner (agents/prompts/notes/docs/wiki/skills/tasks) sauber
-migrieren statt Parallelstruktur; erst Plan erklären, dann ändern.
-
-Liefere zuerst (noch nichts anlegen): 1. Analyse. 2. Empfehlung Governance-only vs. +Execution
-(begründet). 3. Was übernehmen. 4. Was nicht. 5. Schrittweiser Migrationsplan (Governance
-zuerst, Execution optional). 6. Liste neu/geändert. Warte danach auf meine Bestätigung.
-```
-
-Die manuelle Variante (für einen sauberen Start in einem leeren Projekt) folgt unten.
-
 ## Pre-Copy-Checks
 
 - [ ] Zielprojektverzeichnis existiert und ist leer oder enthält kein bestehendes `.ai-workspace/`.

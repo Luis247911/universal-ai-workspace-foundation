@@ -7,6 +7,19 @@ bleibt markdown-only und motorlos (siehe `state/decisions.md` D-2026-06-04-01).
 > **Default: AUS.** Frisch geklont feuert nichts. Aktivierung ist opt-in, reversibel und wird
 > durch den Begleiter `/uaw-automation` gefuehrt.
 
+## In einfachen Worten
+
+Dieses Projekt kann dir zwei kleine Helfer einschalten:
+
+- **"Stand wieder laden":** Startest du Claude neu, liest es automatisch die Notiz wieder, woran
+  ihr zuletzt gearbeitet habt. Du musst nichts neu erklaeren.
+- **"Ans Mitschreiben erinnern":** Nach einer Datei-Aenderung stupst es Claude an, die Notiz
+  aktuell zu halten.
+
+Beide sind **aus**, bis du sie einschaltest, **jederzeit umkehrbar**, und sie wirken **nur in
+diesem Projekt**. Am einfachsten steuerst du sie mit dem Begleiter `/uaw-automation` (fuehrt dich
+Schritt fuer Schritt durch). Der Rest dieser Datei ist die technische Referenz.
+
 ## Harte Grenze
 
 Steuert ausschliesslich dieses Repo. Liest/kopiert/veraendert **nie** `~/.claude/` (globale,

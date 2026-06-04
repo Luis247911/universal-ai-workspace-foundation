@@ -63,11 +63,11 @@ Toggle it through the `/uaw-automation` companion, or edit `.claude/automation.f
 { "boot_reload": true, "recitation_nudge": true }
 ```
 
-The hooks are registered in `.claude/settings.json` but **self-gated**: while a flag is `false`
-they exit silently (inert — verified: exit 0, no output). Being committed, they also run in
-web/cloud sessions; the launcher is `python` (use `python3` where that is the only name). They
-touch only this repo, never your global `~/.claude/`. Full operator docs:
-[`.claude/AUTOMATION.md`](.claude/AUTOMATION.md).
+The hooks are registered in `.claude/settings.json` but do nothing while their flag is `false`
+(they exit immediately with no output), so a fresh clone stays silent until you opt in. Being
+committed, they also run in web/cloud sessions; the launcher is `python` (use `python3` where
+that is the only name). They touch only this repo, never your global `~/.claude/`. Full operator
+docs: [`.claude/AUTOMATION.md`](.claude/AUTOMATION.md).
 
 ## Layout
 

@@ -1,70 +1,74 @@
 ---
-description: Companion for this kit's OPT-IN automation layer (boot_reload + recitation_nudge). Shows the current on/off state, explains each capability in plain terms, and turns it on or off on request — always after explicit confirmation, never automatically. Triggers on "/uaw-automation", "kit automation", "activate automation", "enable recitation", "turn on boot reload", "automation status", "disable automation".
+description: Companion for this kit's OPT-IN automation layer (boot_reload + recitation_nudge). Shows the current on/off state, explains each capability in plain everyday terms, and turns it on or off on request — always after explicit confirmation, never automatically. Triggers on "/uaw-automation", "kit automation", "activate automation", "enable recitation", "turn on boot reload", "automation status", "disable automation".
 argument-hint: "[optional: 'status' | 'on' | 'off' | 'boot_reload' | 'recitation_nudge']"
 ---
 
-# /uaw-automation — Begleiter fuer die opt-in Automatik dieses Kits
+# /uaw-automation — dein Begleiter fuer die optionale Automatik
 
-Du fuehrst den User durch die **optionale, repo-eigene** Automatik-Schicht dieses Kits.
-Optionaler Wunsch/Hinweis des Users: $ARGUMENTS
+Du fuehrst den User durch die optionale Automatik dieses Kits. **Nimm an, der User ist Anfaenger.**
+Sprich Alltagssprache, vermeide Fachbegriffe — und wenn du wirklich einen brauchst, erklaere ihn in
+einem Halbsatz. Geh in kleinen Schritten vor. Frag immer erst nach, bevor du etwas aenderst.
 
-## Harte Grenze (bei Aktivierung/Deaktivierung zuerst sagen)
+Optionaler Wunsch des Users: $ARGUMENTS
 
-Diese Automatik steuert **ausschliesslich dieses Repo** (`.claude/` dieses Kits). Sie liest,
-kopiert oder veraendert **niemals** `~/.claude/` — die globale, private Claude-Code-Konfiguration
-des Users (Persona, Infra-Gate, globale Skills/Hooks/Memory). Repo-Automatik und globale
-Konfiguration werden nicht vermischt.
+## Worum es in einem Satz geht (so oder aehnlich sagen)
 
-## Was diese Schicht ist
+"Dieses Projekt kann dir zwei kleine Helfer einschalten, die Claude helfen, den Faden nicht zu
+verlieren. Beide sind **aus**, bis du sie einschaltest, du kannst sie jederzeit wieder ausschalten,
+und sie wirken nur in diesem Projekt."
 
-Zwei unabhaengig schaltbare Faehigkeiten, beide **lokal, modellgetrieben, reversibel**,
-**standardmaessig AUS**. Prinzip ueberall: **der Hook erinnert nur, das Modell schreibt** — kein
-Script faelscht je State-Inhalt.
+## Die zwei Helfer — in Alltagssprache (Nutzen zuerst, Technik nur auf Nachfrage)
 
-- **boot_reload** (`SessionStart`): Liest beim Session-Start `.ai-workspace/state/current-session.md`
-  und speist es als Kontext ein, damit eine neue/fortgesetzte/gecleart/compactete Session sofort
-  mit dem Live-Zustand bootet. Das deterministische, zuverlaessigste Stueck.
-- **recitation_nudge** (`PostToolUse` bei Write/Edit/NotebookEdit): Nach einer Datei-Aenderung ein
-  kurzer Reminder, `current-session.md` fortzuschreiben (aktiver Task + naechster Schritt +
-  Evidenz) gemaess `session-contract.md` §3. Schreibt nichts selbst.
+- **"Stand wieder laden"** (technischer Name: `boot_reload`): Wenn du Claude neu startest oder ein
+  Gespraech neu beginnst, liest Claude automatisch die Notiz wieder, woran ihr zuletzt gearbeitet
+  habt. Du musst es nicht neu erklaeren.
+- **"Ans Mitschreiben erinnern"** (technischer Name: `recitation_nudge`): Nachdem Claude eine Datei
+  geaendert hat, bekommt es einen kleinen Stups: "Hat sich der Stand geaendert? Dann die Notiz
+  aktualisieren." So bleibt die Notiz aktuell.
 
-Vollstaendige Operator-Doku: `.claude/AUTOMATION.md`. Hintergrund-Entscheidung:
-`.ai-workspace/state/decisions.md` (D-2026-06-04-01/-02).
+Sag klar dazu: **Diese Helfer schreiben nichts von allein.** Sie erinnern nur — entscheiden und
+schreiben tut Claude, und am Ende du.
 
-## Ablauf
+## So fuehrst du den User
 
-### 1. Stand zeigen (immer)
+### 1. Zeig den aktuellen Stand (immer, in Klartext)
 
-Lies `.claude/automation.flags.json` und zeige pro Faehigkeit **AN/AUS** in Klartext. Fehlt die
-Datei oder ein Flag, gilt **AUS** (fail-safe).
+Lies `.claude/automation.flags.json` und sag in einfachen Worten, was an und was aus ist, z.B.:
+"Im Moment sind beide Helfer **aus** — es passiert nichts automatisch." Fehlt die Datei oder ein
+Eintrag, gilt **aus**.
 
-### 2. Erklaeren (bei `status`, ohne Argument, oder wenn der User unsicher ist)
+### 2. Frag, was der User moechte (eine Frage nach der anderen)
 
-Erklaere jede Faehigkeit in einem Satz (s.o.) und dass nichts von selbst feuert, solange das
-jeweilige Flag `false` ist — die Hooks sind in `settings.json` zwar registriert, aber self-gated
-und damit inert.
+- "Moechtest du 'Stand wieder laden' einschalten?" (ja / nein)
+- "Moechtest du 'Ans Mitschreiben erinnern' einschalten?" (ja / nein)
+- Oder bloss erklaeren / wieder ausschalten? Bied es ruhig an.
 
-### 3. Umschalten (nur auf ausdruecklichen Wunsch, nach Bestaetigung)
+### 3. Umschalten — erst nach einem klaren Ja
 
-Wenn der User eine Faehigkeit **aktivieren oder deaktivieren** will:
+1. Wiederhol kurz, was du tust ("Ich schalte 'Stand wieder laden' ein."), und warte auf die
+   Bestaetigung. **Schalte nie ungefragt ein.**
+2. Kipp den Schalter per `Edit` in `.claude/automation.flags.json` (nur `false` -> `true`, oder zum
+   Ausschalten `true` -> `false`). Sonst nichts anfassen.
+3. Sag in Alltagssprache, ab wann es wirkt:
+   - "Stand wieder laden" wirkt **ab dem naechsten Start** (neues Gespraech, `/clear` oder Resume).
+   - "Ans Mitschreiben erinnern" wirkt **ab der naechsten Datei-Aenderung**.
+4. Erinnere: "Du kannst das jederzeit wieder ausschalten — einfach nochmal `/uaw-automation`."
 
-1. Nenne die betroffene Faehigkeit und das Ziel (`true`/`false`) und hol eine **explizite
-   Bestaetigung** ein. Aktiviere nie ungefragt.
-2. Setze den Flag per `Edit` in `.claude/automation.flags.json` (nur den einen Boolean kippen).
-3. Sag, **wann es wirkt**: `boot_reload` ab dem naechsten Session-Start (`/clear`, Resume oder
-   neue Session); `recitation_nudge` ab der naechsten Write/Edit/NotebookEdit-Aktion.
-4. Deaktivieren ist derselbe Weg zurueck: Flag auf `false`. Danach sind die Hooks wieder inert.
+### 4. Kurz beruhigen (bei jeder Aenderung)
 
-### 4. Voll-Entfernung (falls gewuenscht)
+- Es betrifft **nur dieses Projekt**.
+- Es ist **jederzeit umkehrbar**.
+- Die globale Claude-Konfiguration auf deinem Rechner (`~/.claude/`) wird **nie** angefasst.
 
-Wer die Schicht ganz herausnehmen will: den `hooks`-Block aus `.claude/settings.json` entfernen,
-`.claude/hooks/boot_reload.py` + `recitation_nudge.py` + `_flags.py` loeschen und
-`.claude/automation.flags.json` entfernen. Das Governance-Markdown (decisions/session-contract/
-adapter-policy) bleibt unberuehrt — es dokumentiert nur, dass die Option existierte.
+### 5. Falls der User alles ganz entfernen will
 
-### 5. Cross-Surface-Hinweis (bei Aktivierung erwaehnen)
+Sag es einfach: "Ich kann die Automatik komplett herausnehmen — dann ist sie weg, nicht nur aus."
+Frag vorher um Bestaetigung. Dann: den `hooks`-Abschnitt aus `.claude/settings.json` loeschen und die
+Dateien `.claude/hooks/boot_reload.py`, `recitation_nudge.py`, `_flags.py` sowie
+`.claude/automation.flags.json` entfernen.
 
-Die Hooks sind committet und laufen darum auch in Web-/Cloud-Sessions. Der Launcher in
-`settings.json` ist `python`; auf manchen Linux-/Web-Umgebungen heisst er `python3` — falls ein
-Hook dort nicht greift, ist das die einzige anzupassende Stelle (in `settings.json` oder pro
-Maschine in `settings.local.json`). Faellt ein Hook aus, ist der Effekt **inert**, nie blockierend.
+## Fuer Neugierige (nur wenn der User mehr wissen will)
+
+Die Schalter stehen in `.claude/automation.flags.json`. Die Helfer sind in `.claude/settings.json`
+eingetragen, tun aber nichts, solange ihr Schalter auf `false` steht. Weil sie zum Projekt gehoeren,
+funktionieren sie auch in Web-/Cloud-Sessions. Alle Details: `.claude/AUTOMATION.md`.

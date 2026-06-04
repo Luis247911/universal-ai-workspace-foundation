@@ -180,12 +180,14 @@ Aufbau, Anpassung und die vollständigen Skripte stehen in [`.ai-workspace/templ
 
 ## Optionale Session-Automatik (opt-in)
 
-Über die git-Hooks hinaus bringt die Execution-Schicht eine **optionale, schaltbare Session-Automatik** mit, **standardmäßig AUS**. Das Kit führt von selbst keinen Code aus; es weist nur auf die Möglichkeit hin, sie zu aktivieren. Zwei Fähigkeiten, beide lokal, modellgetrieben und reversibel (Prinzip: *der Hook erinnert, das Modell schreibt*; kein Script verändert je den State):
+Das Kit kann dir zwei kleine Helfer einschalten. **Standardmäßig sind beide AUS**, und du kannst sie jederzeit wieder ausschalten. Sie wirken nur in diesem Projekt und schreiben nie etwas von allein; sie erinnern Claude nur daran, den Faden zu halten:
 
-- **boot_reload** (`SessionStart`): lädt beim Start `.ai-workspace/state/current-session.md` als Kontext, damit jede neue, fortgesetzte oder compactete Session sofort mit dem Live-Zustand bootet.
-- **recitation_nudge** (`PostToolUse`): erinnert nach einer Datei-Änderung daran, `current-session.md` fortzuschreiben (gemäß `session-contract.md` §3).
+- **„Stand wieder laden"** (`boot_reload`): Startest du Claude neu, liest es automatisch die Notiz wieder, woran ihr zuletzt gearbeitet habt. Du musst nichts neu erklären.
+- **„Ans Mitschreiben erinnern"** (`recitation_nudge`): Nach einer Datei-Änderung bekommt Claude einen kleinen Stups, die Projekt-Notiz (`current-session.md`) aktuell zu halten.
 
-Aktivieren, erklären lassen oder wieder abschalten: alles über den Begleiter `/uaw-automation`, oder direkt über den Toggle `.claude/automation.flags.json` (Default `{ "boot_reload": false, "recitation_nudge": false }`). Die Hooks sind in `.claude/settings.json` registriert, aber **self-gated**: solange ein Flag `false` ist, beenden sie sich ohne jede Ausgabe (inert). Weil sie committet sind, greifen sie auch in Web-/Cloud-Sessions; sie steuern ausschließlich dieses Repo und rühren globale `~/.claude/`-Konfiguration nie an. Vollständige Operator-Doku: [`.claude/AUTOMATION.md`](.claude/AUTOMATION.md).
+Am einfachsten steuerst du sie mit dem Begleiter **`/uaw-automation`**: der zeigt dir den Stand, erklärt alles in Ruhe und schaltet auf Wunsch um (immer erst nach deinem Ja).
+
+**Technischer Hinweis:** Die Helfer sind in `.claude/settings.json` eingetragen, tun aber nichts, solange ihr Schalter in `.claude/automation.flags.json` auf `false` steht (Default `{ "boot_reload": false, "recitation_nudge": false }`). Weil sie zum Projekt gehören, funktionieren sie auch in Web-/Cloud-Sessions; die globale `~/.claude/`-Konfiguration auf deinem Rechner wird nie angefasst. Vollständige Doku: [`.claude/AUTOMATION.md`](.claude/AUTOMATION.md).
 
 ## Upgrade von v2.0
 

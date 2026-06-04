@@ -31,7 +31,23 @@ Konsistent neueste zuerst (oder aelteste zuerst — eine Konvention pro Projekt;
 
 ## Aktive Eintraege
 
-(noch keine)
+- ID: D-2026-06-04-02
+- Datum: 2026-06-04
+- Entscheidung: Eine optionale, repo-committete Session-Automatik-Schicht (boot_reload + recitation_nudge) wird unter `.claude/` ergaenzt -- default AUS, reversibel ueber `.claude/automation.flags.json`, gefuehrt durch den Begleiter `/automation`.
+- Begruendung: Das Kit bleibt eine Vorlage, die nichts by default ausfuehrt; das Onboarding weist aber auf die opt-in Automatik hin. Jeder Hook ist self-gated (Flag false -> sofort inert) und vollstaendig self-contained im Repo. Beruehrt `~/.claude/` (die globale, private Schicht) nie. Setzt D-2026-06-04-01 voraus: der Motor lebt unter `.claude/`, nicht im Governance-Markdown.
+- Status: active
+- Reversibilitaet: reversible
+- Follow-up-Date:
+- Supersedes:
+
+- ID: D-2026-06-04-01
+- Datum: 2026-06-04
+- Entscheidung: Der Governance-Core (`.ai-workspace/`) bleibt eingefroren markdown-only und motorlos; jede ausfuehrbare Automatik lebt ausschliesslich unter `.claude/` bzw. `src/` (gesegnete Execution-Mounts, AGENTS.md §3/§8).
+- Begruendung: Die Trennung von Haltung (Governance/State/Memory als auditierbares Markdown) und Motor (versionierter Execution-Code) haelt den Core tool-agnostisch und die 2-Invarianten-Pytest gruen. Bewusst KEINE selbst-feuernde Routine im Core (security-policy.md §7).
+- Status: active
+- Reversibilitaet: hard-to-reverse
+- Follow-up-Date:
+- Supersedes:
 
 ## Cross-Links
 

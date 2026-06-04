@@ -72,6 +72,24 @@ Die Grenze ist scharf: **Code, der läuft, lebt in `.claude/` und `src/`. Wahrhe
 
 `.ai-workspace/` und `AGENTS.md` bleiben tool-neutral. `.claude/` ist Claude-Code-spezifisch; die Engine `src/harness/` ist tool-unabhängig und auch ohne `.claude/` nutzbar.
 
+## Glossar — die leicht verwechselbaren Begriffe
+
+Eine Referenz, **kein** zweiter Regeltext: jede Zeile zeigt nur, *was* ein Begriff ist und *wo* er geregelt wird. Die vollständige Mount-Point-Map steht in [`.ai-workspace/README.md`](.ai-workspace/README.md).
+
+| Begriff | Was es ist | Wo es lebt | Wo geregelt |
+|---------|-----------|-----------|-------------|
+| **Governance** | Die Schicht, die *persistiert*: Regeln, Zustand, Wissen (Markdown) | `.ai-workspace/` | `AGENTS.md` §2.5 |
+| **Execution** | Die Schicht, die *läuft*: Skills + Engine (Code) | `.claude/` + `src/harness/` | `AGENTS.md` §2.5 |
+| **State** | Operativer kanonischer Projektzustand — das **Gedächtnis dieses Workspaces** | `.ai-workspace/state/` | `protocol.md` §4, `security-policy.md` §11 |
+| **Memory** (Engine) | **Baukasten**, um einem Agenten, den *du baust*, ein Gedächtnis zu geben (Typ × Scope, in-context/archival). **Nicht** `state/` | `src/harness/memory/`, Skill `memory-architect` | `skills-authoring-policy.md` |
+| **Knowledge** | Dauerhaftes, verlinktes Langzeitwissen (`[[wiki-links]]`, MOCs) | `.ai-workspace/knowledge/` | `knowledge-graph-policy.md` |
+| **Data-Space** | Manifest-only: Pointer auf *externe* Originaldaten, nie die Rohdaten selbst | `.ai-workspace/data-space/` | `knowledge-graph-policy.md`, `security-policy.md` §11 |
+| **Source** | Registrierte externe Quelle (Datei/URL/Binär) mit Trust-Level | Eintrag in `state/source-registry.md` | `source-policy.md` |
+| **Artifact** | Erzeugtes Output (Research/Deliverable/Note), getrackt per Index | Eintrag in `state/artifact-index.md` | `file-lifecycle.md` |
+| **Adapter** | Projekt-/domänenspezifische Erweiterung; Core bleibt domain-neutral | `.ai-workspace/adapters/<slug>/` | `adapter-policy.md` |
+| **Skill** | Tool-nativer, lauffähiger Baustein (dünner Wrapper über der Engine) | `.claude/skills/<slug>/` | `skills-authoring-policy.md` |
+| **Delegation** | Jede ausgelagerte Arbeit (Subagent/Task/Routine); Output untrusted bis verifiziert | Vertrag, kein Ordner | `delegation-policy.md` |
+
 ## Was diese Foundation ist
 
 **Execution-Schicht (neu in v3.0):**
@@ -143,6 +161,32 @@ sources/credits.md             jede geliehene Struktur-Idee attribuiert
 
 Die verbotenen Top-Level-Namen (`skills/`, `agents/`, `hooks/`, `harness/`, `mcp/` und weitere) bleiben verboten, mit **zwei begründeten Ausnahmen**: `.claude/` ist der einzige gesegnete Execution-Mount (`.claude/skills/`, nicht nacktes `skills/`), und Standard-Projekt-Infrastruktur (`src/`, `tests/`, `examples/`, `sources/`, `.github/`, `pyproject.toml`) steht auf der Allowlist. Innerhalb `.ai-workspace/` bleibt die Markdown-only-Regel **unverändert** streng. Details: `AGENTS.md` §3.
 
+## Schutz vor versehentlichen Leaks (optionale git-Hooks)
+
+Damit die reine *Nutzung* dieses Kits keine Echtdaten ins Repository trägt, liegen unter `.githooks/` zwei optionale Hooks bereit. Sie sind opt-in und greifen erst nach:
+
+```sh
+git config core.hooksPath .githooks
+chmod +x .githooks/pre-commit .githooks/pre-push   # unixoide Systeme / Git-bash
+```
+
+- **pre-commit** blockt einen Commit, der eine per `.gitignore` ausgeschlossene Datei force-added (`git add -f`), ein Secret-Muster (Provider-Token, PEM-Schlüssel, hartcodierte Zuweisung) oder einen privaten Begriff enthält.
+- **pre-push** wiederholt den Scan als Pre-Release-Check über den gesamten getrackten Baum.
+- Echte Namen (Mandanten, Personen) kommen in die ungetrackte Datei `.private-scan-terms`, eine Zeile pro Begriff, nicht in den Hook-Code. Sie ist über `.gitignore` ausgeschlossen und wird nie committet.
+- Eine bewusste Ausnahme bleibt möglich: `git commit --no-verify` bzw. `git push --no-verify`.
+- Windows: Die Hooks brauchen LF-Zeilenenden; `.gitattributes` erzwingt das, sonst bricht die Shebang.
+
+Aufbau, Anpassung und die vollständigen Skripte stehen in [`.ai-workspace/templates/git-hooks-template.md`](.ai-workspace/templates/git-hooks-template.md).
+
+## Optionale Session-Automatik (opt-in)
+
+Über die git-Hooks hinaus bringt die Execution-Schicht eine **optionale, schaltbare Session-Automatik** mit, **standardmäßig AUS**. Das Kit führt von selbst keinen Code aus; es weist nur auf die Möglichkeit hin, sie zu aktivieren. Zwei Fähigkeiten, beide lokal, modellgetrieben und reversibel (Prinzip: *der Hook erinnert, das Modell schreibt*; kein Script verändert je den State):
+
+- **boot_reload** (`SessionStart`): lädt beim Start `.ai-workspace/state/current-session.md` als Kontext, damit jede neue, fortgesetzte oder compactete Session sofort mit dem Live-Zustand bootet.
+- **recitation_nudge** (`PostToolUse`): erinnert nach einer Datei-Änderung daran, `current-session.md` fortzuschreiben (gemäß `session-contract.md` §3).
+
+Aktivieren, erklären lassen oder wieder abschalten: alles über den Begleiter `/uaw-automation`, oder direkt über den Toggle `.claude/automation.flags.json` (Default `{ "boot_reload": false, "recitation_nudge": false }`). Die Hooks sind in `.claude/settings.json` registriert, aber **self-gated**: solange ein Flag `false` ist, beenden sie sich ohne jede Ausgabe (inert). Weil sie committet sind, greifen sie auch in Web-/Cloud-Sessions; sie steuern ausschließlich dieses Repo und rühren globale `~/.claude/`-Konfiguration nie an. Vollständige Operator-Doku: [`.claude/AUTOMATION.md`](.claude/AUTOMATION.md).
+
 ## Upgrade von v2.0
 
 v2.0 war eine reine Markdown-Kontroll- und Policy-Schicht („kein Agent-Harness, kein Skill-Pack"). v3.0 behält diese Schicht **unverändert in ihrer Rolle** und legt die Execution-Schicht daneben.
@@ -155,6 +199,7 @@ v2.0 war eine reine Markdown-Kontroll- und Policy-Schicht („kein Agent-Harness
 ## Nächste Schritte
 
 - Code ausführen: [`install-harness.md`](install-harness.md).
+- Optionale Session-Automatik (opt-in, default AUS): `/uaw-automation` bzw. [`.claude/AUTOMATION.md`](.claude/AUTOMATION.md).
 - Governance verstehen: `AGENTS.md`, dann `.ai-workspace/README.md` (vollständige Mount-Point-Map).
 - Skills schreiben: `.ai-workspace/skills-authoring-policy.md`.
 - Knowledge-Graph: `.ai-workspace/knowledge-graph-policy.md`.

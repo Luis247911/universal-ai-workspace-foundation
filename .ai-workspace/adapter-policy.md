@@ -83,6 +83,8 @@ Zwei Adapter teilen sich `state/`. Konflikte zwischen Adaptern (z.B. zwei Adapte
 
 **Pflicht-Regel:** Maintenance Routines duerfen ausschliesslich ueber Adapter oder explizite globale User-Konfiguration registriert werden. **Foundation-Core enthaelt keine aktive Routine.**
 
+**Abgrenzung zur opt-in Automatik-Schicht (Execution-Layer).** "Keine aktive Routine" heisst: der Core feuert nichts von selbst. Davon zu unterscheiden ist die optionale, core-mitgelieferte Automatik-Schicht unter `.claude/` (Session-Hooks wie `boot_reload`/`recitation_nudge`, default AUS, opt-in, reversibel ueber `.claude/automation.flags.json`, gefuehrt durch `/automation`). Sie ist **kein Adapter** und **keine Maintenance-Routine** -- sie ist domain-neutrale Core-Execution (vgl. §11) und gehorcht denselben Sicherheits-Defaults: Aktivierung erfordert explizite User-Zustimmung, Deaktivierung ist jederzeit moeglich. Ein Adapter darf diese Schicht **nicht** stillschweigend umverdrahten, als Aktivierungs-Bypass nutzen oder als Abhaengigkeit voraussetzen; bringt ein Adapter eigene Routinen ein, laufen sie ueber die Registrierung in diesem §8, nicht ueber die Core-Automatik.
+
 Ein Adapter, der Routines einbringt:
 
 1. Dokumentiert sie in `adapter.md` Sektion "Maintenance Routines".

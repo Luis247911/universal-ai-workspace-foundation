@@ -42,6 +42,12 @@ Update-Inhalte:
 - Offene Handoffs notiert.
 - Pointer auf relevante `decisions.md`/`open-questions.md`/`knowledge/<topic>/_moc.md` aktualisiert.
 
+### 3.1 Recitation-Rationale (warum laufend fortschreiben)
+
+`current-session.md` ist das Datei-als-Gedaechtnis dieser Foundation. Der Grund fuer die laufende Fortschreibung ist nicht Buchhaltung, sondern Robustheit gegen Kontext-Drift: Ein lang laufender Agent verliert das Ziel aus dem Fokus, und eine Compaction kann Zwischenkontext verwerfen. Wird der Live-State dagegen kontinuierlich frischgehalten und bei jedem Session-Start neu gelesen (Boot-Order §1), ueberlebt er -- nicht weil ein Mechanismus den Compaction-Moment abfaengt, sondern weil der State selbst aktuell ist und beim Boot wieder eingespeist wird.
+
+Diese Fortschreibung ist **modellgetrieben und manuell** (Teil des Boot-/Handoff-Vertrags), nicht an einen laufenden Motor gebunden. Optional kann die Execution-Schicht (`.claude/`, opt-in, default AUS) kurze Reminder einspeisen, die genau an diese Regeln erinnern -- etwa beim Session-Start den Live-State neu laden oder nach einer Datei-Mutation an die Fortschreibung erinnern. Diese Automatik **schreibt nie selbst**; sie erinnert nur, das Modell entscheidet und schreibt. Aktivierung, Mechanik und Reversibilitaet liegen ausschliesslich in der Execution-Schicht (siehe `.claude/AUTOMATION.md` und den Begleiter `/automation`), nicht in diesem Governance-Markdown. Default bleibt: nichts feuert von selbst.
+
 ## 4. Handoff-Procedure
 
 Wenn eine Session bewusst beendet wird mit der Erwartung, dass eine spaetere Session uebernimmt:

@@ -18,5 +18,16 @@
       "Bash(npm install:*)",
       "Bash(npx:*)"
     ]
+  },
+  "hooks": {
+    "SessionStart": [
+      { "matcher": "startup", "hooks": [ { "type": "command", "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/boot_reload.py\"" } ] },
+      { "matcher": "resume",  "hooks": [ { "type": "command", "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/boot_reload.py\"" } ] },
+      { "matcher": "clear",   "hooks": [ { "type": "command", "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/boot_reload.py\"" } ] },
+      { "matcher": "compact", "hooks": [ { "type": "command", "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/boot_reload.py\"" } ] }
+    ],
+    "PostToolUse": [
+      { "matcher": "Write|Edit|NotebookEdit", "hooks": [ { "type": "command", "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/recitation_nudge.py\"" } ] }
+    ]
   }
 }

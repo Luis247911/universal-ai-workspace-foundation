@@ -46,6 +46,29 @@ python -m harness.eval run --suite tests/goldens/repo.suite.json --threshold 0.9
 - `UAW_LLM=live` (needs `[llm]` extra + `ANTHROPIC_API_KEY`): real model calls. LLM-graded
   eval assertions (`llm_rubric`) are **skipped** in mock mode and **scored** when live.
 
+## Optional: session automation (opt-in)
+
+The execution layer also ships an **optional, committed session-automation layer**, **off by
+default**. Nothing fires on a fresh clone; you opt in per capability. Both are local and
+model-driven: *the hook reminds, the model writes* — no script ever mutates state.
+
+- **boot_reload** (`SessionStart`) re-injects `.ai-workspace/state/current-session.md` so a
+  new / resumed / compacted session boots with the live state in view.
+- **recitation_nudge** (`PostToolUse`) nudges you to keep `current-session.md` current after a
+  file edit, per `session-contract.md` section 3.
+
+Toggle it through the `/uaw-automation` companion, or edit `.claude/automation.flags.json`:
+
+```json
+{ "boot_reload": true, "recitation_nudge": true }
+```
+
+The hooks are registered in `.claude/settings.json` but **self-gated**: while a flag is `false`
+they exit silently (inert — verified: exit 0, no output). Being committed, they also run in
+web/cloud sessions; the launcher is `python` (use `python3` where that is the only name). They
+touch only this repo, never your global `~/.claude/`. Full operator docs:
+[`.claude/AUTOMATION.md`](.claude/AUTOMATION.md).
+
 ## Layout
 
 ```

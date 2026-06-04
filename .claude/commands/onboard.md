@@ -20,6 +20,11 @@ Optionaler Hinweis des Users: $ARGUMENTS
 
 Details: `AGENTS.md` §2.5.
 
+> **Optionale Automatik (opt-in, default AUS):** Die Execution-Schicht bringt eine schaltbare
+> Session-Automatik mit (Boot-Reload des Live-States + Recitation-Reminder). Sie ist **kein**
+> Pflicht-Teil des Onboardings. Wer sie spaeter aktivieren oder nur verstehen will, ruft
+> `/uaw-automation` auf — steuert nur dieses Repo, nie globale `~/.claude/`-Konfiguration.
+
 ## Harte Regeln (nicht verhandelbar)
 
 - Nichts blind uebernehmen.

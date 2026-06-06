@@ -22,7 +22,12 @@ import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 HOOKS = REPO_ROOT / ".claude" / "hooks"
-ALL_HOOKS = ["boot_reload.py", "recitation_nudge.py", "first_run_onboarding.py", "daily_maintenance.py"]
+ALL_HOOKS = [
+    "boot_reload.py",
+    "recitation_nudge.py",
+    "first_run_onboarding.py",
+    "daily_maintenance.py",
+]
 
 
 def _run(hook_name: str, project_dir: Path, extra_env: dict[str, str] | None = None):
@@ -41,7 +46,9 @@ def _run(hook_name: str, project_dir: Path, extra_env: dict[str, str] | None = N
     return proc.stdout, proc.returncode
 
 
-def _sandbox(tmp_path: Path, flags: dict, *, placeholders: bool = True, marker: str | None = None) -> Path:
+def _sandbox(
+    tmp_path: Path, flags: dict, *, placeholders: bool = True, marker: str | None = None
+) -> Path:
     """Build a throwaway workspace with the given flags / state for a hook to read."""
     claude = tmp_path / ".claude"
     claude.mkdir(parents=True, exist_ok=True)
@@ -64,7 +71,7 @@ def _assert_single_json(stdout: str) -> dict:
     return payload
 
 
-# --- off-path: every hook is silent + exit 0 when all flags are off --------------------------------
+# --- off-path: every hook is silent + exit 0 when all flags are off ---
 
 @pytest.mark.parametrize("hook", ALL_HOOKS)
 def test_all_hooks_inert_when_flags_off(tmp_path, hook):
@@ -74,7 +81,7 @@ def test_all_hooks_inert_when_flags_off(tmp_path, hook):
     assert stdout == ""
 
 
-# --- first_run_onboarding --------------------------------------------------------------------------
+# --- first_run_onboarding ---
 
 def test_onboarding_fires_on_fresh_workspace(tmp_path):
     ws = _sandbox(tmp_path, flags={"first_run_onboarding": True}, placeholders=True)
@@ -112,7 +119,7 @@ def test_onboarding_inert_with_env_optout(tmp_path):
     assert stdout == ""
 
 
-# --- daily_maintenance -----------------------------------------------------------------------------
+# --- daily_maintenance ---
 
 def test_daily_maintenance_fires_and_writes_marker(tmp_path):
     ws = _sandbox(tmp_path, flags={"daily_maintenance": True})
@@ -125,7 +132,8 @@ def test_daily_maintenance_fires_and_writes_marker(tmp_path):
 
 def test_daily_maintenance_inert_same_day(tmp_path):
     ws = _sandbox(tmp_path, flags={"daily_maintenance": True})
-    (ws / ".claude" / ".daily_maintenance_last").write_text(date.today().isoformat(), encoding="utf-8")
+    marker = ws / ".claude" / ".daily_maintenance_last"
+    marker.write_text(date.today().isoformat(), encoding="utf-8")
     stdout, code = _run("daily_maintenance.py", ws)
     assert code == 0
     assert stdout == ""

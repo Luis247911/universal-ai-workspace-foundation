@@ -20,6 +20,10 @@ credentials/
 # === Local Claude Code overrides (committed: settings.json + *.example) ===
 .claude/settings.local.json
 
+# === Automation run-markers (per-machine, ephemeral; never committed) ===
+.claude/.onboarding-state.json
+.claude/.daily_maintenance_last
+
 # === Python build / packaging ===
 __pycache__/
 *.py[cod]
@@ -59,3 +63,10 @@ desktop.ini
 # === Governance lifecycle (ephemeral / draft zones) ===
 .ai-workspace/scratch/
 .ai-workspace/research/_drafts/
+
+# === Working / scratch docs (local only, never published) ===
+optimierungen-harness.md
+
+# === Kit-Hygiene: ungetrackte Liste echter Klarnamen fuer den Pre-Release-Scan ===
+# Wird von den optionalen .githooks/ gelesen. Enthaelt PII -> nie committen.
+.private-scan-terms

@@ -19,7 +19,7 @@ Zwei Wege - der erste braucht kein Klonen.
 
 ```text
 Du arbeitest in meinem aktuellen Projekt und sollst prüfen, ob und wie es sich an der
-Universal AI Workspace Foundation (v3.0) ausrichten lässt.
+Universal AI Workspace Foundation (v3.1) ausrichten lässt.
 
 Die Foundation hat ZWEI Schichten - wir entscheiden gemeinsam, welche dieses Projekt braucht:
 - Governance (.ai-workspace/, reines Markdown): Regeln, Zustand, Wissen. Fast immer sinnvoll.
@@ -45,7 +45,7 @@ Liefere zuerst (noch nichts anlegen): 1. Analyse. 2. Empfehlung Governance-only 
 zuerst, Execution optional). 6. Liste neu/geändert. Warte danach auf meine Bestätigung.
 ```
 
-Hat dein Projekt die Foundation schon (oder ist `.claude/` vorhanden)? Dann führe stattdessen `/onboard` aus.
+Hast du die Foundation schon im Projekt (geklont, `.claude/` vorhanden)? Dann begrüßt dich beim ersten Öffnen in Claude Code automatisch `/start` — der eine Einstieg, der fragt: bestehendes Projekt (→ Migrationszweig `/onboard`) oder von Null starten? `/start` ist jederzeit auch manuell aufrufbar.
 
 ### 2. Engine selbst ausprobieren (klonen + installieren)
 

@@ -34,7 +34,7 @@ Diese vier Fragen werden im Setup beantwortet. Die Antworten landen in `state/de
 
 ### Frage 3: Maintenance-Routine-Blueprints adoptieren?
 
-- **Ja:** In einem Adapter (`adapters/<slug>/maintenance/<routine-name>.md`) mit `templates/maintenance-routine.md` registrieren. Universelle Blueprints stehen als Auswahl-Hilfe zur Verfuegung (knowledge-graph-lint, knowledge-graph-sync, session-memory-review, source-artifact-hygiene, adapter-lifecycle-review, document-normalization-review, optional session-snapshot-export). Aktivierung erst nach explizitem User-Aktivierungs-Schritt pro Routine.
+- **Ja:** In einem Adapter (`adapters/<slug>/maintenance/<routine-name>.md`) mit `templates/maintenance-routine.md` registrieren. Universelle Blueprints stehen als Auswahl-Hilfe zur Verfuegung (knowledge-graph-lint, knowledge-graph-sync, session-memory-review, source-artifact-hygiene, adapter-lifecycle-review, document-normalization-review, optional session-snapshot-export). Aktivierung erst nach explizitem User-Aktivierungs-Schritt pro Routine. Alternativ steht seit v3.1 die mitgelieferte opt-in Pflege-Routine `daily_maintenance` bereit (Execution-Schicht, default AUS, ueber `/start` oder `/uaw-automation` schaltbar), die diese Blueprints einmal pro Tag anstupst.
 - **Nein:** Verzicht in `decisions.md` festhalten.
 
 ### Frage 4: Externe Binaerinputs erwartet?
@@ -97,6 +97,10 @@ Am Ende der Setup-Session enthaelt `current-session.md`:
 - Data-Space-Status (aktiv/inaktiv, Liste).
 - Document-Normalization-Status (geplant/inaktiv).
 - Resume-Anweisung fuer die naechste Arbeitssession.
+
+## 7. Skalierung: ein Workspace = ein Bounded Context
+
+Ein Workspace entspricht **einem** Bounded Context (einer kohaerenten Domaene oder Aufgabe). Mehrere Agenten teilen sich einen Workspace nur, wenn sie Wissen/State teilen und sich koordinieren muessen; unverbundene Domaenen bekommen je eine **eigene** Foundation-Instanz statt eines gemeinsamen Sammel-Workspaces. Eine gemeinsame Wissensbasis wird per Data-Space-Manifest/Pointer referenziert (`knowledge-graph-policy.md`), nicht kopiert.
 
 ## Cross-Links
 

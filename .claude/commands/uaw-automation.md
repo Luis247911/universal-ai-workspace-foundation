@@ -1,6 +1,6 @@
 ---
-description: Companion for this kit's OPT-IN automation layer (boot_reload + recitation_nudge). Shows the current on/off state, explains each capability in plain everyday terms, and turns it on or off on request — always after explicit confirmation, never automatically. Triggers on "/uaw-automation", "kit automation", "activate automation", "enable recitation", "turn on boot reload", "automation status", "disable automation".
-argument-hint: "[optional: 'status' | 'on' | 'off' | 'boot_reload' | 'recitation_nudge']"
+description: Companion for this kit's OPT-IN automation layer (boot_reload + recitation_nudge + daily_maintenance) and the default-on first-run onboarding. Shows the current on/off state, explains each capability in plain everyday terms, and turns it on or off on request — always after explicit confirmation, never automatically. Triggers on "/uaw-automation", "kit automation", "activate automation", "enable recitation", "turn on boot reload", "daily maintenance", "automation status", "disable automation".
+argument-hint: "[optional: 'status' | 'on' | 'off' | 'boot_reload' | 'recitation_nudge' | 'daily_maintenance' | 'first_run_onboarding']"
 ---
 
 # /uaw-automation — dein Begleiter fuer die optionale Automatik
@@ -17,7 +17,7 @@ Optionaler Wunsch des Users: $ARGUMENTS
 verlieren. Beide sind **aus**, bis du sie einschaltest, du kannst sie jederzeit wieder ausschalten,
 und sie wirken nur in diesem Projekt."
 
-## Die zwei Helfer — in Alltagssprache (Nutzen zuerst, Technik nur auf Nachfrage)
+## Die drei Helfer — in Alltagssprache (Nutzen zuerst, Technik nur auf Nachfrage)
 
 - **"Stand wieder laden"** (technischer Name: `boot_reload`): Wenn du Claude neu startest oder ein
   Gespraech neu beginnst, liest Claude automatisch die Notiz wieder, woran ihr zuletzt gearbeitet
@@ -25,23 +25,35 @@ und sie wirken nur in diesem Projekt."
 - **"Ans Mitschreiben erinnern"** (technischer Name: `recitation_nudge`): Nachdem Claude eine Datei
   geaendert hat, bekommt es einen kleinen Stups: "Hat sich der Stand geaendert? Dann die Notiz
   aktualisieren." So bleibt die Notiz aktuell.
+- **"Taegliche Pflege-Erinnerung"** (technischer Name: `daily_maintenance`): Einmal pro Tag, beim
+  ersten Start, bekommt Claude einen Stups, kurz aufzuraeumen — lose Notizen aus `scratch/`
+  einsortieren, tote Verweise und alte Notizen pruefen. Wichtig: nur eine **Erinnerung**, es wird
+  nie ungefragt geloescht oder verschoben.
 
 Sag klar dazu: **Diese Helfer schreiben nichts von allein.** Sie erinnern nur — entscheiden und
 schreiben tut Claude, und am Ende du.
+
+Davon getrennt gibt es das **Erst-Start-Onboarding** (`first_run_onboarding`, default **AN**): beim
+allerersten Start in einem frischen Projekt begruesst dich Claude und bietet `/start` an. Das ist
+das einzige, was frisch geklont von selbst anspringt; es laeuft genau einmal und laesst sich hier
+ausschalten oder mit `UAW_DISABLE_ONBOARDING` stummschalten.
 
 ## So fuehrst du den User
 
 ### 1. Zeig den aktuellen Stand (immer, in Klartext)
 
 Lies `.claude/automation.flags.json` und sag in einfachen Worten, was an und was aus ist, z.B.:
-"Im Moment sind beide Helfer **aus** — es passiert nichts automatisch." Fehlt die Datei oder ein
-Eintrag, gilt **aus**.
+"Im Moment sind die drei Helfer **aus** — es passiert nichts automatisch; nur das einmalige
+Erst-Start-Onboarding ist standardmaessig an." Fehlt die Datei oder ein Eintrag, gilt fuer die drei
+Helfer **aus** (nur `first_run_onboarding` ist default an).
 
 ### 2. Frag, was der User moechte (eine Frage nach der anderen)
 
 - "Moechtest du 'Stand wieder laden' einschalten?" (ja / nein)
 - "Moechtest du 'Ans Mitschreiben erinnern' einschalten?" (ja / nein)
-- Oder bloss erklaeren / wieder ausschalten? Bied es ruhig an.
+- "Moechtest du 'Taegliche Pflege-Erinnerung' einschalten?" (ja / nein)
+- Oder bloss erklaeren / wieder ausschalten? Bied es ruhig an. (Auch das Erst-Start-Onboarding
+  `first_run_onboarding` laesst sich hier abschalten, falls gewuenscht.)
 
 ### 3. Umschalten — erst nach einem klaren Ja
 

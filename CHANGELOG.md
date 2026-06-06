@@ -4,6 +4,83 @@ All notable changes to this project are documented here. Format based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); this project follows
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.1.0] — 2026-06-06
+
+A first-run onboarding plus an opt-in daily maintenance routine. The governance core
+`.ai-workspace/**` stays Markdown-only and motorless; all new executable code lives in the execution
+layer (`.claude/`). The kit's "default off" promise is deliberately and visibly amended: a single
+one-time onboarding nudge now fires on first start (documented exception, opt-out via flag or
+`UAW_DISABLE_ONBOARDING`).
+
+### Added
+
+- **First-run onboarding** — `first_run_onboarding` SessionStart(startup) hook (default ON) detects a
+  fresh, unconfigured workspace (state placeholders present, no marker) and asks the model to run
+  `/start`. Goes inert via a gitignored marker (`.claude/.onboarding-state.json`) or once the state
+  placeholders are filled. Deletes nothing; opt-out via `UAW_DISABLE_ONBOARDING`.
+- **`/start` command** — a single entry-point "conductor": forks existing-project (delegates to
+  `/onboard`) vs. start-from-scratch (drives `setup-protocol.md` §1–§2) vs. leave-me-alone, then
+  offers the opt-in helpers in plain language. Fills the previously missing interactive greenfield path.
+- **Daily maintenance routine** — `daily_maintenance` SessionStart(startup+resume) hook (opt-in,
+  default OFF) nudges one maintenance pass per local calendar day (file `scratch/`, flag dead
+  `[[wiki-links]]`/stale notes, orphaned artifacts) per the `knowledge-graph-policy.md` §12 blueprints.
+  Suggests only — never auto-applies. Finally gives the long-specified blueprints a trigger.
+- **`tests/test_automation_hooks.py`** — off-path (inert, empty stdout, exit 0) and on-path (exactly
+  one valid `hookSpecificOutput` JSON) checks for every automation hook; guards double-print
+  regressions. Runs in the existing pytest gate.
+
+### Changed
+
+- **`.claude/AUTOMATION.md`** — the "default off / fresh clone fires nothing" line is amended to the
+  documented one-time-onboarding exception; capability table, file list, self-tests, and a run-marker
+  doctrine (a hook may write its own gitignored run-marker, never governance state or config) added.
+- **`/uaw-automation`** — now covers the third helper (`daily_maintenance`) and the default-on
+  onboarding in plain everyday terms.
+- **Governance reconciliation** so the docs no longer contradict themselves: `knowledge-graph-policy.md`
+  §7/§12 ("no active routine" → "an opt-in active maintenance nudge ships in the execution layer"),
+  `file-lifecycle.md` §7 (cadences now have an opt-in trigger), `adapter-policy.md` §8,
+  `setup-protocol.md` §2, `README.md` quickstart (advertises `/start`).
+- **Decisions** — D-2026-06-06-01 (default-on first-run onboarding), D-2026-06-06-02 (opt-in daily
+  maintenance), D-2026-06-06-03 (run-marker doctrine).
+
+### Unchanged (intentionally)
+
+- The governance core `.ai-workspace/**` stays Markdown-only and motorless; the invariant test
+  `tests/test_governance_invariants.py` stays green (all new code is under `.claude/`). No new engine
+  area and no `harness.governance` linter — named as future work (O1/O6).
+
+## [3.0.1] — 2026-05-30
+
+A documentation-clarity pass plus one machine-checked structural invariant. The governance core
+`.ai-workspace/**` keeps its role **and** its content; this release only clarifies wording and adds a
+guard rail. No new engine area, no new CLI, no version reposition.
+
+### Added
+
+- **Glossary** in `README.md` — disambiguates the easily-confused terms (governance, execution,
+  `state` vs. the `memory` engine, knowledge, data-space, source, artifact, adapter, skill,
+  delegation): what each is, where it lives, where it is governed. A pointer/index, not a second copy
+  of any rule.
+- **`tests/test_governance_invariants.py`** — asserts the two purely-mechanical invariants of the
+  governance layer: `.ai-workspace/**` is Markdown-only, and no anti-sprawl-forbidden top-level
+  directory exists under it. Runs inside the existing `pytest` gate — no new CI step, and **not** a
+  shipped maintenance routine (stays within `knowledge-graph-policy.md` §12).
+- **Scaling note** in `setup-protocol.md` (§7) — one workspace = one bounded context; unrelated
+  domains get their own instance; shared knowledge is referenced by pointer, not copied.
+- **State-file-compaction** note in `file-lifecycle.md` (§5) — how to roll up append-growing state
+  files into a dated archive while leaving a pointer index behind.
+
+### Changed
+
+- **`memory-architect` skill** — its Boundaries now state explicitly that it builds memory for an
+  agent you create, **not** the memory of this workspace (that is `.ai-workspace/state/`).
+
+### Unchanged (intentionally)
+
+- No `MAP.md`, no `foundation_version` stamp (rejected: without a sync mechanism it would silently go
+  stale and lie), no `harness.governance` engine area. The `v3.0` strings stay — this is a PATCH, not
+  a repositioning.
+
 ## [3.0.0] — 2026-05-26
 
 v3.0 turns the foundation from a **pure Markdown control/policy layer** into a genuine, runnable
@@ -75,4 +152,6 @@ Two supported paths:
    [`install-harness.md`](install-harness.md) (`pip install -e .` → zero third-party wheels). The
    skills load on demand via their `description`; start triage with `agent-pattern-selector`.
 
+[3.1.0]: https://github.com/Luis247911/universal-ai-workspace-foundation/releases/tag/v3.1.0
+[3.0.1]: https://github.com/Luis247911/universal-ai-workspace-foundation/releases/tag/v3.0.1
 [3.0.0]: https://github.com/Luis247911/universal-ai-workspace-foundation/releases/tag/v3.0.0

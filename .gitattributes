@@ -1,0 +1,4 @@
+# Shell-Hooks und Skripte muessen LF behalten (dieses Repo hat core.autocrlf=true).
+# Sonst macht der Checkout CRLF daraus und zerstoert die Shebang: "#!/bin/sh\r: bad interpreter".
+.githooks/** text eol=lf
+*.sh text eol=lf

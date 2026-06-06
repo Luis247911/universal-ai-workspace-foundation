@@ -5,7 +5,7 @@ argument-hint: "[optional hint, e.g. 'governance only' or a folder to focus on]"
 
 # /onboard — bestehendes Projekt an die Foundation ausrichten
 
-Du richtest das **aktuelle Projekt** an der Universal AI Workspace Foundation (v3.0) aus. Die
+Du richtest das **aktuelle Projekt** an der Universal AI Workspace Foundation (v3.1) aus. Die
 Foundation-Dateien liegen bereits lokal in diesem Repo vor — lies sie mit `Read`/`Glob`/`Grep`,
 **nicht** aus dem Netz.
 

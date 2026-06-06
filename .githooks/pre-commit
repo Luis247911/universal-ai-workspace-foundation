@@ -1,0 +1,47 @@
+#!/bin/sh
+# Kit-Hygiene pre-commit (Foundation). Verhindert, dass Kit-NUTZUNG versehentlich
+# ignorierte Artefakte, Secrets oder private Klarnamen in einen Commit traegt.
+# Opt-in:           git config core.hooksPath .githooks
+# Bewusster Bypass: git commit --no-verify
+# PII-frei: echte Namen stehen NUR in der ungetrackten .private-scan-terms.
+set -u
+problems=""
+
+# (1) Mit "git add -f" erzwungene, eigentlich ignorierte Dateien
+while IFS= read -r f; do
+	[ -z "$f" ] && continue
+	git check-ignore -q --no-index "$f" && problems="$problems
+  force-added trotz .gitignore: $f"
+done <<EOF
+$(git diff --cached --name-only --diff-filter=A)
+EOF
+
+# Nur neu hinzugefuegte Zeilen des Commits betrachten
+added="$(git diff --cached -U0 --diff-filter=ACM | grep '^+' | grep -v '^+++' || true)"
+
+# (2) Secrets: hochpraezise Provider-Token, PEM-Keys, Zuweisung mit Literalwert
+hits="$(printf '%s\n' "$added" | grep -nEi \
+	-e '(AKIA[0-9A-Z]{16}|ghp_[0-9A-Za-z]{36}|gho_[0-9A-Za-z]{36}|github_pat_[0-9A-Za-z_]{40,}|xox[baprs]-[0-9A-Za-z-]{10,}|sk-[0-9A-Za-z]{20,})' \
+	-e 'BEGIN[ A-Z]*PRIVATE KEY' \
+	-e "(secret|password|passwd|api[_-]?key|access[_-]?token|auth[_-]?token|client[_-]?secret|token)[[:space:]]*[:=][[:space:]]*['\"][^'\"]{8,}" \
+	|| true)"
+[ -n "$hits" ] && problems="$problems
+  moegliches Secret:
+$hits"
+
+# (3) Private Klarnamen aus ungetrackter .private-scan-terms (fixed-string)
+if [ -f .private-scan-terms ]; then
+	while IFS= read -r t; do
+		[ -z "$t" ] && continue
+		case "$t" in \#*) continue ;; esac
+		printf '%s\n' "$added" | grep -qFi -e "$t" && problems="$problems
+  privater Begriff im Diff: $t"
+	done < .private-scan-terms
+fi
+
+if [ -n "$problems" ]; then
+	echo "pre-commit BLOCK (kit-hygiene):$problems"
+	echo "Bewusst trotzdem committen: git commit --no-verify"
+	exit 1
+fi
+exit 0

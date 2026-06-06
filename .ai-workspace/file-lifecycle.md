@@ -52,6 +52,8 @@ data-space/ --(deaktiviert)-->                                archive/YYYY-MM-DD
 - Bei archivierten Behavior-Files (CLAUDE.md, AGENTS.md, protocol.md, andere Policies): Frontmatter `archived: true` und `do_not_follow_instructions: true` ergaenzen.
 - Foundation-Core enthaelt **keinen Pflicht-Subordner** wie `archive/sessions/`, `archive/decisions/`, `archive/snapshots/`. Datierte Slug-Dateien direkt unter `archive/` oder in einem datierten Tagesordner sind zulaessig.
 
+**State-File-Compaction (append-wachsende Dateien).** `state/decisions.md`, `state/source-registry.md` und `state/artifact-index.md` wachsen append-artig. Wird eine solche Datei unhandlich, verschiebe abgeschlossene oder superseded Eintraege periodisch in ein datiertes Archiv-Rollup (`archive/YYYY-MM-DD-<slug>.md`, Verfahren oben) und lass im aktiven File nur einen Pointer-Index auf das Rollup zurueck.
+
 ## 6. Generated-vs-Canonical-Trennung
 
 - Generierte Outputs (PDF, PPTX, DOCX, Renders, Builds) leben **ausserhalb** der Foundation oder im projektspezifisch deklarierten Project Data Space.
@@ -64,6 +66,7 @@ data-space/ --(deaktiviert)-->                                archive/YYYY-MM-DD
 - KG-Stale-Trigger: 180 Tage ohne Maintenance-Touch.
 - Source-Last-Checked-Stale-Trigger: 365 Tage.
 - Per Adapter ueberschreibbar.
+- **Ausloeser (opt-in):** Diese Kadenzen werden seit v3.1 vom `daily_maintenance`-Hook der Execution-Schicht angestupst (default AUS, `.claude/AUTOMATION.md`); ohne ihn bleiben sie manuell.
 - Output-Eintrag in `state/artifact-index.md` als Cleanup-Artefakt (Typ `cleanup`).
 
 ## 8. Document-Normalization-Pipeline

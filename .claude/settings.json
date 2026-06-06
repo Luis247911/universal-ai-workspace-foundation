@@ -21,8 +21,15 @@
   },
   "hooks": {
     "SessionStart": [
-      { "matcher": "startup", "hooks": [ { "type": "command", "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/boot_reload.py\"" } ] },
-      { "matcher": "resume",  "hooks": [ { "type": "command", "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/boot_reload.py\"" } ] },
+      { "matcher": "startup", "hooks": [
+        { "type": "command", "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/boot_reload.py\"" },
+        { "type": "command", "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/first_run_onboarding.py\"" },
+        { "type": "command", "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/daily_maintenance.py\"" }
+      ] },
+      { "matcher": "resume", "hooks": [
+        { "type": "command", "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/boot_reload.py\"" },
+        { "type": "command", "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/daily_maintenance.py\"" }
+      ] },
       { "matcher": "clear",   "hooks": [ { "type": "command", "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/boot_reload.py\"" } ] },
       { "matcher": "compact", "hooks": [ { "type": "command", "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/boot_reload.py\"" } ] }
     ],

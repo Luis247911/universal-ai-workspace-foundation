@@ -1,0 +1,37 @@
+#!/bin/sh
+# Kit-Hygiene pre-push (Foundation) = Pre-Release-Scan ueber den GESAMTEN getrackten Baum.
+# Opt-in:           git config core.hooksPath .githooks
+# Bewusster Bypass: git push --no-verify
+# Die Hook-Dateien und das Template enthalten die Muster selbst als Text -> ausgeschlossen.
+set -u
+problems=""
+X1=":!.githooks"
+X2=":!.ai-workspace/templates/git-hooks-template.md"
+
+# (1) Secrets ueber alle getrackten Dateien (git grep sieht nur Getracktes)
+hits="$(git grep -nEi \
+	-e '(AKIA[0-9A-Z]{16}|ghp_[0-9A-Za-z]{36}|gho_[0-9A-Za-z]{36}|github_pat_[0-9A-Za-z_]{40,}|xox[baprs]-[0-9A-Za-z-]{10,}|sk-[0-9A-Za-z]{20,})' \
+	-e 'BEGIN[ A-Z]*PRIVATE KEY' \
+	-e "(secret|password|passwd|api[_-]?key|access[_-]?token|auth[_-]?token|client[_-]?secret|token)[[:space:]]*[:=][[:space:]]*['\"][^'\"]{8,}" \
+	-- "$X1" "$X2" 2>/dev/null || true)"
+[ -n "$hits" ] && problems="$problems
+  moegliches Secret:
+$hits"
+
+# (2) Private Klarnamen aus ungetrackter .private-scan-terms (fixed-string)
+if [ -f .private-scan-terms ]; then
+	while IFS= read -r t; do
+		[ -z "$t" ] && continue
+		case "$t" in \#*) continue ;; esac
+		m="$(git grep -nFi -e "$t" -- "$X1" "$X2" 2>/dev/null || true)"
+		[ -n "$m" ] && problems="$problems
+  privater Begriff getrackt: $t"
+	done < .private-scan-terms
+fi
+
+if [ -n "$problems" ]; then
+	echo "pre-push BLOCK (kit-hygiene, Pre-Release-Scan):$problems"
+	echo "Bewusst trotzdem pushen: git push --no-verify"
+	exit 1
+fi
+exit 0

@@ -45,6 +45,7 @@ The demo walks working memory → promote to archival → vector recall, all in-
 
 ## Boundaries
 
+- This is the toolkit for giving **an agent you build** a memory — **not** the memory of this workspace itself (that lives in `.ai-workspace/state/`; see the glossary in the repo `README.md`).
 - This skill **owns** the type×scope model and the in-context/archival boundary.
 - For *guarding* what gets written (no PII into long-term memory), use [[guardrail-designer]].
 - The backend (pure-python cosine by default, numpy under the `[vector]` extra) is an implementation detail of the `memory` engine.

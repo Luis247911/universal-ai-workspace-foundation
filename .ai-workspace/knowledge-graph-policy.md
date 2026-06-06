@@ -63,7 +63,7 @@ Es muss moeglich sein:
 - Alte Notes nicht automatisch zu loeschen.
 - Aenderungen ueber `templates/cleanup-review.md` und `state/artifact-index.md` nachvollziehbar zu machen.
 
-Die Foundation liefert dafuer **keine aktive Routine**, sondern nur das Pflege-Protokoll und das Maintenance-Routine-Template (siehe Section 11 + `templates/maintenance-routine.md`).
+Die Foundation-Governance-Schicht selbst bleibt **motorlos** und liefert das Pflege-Protokoll + das Maintenance-Routine-Template (siehe Section 11 + `templates/maintenance-routine.md`). Seit v3.1 liegt jedoch eine **optionale aktive Pflege-Routine** (opt-in, default AUS) in der Execution-Schicht (`.claude/`): der `daily_maintenance`-Hook stupst einmal pro Tag einen Pflege-Pass an und schlaegt vor — er mutiert nichts von selbst (Details `.claude/AUTOMATION.md`; Entscheidung D-2026-06-06-02). Der Governance-Core selbst feuert weiterhin nichts.
 
 ## 8. Retrieval-Regel
 
@@ -178,7 +178,7 @@ Verifizierte Normalized Markdown darf als bevorzugte Arbeitsfassung genutzt werd
 
 Eine Maintenance Routine ist ein **optionaler**, projektspezifisch oder global definierter Wartungsprozess, der den Markdown-Knowledge-Graph, die Source Registry, den Artifact Index, Adapter, Lifecycle-Dateien oder Normalized-Documents prueft und Reports erzeugt.
 
-**Foundation-Status:** Foundation enthaelt **keine aktive Maintenance Routine**. Foundation enthaelt:
+**Foundation-Status:** Der Governance-Core (`.ai-workspace/`) enthaelt **keine aktive Maintenance Routine** und bleibt motorlos. Seit v3.1 liefert die Execution-Schicht (`.claude/`) jedoch eine **optionale, opt-in Pflege-Routine** (`daily_maintenance`-Hook, default AUS, nur Vorschlag nie auto-apply, siehe `.claude/AUTOMATION.md` + D-2026-06-06-02), die genau diese Blueprints einmal pro Tag anstupst. Der Core selbst enthaelt:
 
 - Das **Konzept** (diese Sektion).
 - Die **Spezifikations-Vorlage** (`templates/maintenance-routine.md`).

@@ -34,7 +34,13 @@
       { "matcher": "compact", "hooks": [ { "type": "command", "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/boot_reload.py\"" } ] }
     ],
     "PostToolUse": [
-      { "matcher": "Write|Edit|NotebookEdit", "hooks": [ { "type": "command", "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/recitation_nudge.py\"" } ] }
+      { "matcher": "Write|Edit|NotebookEdit", "hooks": [ { "type": "command", "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/recitation_nudge.py\"" } ] },
+      { "matcher": "Write|Edit|NotebookEdit", "hooks": [ { "type": "command", "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/session_state_guard.py\"" } ] },
+      { "matcher": "Read|Grep|Glob|Bash|Task|WebFetch|WebSearch|Write|Edit|NotebookEdit", "hooks": [ { "type": "command", "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/compact_nudge.py\"" } ] },
+      { "matcher": "WebFetch|WebSearch", "hooks": [ { "type": "command", "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/external_content_guard.py\"" } ] }
+    ],
+    "UserPromptSubmit": [
+      { "hooks": [ { "type": "command", "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/prompt_optimizer.py\"" } ] }
     ]
   }
 }

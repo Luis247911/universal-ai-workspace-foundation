@@ -40,6 +40,14 @@ not by more agents. Reach for orchestration and multi-agent topologies last, not
 | "What should the agent remember, and where?" | [[memory-architect]] |
 | "I'm writing/editing a skill" | [[skill-author]] |
 | "Is this third-party skill safe to run?" | [[skill-supply-chain-check]] |
+| "A subagent doesn't know what context it needs" | [[iterative-retrieval]] |
+| "The pipeline misbehaves but each step looks fine" | [[agent-architecture-audit]] |
+| "Fetching web or external content — is it safe?" | [[external-content-security]] |
+| "The request is vague / underspecified" | [[prompt-optimizer]] |
+| "Search for an existing library before building" | [[search-first]] |
+| "Write the test first, then verify the change" | [[tdd-workflow]] / [[verification-loop]] |
+| "Long session, context filling up" | [[strategic-compact]] |
+| "Tune the harness config (hooks, budgets, routing)" | [[harness-optimizer]] |
 
 ## How to use the result
 

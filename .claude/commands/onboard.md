@@ -14,7 +14,7 @@ Optionaler Hinweis des Users: $ARGUMENTS
 ## Die zwei Schichten (Kurzfassung)
 
 - **Governance** (`.ai-workspace/`, reines Markdown): Regeln, Zustand, Wissen. Fast immer sinnvoll.
-- **Execution** (`.claude/` + `src/harness/`, Python): 12 Skills ueber einer pip-installierbaren
+- **Execution** (`.claude/` + `src/harness/`, Python): Skills ueber einer pip-installierbaren
   Engine (Evals, Guardrails, Tracing, HITL, Routing, Memory, Orchestrierung). Nur wenn das Projekt
   sie wirklich nutzt.
 

@@ -33,6 +33,14 @@ Ideas reimplemented, with attribution (full mapping in sources/credits.md):
   CrewAI                     MIT             multi-agent topology vocabulary
   OpenAI Agents SDK          MIT             multi-agent topology vocabulary
   ReAct (Yao et al., 2022)   arXiv:2210.03629  reason-act-observe loop (concept)
+  ECC (affaan-m/ECC)         MIT             pure-pattern skills: iterative-retrieval,
+                                             strategic-compact, search-first,
+                                             agent-architecture-audit, harness-optimizer
+  OWASP Top 10 for LLM Apps  CC BY-SA 4.0    external-content-security threat model (LLM01;
+                                             concept/names only)
+
+The pure-pattern skills verification-loop, tdd-workflow and prompt-optimizer encode general
+software and prompt-engineering practice (no specific upstream source).
 
 Anthropic concepts (proprietary docs) are referenced by NAME ONLY -- the
 "Building Effective Agents" workflow shape names (prompt-chaining, routing,

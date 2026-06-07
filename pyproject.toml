@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "uaw-harness"
-version = "3.1.0"
+version = "3.2.0"
 description = "Runnable reference implementations of agent-engineering patterns — the executable layer of the universal-ai-workspace-foundation."
 readme = "install-harness.md"
 requires-python = ">=3.10"

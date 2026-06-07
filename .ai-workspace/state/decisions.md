@@ -31,6 +31,24 @@ Konsistent neueste zuerst (oder aelteste zuerst — eine Konvention pro Projekt;
 
 ## Aktive Eintraege
 
+- ID: D-2026-06-07-02
+- Datum: 2026-06-07
+- Entscheidung: Vier zusaetzliche opt-in Execution-Hooks unter `.claude/` (default AUS): `prompt_optimizer` (UserPromptSubmit, vage-Prompt-Disambiguierung), `external_content_guard` (PostToolUse WebFetch|WebSearch, Quarantaene-Reminder + optionale gitignored Projekt-Deny-Liste), `compact_nudge` (PostToolUse, periodischer Strategic-Compact-Vorschlag via gitignored Zaehler-Marker), `session_state_guard` (PostToolUse Write|Edit|NotebookEdit, staleness-gegateter, gedrosselter Reminder, `current-session.md` zu sichern). Statisch + additiv in `settings.json` registriert; bestehende Hooks (inkl. `first_run_onboarding` default AN) unveraendert.
+- Begruendung: Ergaenzt die Phase-1-Skills (external-content-security, strategic-compact, prompt-optimizer) um ihre opt-in Durchsetzungs-/Erinnerungs-Schicht. Jeder Hook self-gated (Flag false -> inert), advisory (kein exit 2, kein Governance-State-Write), Marker gemaess D-2026-06-06-03. `session_state_guard` beantwortet "Per-Turn-Reminder nervt" durch Staleness-Gating statt Per-Event-Nudge. Haelt C1/C2 + D-2026-06-04-01.
+- Status: active
+- Reversibilitaet: reversible
+- Follow-up-Date:
+- Supersedes:
+
+- ID: D-2026-06-07-01
+- Datum: 2026-06-07
+- Entscheidung: Durability-Modell von `current-session.md` ist kanonisch die lebende Datei + git-Historie (kein mechanischer Pro-Session-Archiv-Rotations-Kreislauf). Overwrite ist non-destruktiv via git (getrackte Datei); `archive/` bleibt fuer semantische Snapshots. `session-contract.md` §3 / `current-session.md` §5 entsprechend praezisiert. Ein zuverlaessiger End-of-Session-Auto-Write ist nicht machbar (harter Kill feuert keinen Hook; Hook schreibt keinen Governance-State); Absicherung = kontinuierliche Frische (opt-in `session_state_guard`) + Commit-Disziplin.
+- Begruendung: Macht die implizite Design-Entscheidung explizit und beantwortet die wiederkehrende Frage Rotation-vs-Overwrite. git ist bereits die Versionshistorie -> Rotation waere redundant + Churn. Haelt den motorlosen Governance-Core (D-2026-06-04-01); der Reminder lebt in der Execution-Schicht.
+- Status: active
+- Reversibilitaet: reversible
+- Follow-up-Date:
+- Supersedes:
+
 - ID: D-2026-06-06-03
 - Datum: 2026-06-06
 - Entscheidung: Praezisierung der "Hook liest nur"-Doktrin: Execution-Hooks unter `.claude/` duerfen ihren eigenen ephemeren, gitignored Lauf-Marker schreiben (z.B. `.claude/.daily_maintenance_last`; `/start` schreibt `.claude/.onboarding-state.json`). Verboten bleibt das Schreiben nach `.ai-workspace/**` (Governance-State) und nach `automation.flags.json` (Config) ausser durch Modell/Nutzer.

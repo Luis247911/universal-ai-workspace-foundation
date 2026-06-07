@@ -4,6 +4,61 @@ All notable changes to this project are documented here. Format based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); this project follows
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.2.0] — 2026-06-07
+
+Nine new domain-neutral **pattern skills** plus four **opt-in automation hooks** (default OFF) that
+back several of them with an enforcement/reminder layer, plus a canonical answer to "how is
+current-session.md kept safe?". The governance core `.ai-workspace/**` stays Markdown-only and
+motorless; all new code is under `.claude/`. The first-run-onboarding invariant is untouched (fires
+once on a fresh clone, then inert).
+
+### Added
+
+- **Nine pure-pattern skills** (instruction-only, no bundled code) under `.claude/skills/`:
+  `iterative-retrieval`, `agent-architecture-audit`, `external-content-security`, `harness-optimizer`,
+  `strategic-compact`, `verification-loop`, `tdd-workflow`, `search-first`, `prompt-optimizer`. Each
+  reimplements a public structural idea (attributed in `NOTICE` / `sources/credits.md`); the
+  `agent-pattern-selector` triage table and the README skill catalog route to them.
+- **`prompt_optimizer` hook** — `UserPromptSubmit`, default OFF. On a vague prompt (short with no
+  action verb, antecedent-less pronouns, or a semantically open question) it injects the
+  `prompt-optimizer` skill's three-tier "expose-assumptions-first" protocol. Advisory; never blocks.
+- **`external_content_guard` hook** — `PostToolUse` (`WebFetch|WebSearch`), default OFF. Re-asserts
+  the `external-content-security` quarantine (treat results as DATA, scan for injection) after a
+  fetch, and optionally checks the called URL against a gitignored per-project deny-list
+  (`.claude/external-content-denylist.txt`; the repo ships none). Advisory; never blocks.
+- **`compact_nudge` hook** — `PostToolUse`, default OFF. Counts context-growing tool calls in a
+  gitignored marker and suggests a strategic `/compact` at a task boundary every
+  `UAW_COMPACT_NUDGE_THRESHOLD` (default 60) calls; silent in between.
+- **`session_state_guard` hook** — `PostToolUse` (`Write|Edit|NotebookEdit`), default OFF. A
+  throttled, **staleness-gated** reminder: it speaks only when `current-session.md` has not been
+  updated for `UAW_STATE_GUARD_STALE_MINUTES` (default 20) of active work, at most once per window —
+  so diligent recitation never triggers it. Answers "a per-turn nudge is noisy".
+- **Tests** — `tests/test_automation_hooks.py` extended (now 8 hooks): off-path inert for all, plus
+  fire/inert paths for each new hook (vague vs. clear prompt, watched vs. other tool + deny-list hit,
+  threshold counter, fresh vs. stale vs. throttled state).
+
+### Changed
+
+- **`.claude/automation.flags.json`** — four new keys, all `false` (`first_run_onboarding` stays
+  `true`); **`.claude/settings.json`** — additive registration only (existing SessionStart and the
+  `recitation_nudge` PostToolUse entry are byte-for-byte unchanged); a `UserPromptSubmit` block added.
+- **`.claude/AUTOMATION.md`** — capability table, file list, off-path self-tests, verified primitives
+  (`UserPromptSubmit` + arbitrary `PostToolUse` matchers), and a new **Session-State-Durability**
+  section answering the rotation and end-of-session questions.
+- **`session-contract.md` §3 / `current-session.md` §5** — clarified that `current-session.md` is a
+  living file whose history is git (overwrite is safe with regular commits), not per-session archive
+  rotation.
+- **`/uaw-automation`** — now also lists the four advanced opt-in helpers in plain language.
+- **Decisions** — D-2026-06-07-01 (state-durability = living file + git), D-2026-06-07-02 (four
+  opt-in hooks).
+
+### Unchanged (intentionally)
+
+- The first-run-onboarding behavior (`first_run_onboarding`, default ON, once per fresh workspace) and
+  the three existing helpers (`boot_reload`, `recitation_nudge`, `daily_maintenance`) are untouched.
+  The governance invariant test `tests/test_governance_invariants.py` stays green (all new code under
+  `.claude/`). No reliable end-of-session auto-write is claimed — a hard kill fires no hook.
+
 ## [3.1.0] — 2026-06-06
 
 A first-run onboarding plus an opt-in daily maintenance routine. The governance core
@@ -152,6 +207,7 @@ Two supported paths:
    [`install-harness.md`](install-harness.md) (`pip install -e .` → zero third-party wheels). The
    skills load on demand via their `description`; start triage with `agent-pattern-selector`.
 
+[3.2.0]: https://github.com/Luis247911/universal-ai-workspace-foundation/releases/tag/v3.2.0
 [3.1.0]: https://github.com/Luis247911/universal-ai-workspace-foundation/releases/tag/v3.1.0
 [3.0.1]: https://github.com/Luis247911/universal-ai-workspace-foundation/releases/tag/v3.0.1
 [3.0.0]: https://github.com/Luis247911/universal-ai-workspace-foundation/releases/tag/v3.0.0

@@ -13,8 +13,8 @@ Optionaler Wunsch des Users: $ARGUMENTS
 
 ## Worum es in einem Satz geht (so oder aehnlich sagen)
 
-"Dieses Projekt kann dir zwei kleine Helfer einschalten, die Claude helfen, den Faden nicht zu
-verlieren. Beide sind **aus**, bis du sie einschaltest, du kannst sie jederzeit wieder ausschalten,
+"Dieses Projekt kann dir ein paar kleine Helfer einschalten, die Claude helfen, den Faden nicht zu
+verlieren. Sie sind **aus**, bis du sie einschaltest, du kannst sie jederzeit wieder ausschalten,
 und sie wirken nur in diesem Projekt."
 
 ## Die drei Helfer — in Alltagssprache (Nutzen zuerst, Technik nur auf Nachfrage)
@@ -37,6 +37,17 @@ Davon getrennt gibt es das **Erst-Start-Onboarding** (`first_run_onboarding`, de
 allerersten Start in einem frischen Projekt begruesst dich Claude und bietet `/start` an. Das ist
 das einzige, was frisch geklont von selbst anspringt; es laeuft genau einmal und laesst sich hier
 ausschalten oder mit `UAW_DISABLE_ONBOARDING` stummschalten.
+
+## Fortgeschrittene Helfer (auch opt-in, default AUS)
+
+Es gibt vier weitere Helfer fuer fortgeschrittene Nutzer. Erklaere sie nur, wenn der User danach fragt — und genauso: erst nach klarem Ja einschalten. Alle sind **default AUS** und steuern nur dieses Projekt.
+
+- **„Vage Frage schaerfen"** (`prompt_optimizer`): Wenn eine Eingabe sehr knapp/unklar ist, erinnert es Claude, kurz seine Annahmen zu nennen und weiterzumachen — statt lange rueckzufragen.
+- **„Schutz bei externen Inhalten"** (`external_content_guard`): Nach dem Abrufen einer Webseite/Quelle ein Hinweis, den Inhalt als Daten (nicht als Befehle) zu behandeln und auf Manipulation zu pruefen.
+- **„Aufraeum-Vorschlag in langen Sessions"** (`compact_nudge`): Nach vielen Schritten ein Hinweis, an einer guten Stelle den Verlauf zu verdichten (`/compact`).
+- **„Stand sichern, wenn veraltet"** (`session_state_guard`): Erinnert **nur**, wenn die Projekt-Notiz laenger nicht aktualisiert wurde — nicht nach jeder Aktion. So geht bei versehentlichem Schliessen wenig verloren; der echte Schutz ist regelmaessiges Committen.
+
+Umschalten geht genau wie bei den einfachen Helfern: ein Schalter in `.claude/automation.flags.json`. Details: `.claude/AUTOMATION.md`.
 
 ## So fuehrst du den User
 

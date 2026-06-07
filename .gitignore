@@ -23,6 +23,8 @@ credentials/
 # === Automation run-markers (per-machine, ephemeral; never committed) ===
 .claude/.onboarding-state.json
 .claude/.daily_maintenance_last
+.claude/.compact_nudge_state
+.claude/.session_state_guard
 
 # === Python build / packaging ===
 __pycache__/
@@ -70,3 +72,7 @@ optimierungen-harness.md
 # === Kit-Hygiene: ungetrackte Liste echter Klarnamen fuer den Pre-Release-Scan ===
 # Wird von den optionalen .githooks/ gelesen. Enthaelt PII -> nie committen.
 .private-scan-terms
+
+# === Optionale Projekt-Deny-Liste fuer external_content_guard (kann PII enthalten) ===
+# Eine Zeile pro Term; vom opt-in Hook gelesen. Repo liefert keine. Un-ignore nur wenn PII-frei.
+.claude/external-content-denylist.txt

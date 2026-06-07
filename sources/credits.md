@@ -50,6 +50,23 @@ Anthropic's published guidance is proprietary. We reuse **only concept names**, 
   disclosure) inform `skills-authoring-policy.md` and the `skill-author` skill. The schema fields are
   reimplemented; no documentation prose was copied.
 
+## Skills -- structural ideas (pure-pattern, no engine)
+
+Several `.claude/skills/` entries are instruction-only patterns (no bundled code). They reimplement
+public *ideas*; no code or prose was copied.
+
+| Skill | Inspiration | License (verify at source) | Idea borrowed (no code copied) |
+|-------|-------------|----------------------------|--------------------------------|
+| iterative-retrieval | [ECC](https://github.com/affaan-m/ECC) | MIT | dispatch-evaluate-refine retrieval loop for subagent context |
+| strategic-compact | [ECC](https://github.com/affaan-m/ECC) | MIT | manual compaction at task boundaries; survives-compaction model |
+| search-first | [ECC](https://github.com/affaan-m/ECC) | MIT | research-before-build with an adopt/extend/compose/build matrix |
+| agent-architecture-audit | [ECC](https://github.com/affaan-m/ECC) | MIT | layered read-only agent-architecture audit + named failure patterns |
+| harness-optimizer | [ECC](https://github.com/affaan-m/ECC) | MIT | read-only harness-config audit returning reversible deltas |
+| external-content-security | [OWASP Top 10 for LLM Apps](https://owasp.org/www-project-top-10-for-large-language-model-applications/) | CC BY-SA 4.0 (names/concept only) | external-content-as-data + prompt-injection defense vocabulary (LLM01) |
+| verification-loop | general practice | -- | change-test-smoke-iterate discipline |
+| tdd-workflow | TDD (Kent Beck et al.) | -- (community practice) | red-green-refactor test-first loop |
+| prompt-optimizer | general prompt-engineering practice | -- | assumptions-first disambiguation protocol |
+
 ## What we did NOT do
 
 - No `git clone`, no vendored source, no fork of any project above.

@@ -2,5 +2,9 @@
   "first_run_onboarding": true,
   "boot_reload": false,
   "recitation_nudge": false,
-  "daily_maintenance": false
+  "daily_maintenance": false,
+  "prompt_optimizer": false,
+  "external_content_guard": false,
+  "compact_nudge": false,
+  "session_state_guard": false
 }

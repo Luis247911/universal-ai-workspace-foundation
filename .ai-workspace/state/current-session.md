@@ -36,7 +36,7 @@ Diese fuenf Fragen werden bei jedem Resume aktiv geprueft. Wenn die Antworten le
 
 ## 5. Recent Actions (max 10)
 
-Append-only-Liste; aeltere Eintraege werden bei Update gepruned und ggf. in `archive/YYYY-MM-DD-session-snapshot-<slug>.md` archiviert.
+Append-only-Liste; aeltere Eintraege werden bei Update gepruned und ggf. in `archive/YYYY-MM-DD-session-snapshot-<slug>.md` archiviert. Die vollstaendige Versionshistorie dieser Datei liegt ohnehin in git (sie wird ueberschrieben, nicht rotiert) — `archive/` nur fuer bewusste Snapshots. Siehe `session-contract.md` §3 + D-2026-06-07-01.
 
 (noch keine)
 

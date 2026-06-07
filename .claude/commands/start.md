@@ -6,7 +6,7 @@ argument-hint: "[optional: 'existing' | 'fresh' | 'skip']"
 # /start — der eine Einstieg in die Foundation
 
 Du fuehrst einen (oft neuen) Nutzer durch den allerersten Schritt in einem frisch geklonten
-Universal-AI-Workspace-Foundation-Repo (v3.1). **Nimm an, der User ist Anfaenger.** Sprich
+Universal-AI-Workspace-Foundation-Repo (v3.2). **Nimm an, der User ist Anfaenger.** Sprich
 Alltagssprache, kleine Schritte, frag immer erst nach, bevor du etwas anlegst oder aenderst.
 
 Dieser Command ist ein **Dirigent**: er stellt die Weiche und ruft dann die bestehenden Flows auf
@@ -61,6 +61,11 @@ Fuer jedes "ja": kippe das passende Flag in `.claude/automation.flags.json` von 
 (per `Edit`, sonst nichts anfassen). Bestaetige in Alltagssprache und erinnere: *"Betrifft nur
 dieses Projekt, die globale Claude-Konfiguration bleibt unberuehrt; jederzeit aus mit
 `/uaw-automation`."* Wer das nicht will: ueberspringen, Hinweis auf `/uaw-automation` fuer spaeter.
+
+Es gibt zusaetzlich ein paar **fortgeschrittene** Helfer (auch alle aus): z.B. vage Anfragen
+schaerfen, ein Schutz beim Abrufen externer Inhalte, ein Compaction-Vorschlag in langen Sessions und
+ein dezenter Reminder, den Stand zu sichern (nur wenn er veraltet). Erwaehne sie hier nur in einem
+Satz und verweise fuer Details auf `/uaw-automation` — ueberfrachte den Erst-Start nicht damit.
 
 ## Schritt 3 — Abschluss (Onboarding inert stellen)
 

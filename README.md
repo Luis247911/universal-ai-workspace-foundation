@@ -23,7 +23,7 @@ Universal AI Workspace Foundation (v3.1) ausrichten lässt.
 
 Die Foundation hat ZWEI Schichten - wir entscheiden gemeinsam, welche dieses Projekt braucht:
 - Governance (.ai-workspace/, reines Markdown): Regeln, Zustand, Wissen. Fast immer sinnvoll.
-- Execution (.claude/ + src/harness/, Python): 12 Claude-Code-Skills über einer
+- Execution (.claude/ + src/harness/, Python): viele Claude-Code-Skills über einer
   pip-installierbaren Engine (Evals, Guardrails, Tracing, HITL, Routing, Memory,
   Orchestrierung). Nur wenn das Projekt sie wirklich nutzt.
 
@@ -95,7 +95,7 @@ Eine Referenz, **kein** zweiter Regeltext: jede Zeile zeigt nur, *was* ein Begri
 **Execution-Schicht (neu in v3.0):**
 
 - Eine lauffähige Engine `src/harness/` mit acht Bereichen: `eval`, `router`, `hitl`, `guardrails`, `observability`, `memory`, `orchestrator`, `skills`.
-- 12 echte Claude-Code-Skills unter `.claude/skills/<slug>/` mit offiziellem SKILL.md-Frontmatter.
+- Viele echte Claude-Code-Skills unter `.claude/skills/<slug>/` mit offiziellem SKILL.md-Frontmatter — engine-gestützte und reine Pattern-Skills (Katalog weiter unten).
 - **stdlib-first**: ein nacktes `pip install -e .` zieht **null** Third-Party-Wheels.
 - **mock-offline by default** (`UAW_LLM=mock`): ruft ein Skill ein LLM auf, antwortet im Default ein deterministischer Mock, ohne Netz und ohne Key (grüne CI). Echte LLM-Calls sind opt-in (siehe [`install-harness.md`](install-harness.md)).
 - Ein Eval-Gate mit Exit-Code-Semantik (nicht-null unter Schwelle): CI-tauglich, dogfoodet die eigenen Skills.
@@ -120,10 +120,14 @@ Eine Referenz, **kein** zweiter Regeltext: jede Zeile zeigt nur, *was* ein Begri
 - Kein Datenspeicher für sensible Rohdaten.
 - Kein MCP-Default-Bundle. Hooks sind present-but-advisory (opt-in via `.claude/settings.json`).
 
-## Skill-Katalog (12)
+## Skill-Katalog
 
-| Skill | Bereich | Engine-Modul |
-|-------|---------|--------------|
+Skills laden in Claude Code **bei Bedarf** über ihre `description` (nicht in den 4-File-Boot-Context). Einstieg immer über `agent-pattern-selector` — der sagt dir in einem Satz, welcher Skill zu deinem Problem passt. Es gibt zwei Sorten:
+
+**Engine-gestützte Skills** — ein dünner Wrapper, der an die Engine `src/harness/` weiterreicht (kein doppelter Code):
+
+| Skill | Wofür | Engine-Modul |
+|-------|-------|--------------|
 | `eval-loop-builder` | Eval-Suiten + Gate | `harness.eval` |
 | `eval-judge` | LLM-as-judge (Rubrik) | `harness.eval` |
 | `guardrail-designer` | Input/Output-Validierung, `on_fail`-Enum | `harness.guardrails` |
@@ -137,7 +141,21 @@ Eine Referenz, **kein** zweiter Regeltext: jede Zeile zeigt nur, *was* ein Begri
 | `skill-author` | Skills schreiben + linten | `harness.skills` |
 | `skill-supply-chain-check` | Supply-Chain-Audit von Skill-Code | `harness.skills` |
 
-In Claude Code laden die Skills bei Bedarf über ihre `description`, **nicht** in den 4-File-Boot-Context. Einstieg/Triage: `agent-pattern-selector` mappt ein Problem auf den richtigen Skill. Jeder Script-Skill ist ein dünner Wrapper (`.claude/skills/<slug>/scripts/run.py` forwarded an `harness.<area>.__main__`), **keine duplizierte Logik**. Skills schreiben/ändern: `.ai-workspace/skills-authoring-policy.md` + `python -m harness.skills lint .claude/skills`.
+**Reine Pattern-Skills** — nur Anleitung, kein Code; laufen überall und brauchen die Engine nicht:
+
+| Skill | Wofür |
+|-------|-------|
+| `iterative-retrieval` | Subagent holt sich Kontext in Runden (losschicken -> prüfen -> nachschärfen) |
+| `agent-architecture-audit` | read-only Diagnose einer Agenten-Pipeline (12 Schichten, 5 Fehlermuster) |
+| `external-content-security` | externe Inhalte als Daten behandeln, Prompt-Injection abwehren |
+| `harness-optimizer` | das Setup rund um den Agenten prüfen (Hooks, Budgets, Routing) |
+| `strategic-compact` | langen Verlauf gezielt an Task-Grenzen verdichten |
+| `verification-loop` | Änderung -> testen -> Smoke-Check -> nachbessern |
+| `tdd-workflow` | erst der Test, dann der Code (red-green-refactor) |
+| `search-first` | erst nach etwas Vorhandenem suchen, dann selbst bauen |
+| `prompt-optimizer` | vage Anfrage schärfen (Annahmen offenlegen statt endlos rückzufragen) |
+
+Skills schreiben/ändern: `.ai-workspace/skills-authoring-policy.md` + `python -m harness.skills lint .claude/skills`.
 
 ## Repo-Layout (Top-Ebenen)
 
@@ -180,14 +198,17 @@ Aufbau, Anpassung und die vollständigen Skripte stehen in [`.ai-workspace/templ
 
 ## Optionale Session-Automatik (opt-in)
 
-Das Kit kann dir zwei kleine Helfer einschalten. **Standardmäßig sind beide AUS**, und du kannst sie jederzeit wieder ausschalten. Sie wirken nur in diesem Projekt und schreiben nie etwas von allein; sie erinnern Claude nur daran, den Faden zu halten:
+Das Kit bringt ein paar kleine, **standardmäßig ausgeschaltete** Helfer mit. Sie wirken nur in diesem Projekt, sind jederzeit umkehrbar und schreiben nie etwas von allein — sie erinnern Claude nur, den Faden zu halten. Beispiele:
 
-- **„Stand wieder laden"** (`boot_reload`): Startest du Claude neu, liest es automatisch die Notiz wieder, woran ihr zuletzt gearbeitet habt. Du musst nichts neu erklären.
-- **„Ans Mitschreiben erinnern"** (`recitation_nudge`): Nach einer Datei-Änderung bekommt Claude einen kleinen Stups, die Projekt-Notiz (`current-session.md`) aktuell zu halten.
+- **„Stand wieder laden"** (`boot_reload`): Beim Neustart liest Claude automatisch die Projekt-Notiz wieder, woran ihr zuletzt gearbeitet habt.
+- **„Ans Mitschreiben erinnern"** (`recitation_nudge`): Nach einer Datei-Änderung ein kleiner Stups, `current-session.md` aktuell zu halten.
+- **Fortgeschrittene Helfer** (alle default AUS): tägliche Pflege-Erinnerung (`daily_maintenance`), Vage-Prompt-Schärfung (`prompt_optimizer`), Schutz beim Abrufen externer Inhalte (`external_content_guard`), Compaction-Vorschlag in langen Sessions (`compact_nudge`) und ein dezenter Reminder, den Live-Stand zu sichern — **nur wenn er veraltet** (`session_state_guard`).
 
-Am einfachsten steuerst du sie mit dem Begleiter **`/uaw-automation`**: der zeigt dir den Stand, erklärt alles in Ruhe und schaltet auf Wunsch um (immer erst nach deinem Ja).
+Einzige Ausnahme von „default AUS": beim allerersten Start in einem frischen Projekt begrüßt dich ein einmaliges Onboarding (`first_run_onboarding`, ruft `/start`) — danach inert.
 
-**Technischer Hinweis:** Die Helfer sind in `.claude/settings.json` eingetragen, tun aber nichts, solange ihr Schalter in `.claude/automation.flags.json` auf `false` steht (Default `{ "boot_reload": false, "recitation_nudge": false }`). Weil sie zum Projekt gehören, funktionieren sie auch in Web-/Cloud-Sessions; die globale `~/.claude/`-Konfiguration auf deinem Rechner wird nie angefasst. Vollständige Doku: [`.claude/AUTOMATION.md`](.claude/AUTOMATION.md).
+Am einfachsten steuerst du alles mit dem Begleiter **`/uaw-automation`** (zeigt den Stand, erklärt, schaltet erst nach deinem Ja um).
+
+**Technischer Hinweis:** Die Helfer sind in `.claude/settings.json` eingetragen, tun aber nichts, solange ihr Schalter in `.claude/automation.flags.json` auf `false` steht (Default: nur `first_run_onboarding` ist `true`, alle anderen `false`). Weil sie zum Projekt gehören, funktionieren sie auch in Web-/Cloud-Sessions; die globale `~/.claude/`-Konfiguration auf deinem Rechner wird nie angefasst. Vollständige Doku inkl. State-Durability: [`.claude/AUTOMATION.md`](.claude/AUTOMATION.md).
 
 ## Upgrade von v2.0
 

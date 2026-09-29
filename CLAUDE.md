@@ -1,6 +1,14 @@
 # CLAUDE.md — Tool-Delta für Claude Code
 
-Diese Datei ergänzt `AGENTS.md`, sie ersetzt sie nicht. **Lies AGENTS.md zuerst.**
+Diese Datei ergänzt `AGENTS.md`, sie ersetzt sie nicht.
+
+## Boot-Kontext (per Import erzwungen)
+
+Claude Code lädt automatisch nur `CLAUDE.md`. Die übrigen drei Boot-Dateien (`AGENTS.md` §1) werden deshalb per `@`-Import deterministisch mitgeladen, auch nach `/clear` und `/compact`:
+
+@AGENTS.md
+@.ai-workspace/state/project-index.md
+@.ai-workspace/state/current-session.md
 
 Sie enthält nur Claude-spezifische Hinweise. Operative Regeln, Boot-Order, Anti-Parallelstruktur und alle Policies stehen in `AGENTS.md` und den `.ai-workspace/`-Dateien.
 

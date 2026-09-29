@@ -3,7 +3,7 @@
 Ein Starter-Kit für Projekte, die du mit einem AI-Coding-Assistenten bearbeitest (zuerst für Claude Code gebaut). Es bringt zwei Dinge in einem Repo zusammen:
 
 1. **Regeln und Gedächtnis** in reinem Markdown (Ordner `.ai-workspace/`): klare Konventionen, wo was liegt, plus einen Wissens- und Zustandsspeicher, den der Assistent über mehrere Sitzungen hinweg liest.
-2. **Lauffähige Werkzeuge** (Ordner `.claude/` + `src/harness/`): 12 fertige Bausteine („Skills") über einer kleinen Python-Engine. Damit kannst du zum Beispiel die Antworten eines AI-Agenten automatisch bewerten (Eval), riskante Ein- und Ausgaben blockieren (Guardrail) oder vor einem kritischen Schritt einen Menschen freigeben lassen (Human-in-the-Loop).
+2. **Lauffähige Werkzeuge** (Ordner `.claude/` + `src/harness/`): 21 fertige Bausteine („Skills") über einer kleinen Python-Engine. Damit kannst du zum Beispiel die Antworten eines AI-Agenten automatisch bewerten (Eval), riskante Ein- und Ausgaben blockieren (Guardrail) oder vor einem kritischen Schritt einen Menschen freigeben lassen (Human-in-the-Loop).
 
 Du nimmst beide Schichten oder nur die Regeln. Die Werkzeuge laufen offline: ohne API-Key, ohne Internet, ohne große Zusatz-Bibliotheken.
 
@@ -19,7 +19,7 @@ Zwei Wege - der erste braucht kein Klonen.
 
 ```text
 Du arbeitest in meinem aktuellen Projekt und sollst prüfen, ob und wie es sich an der
-Universal AI Workspace Foundation (v3.1) ausrichten lässt.
+Universal AI Workspace Foundation ausrichten lässt.
 
 Die Foundation hat ZWEI Schichten - wir entscheiden gemeinsam, welche dieses Projekt braucht:
 - Governance (.ai-workspace/, reines Markdown): Regeln, Zustand, Wissen. Fast immer sinnvoll.

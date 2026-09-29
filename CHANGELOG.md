@@ -4,6 +4,31 @@ All notable changes to this project are documented here. Format based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); this project follows
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.2.1] — 2026-09-29
+
+Quick wins from a repo review: a deterministic boot, a current live-model default, and a type
+check in CI. No new skill, hook, or engine area.
+
+### Changed
+
+- **Boot order is now enforced** — `CLAUDE.md` imports `AGENTS.md`, `state/project-index.md` and
+  `state/current-session.md` via `@`-imports, so Claude Code loads all four boot files without
+  relying on the model to follow "read AGENTS.md first". `boot_reload` is now largely redundant
+  for Claude Code (kept for compatibility, still default OFF).
+- **Live LLM gateway** (`harness.core.llm`) — default model `claude-opus-5-5` (was
+  `claude-sonnet-4-6`), overridable via `UAW_MODEL`; default `max_tokens` 16000 (was 512, too low
+  for models that think before answering); server-side refusal fallback (`fallbacks="default"`)
+  on supporting models; a remaining refusal raises `HarnessError` instead of returning empty text;
+  empty `system` is no longer sent. `[llm]` extra now requires `anthropic>=1.9`.
+- **`tests/test_llm.py`** — offline tests for the live path (fallback routing, `UAW_MODEL`
+  override, refusal) against a stub `anthropic` module.
+- **Router demo config** — current model IDs (`claude-sonnet-5-5`, `claude-opus-5-5`).
+- **CI** — `mypy src` gate added; matrix now covers macOS and Python 3.13 (was 3.12).
+- **mypy clean** — optional-extra imports ignored via `[tool.mypy]` overrides; typed
+  `_JSON_TYPES` in `eval/assertions.py`.
+- **Doc drift fixed** — README skill count (12 → 21), version-free onboarding prompts,
+  `/automation` → `/uaw-automation` in `session-contract.md`, `harness.__version__` (was 3.0.0).
+
 ## [3.2.0] — 2026-06-07
 
 Nine new domain-neutral **pattern skills** plus four **opt-in automation hooks** (default OFF) that
@@ -207,6 +232,7 @@ Two supported paths:
    [`install-harness.md`](install-harness.md) (`pip install -e .` → zero third-party wheels). The
    skills load on demand via their `description`; start triage with `agent-pattern-selector`.
 
+[3.2.1]: https://github.com/Luis247911/universal-ai-workspace-foundation/releases/tag/v3.2.1
 [3.2.0]: https://github.com/Luis247911/universal-ai-workspace-foundation/releases/tag/v3.2.0
 [3.1.0]: https://github.com/Luis247911/universal-ai-workspace-foundation/releases/tag/v3.1.0
 [3.0.1]: https://github.com/Luis247911/universal-ai-workspace-foundation/releases/tag/v3.0.1

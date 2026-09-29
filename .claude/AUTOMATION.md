@@ -39,7 +39,7 @@ externen Abhaengigkeiten, kein API).
 
 | Flag | Event | Was es tut | Prinzip |
 |---|---|---|---|
-| `boot_reload` | `SessionStart` | Liest `.ai-workspace/state/current-session.md` und speist es als `additionalContext` ein -> jede neue/resumte/gecleart/compactete Session bootet mit dem Live-State. | Hook liest nur, was das Modell schrieb. |
+| `boot_reload` | `SessionStart` | Liest `.ai-workspace/state/current-session.md` und speist es als `additionalContext` ein -> jede neue/resumte/gecleart/compactete Session bootet mit dem Live-State. Seit v3.2.1 laedt `CLAUDE.md` die Datei bereits per `@`-Import; fuer Claude Code ist der Hook damit weitgehend redundant. | Hook liest nur, was das Modell schrieb. |
 | `recitation_nudge` | `PostToolUse` | Nach Write/Edit/NotebookEdit ein kurzer Reminder, `current-session.md` fortzuschreiben (Task + naechster Schritt + Evidenz, `session-contract.md` §3). | Hook erinnert, **Modell schreibt**. |
 | `first_run_onboarding` | `SessionStart` (startup) | Bei frischem, uneingerichtetem Workspace (State-Platzhalter da, kein Onboarding-Marker) speist es einen Stups ein: begruesse den Nutzer + starte `/start`. **Default AN.** Escape: `UAW_DISABLE_ONBOARDING`. | Hook stupst nur an; `/start` + Modell handeln. |
 | `daily_maintenance` | `SessionStart` (startup+resume) | Beim ersten Start eines lokalen Kalendertages ein Pflege-Pass-Vorschlag (scratch/ einsortieren, tote `[[wiki-links]]`/stale notes, verwaiste Artefakte). Schreibt nur seinen gitignored Datums-Marker. | Hook erinnert + schreibt nur eigenen Lauf-Marker, **Modell schlaegt vor/handelt**. |

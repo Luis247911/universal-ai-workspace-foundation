@@ -17,7 +17,7 @@ from ..core import llm
 from ..core.errors import ConfigError
 from ..core.types import Outcome
 
-_JSON_TYPES = {
+_JSON_TYPES: dict[str, type | tuple[type, ...]] = {
     "object": dict,
     "array": list,
     "string": str,

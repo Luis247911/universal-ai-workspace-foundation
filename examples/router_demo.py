@@ -9,8 +9,8 @@ from harness.router import ErrorClass, FallbackPolicy, ModelRouter, Segment, lin
 
 CONFIG = {
     "model_groups": {
-        "fast": [{"model": "claude-haiku-4-5"}, {"model": "claude-sonnet-4-6"}],
-        "smart": [{"model": "claude-opus-4-7"}],
+        "fast": [{"model": "claude-haiku-4-5"}, {"model": "claude-sonnet-5-5"}],
+        "smart": [{"model": "claude-opus-5-5"}],
     },
     "routing_strategy": "first",
     "fallbacks": {"rate_limit": ["smart"], "context_window": ["smart"]},

@@ -45,6 +45,9 @@ python -m harness.eval run --suite tests/goldens/repo.suite.json --threshold 0.9
 - Default `UAW_LLM=mock`: deterministic canned responses → green CI without secrets.
 - `UAW_LLM=live` (needs `[llm]` extra + `ANTHROPIC_API_KEY`): real model calls. LLM-graded
   eval assertions (`llm_rubric`) are **skipped** in mock mode and **scored** when live.
+- Live model: `claude-opus-5-5` by default; override with `UAW_MODEL=<model-id>` or `model=`.
+  On models that support it, a server-side refusal fallback (`fallbacks="default"`) is enabled;
+  a remaining refusal raises `HarnessError`.
 
 ## Optional: session automation (opt-in)
 

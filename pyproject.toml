@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "uaw-harness"
-version = "3.2.0"
+version = "3.2.1"
 description = "Runnable reference implementations of agent-engineering patterns — the executable layer of the universal-ai-workspace-foundation."
 readme = "install-harness.md"
 requires-python = ">=3.10"
@@ -21,12 +21,12 @@ dependencies = []  # stdlib-first: a bare install pulls in zero third-party whee
 [project.optional-dependencies]
 yaml = ["pyyaml>=6"]
 vector = ["numpy>=1.24"]
-llm = ["anthropic>=0.40"]
+llm = ["anthropic>=1.9"]
 test = ["pytest>=8", "pyyaml>=6"]
 lint = ["ruff>=0.5"]
 types = ["mypy>=1.8"]
 dev = ["pytest>=8", "pyyaml>=6", "ruff>=0.5", "mypy>=1.8"]
-all = ["pyyaml>=6", "numpy>=1.24", "anthropic>=0.40", "pytest>=8", "ruff>=0.5", "mypy>=1.8"]
+all = ["pyyaml>=6", "numpy>=1.24", "anthropic>=1.9", "pytest>=8", "ruff>=0.5", "mypy>=1.8"]
 
 [project.urls]
 Homepage = "https://github.com/Luis247911/universal-ai-workspace-foundation"
@@ -51,6 +51,14 @@ src = ["src", "tests"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B"]
+
+[tool.mypy]
+python_version = "3.10"
+
+[[tool.mypy.overrides]]
+# Optional extras ([vector], [llm], [yaml]) are lazy-imported and absent in a bare install.
+module = ["numpy", "numpy.*", "anthropic", "anthropic.*", "yaml", "yaml.*"]
+ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

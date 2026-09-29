@@ -6,7 +6,7 @@ argument-hint: "[optional: 'existing' | 'fresh' | 'skip']"
 # /start — der eine Einstieg in die Foundation
 
 Du fuehrst einen (oft neuen) Nutzer durch den allerersten Schritt in einem frisch geklonten
-Universal-AI-Workspace-Foundation-Repo (v3.2). **Nimm an, der User ist Anfaenger.** Sprich
+Universal-AI-Workspace-Foundation-Repo. **Nimm an, der User ist Anfaenger.** Sprich
 Alltagssprache, kleine Schritte, frag immer erst nach, bevor du etwas anlegst oder aenderst.
 
 Dieser Command ist ein **Dirigent**: er stellt die Weiche und ruft dann die bestehenden Flows auf

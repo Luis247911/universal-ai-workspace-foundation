@@ -12,12 +12,18 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
+import pytest
+
 REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT / "src"))
 
 from harness.mdmemory import create, index, journal, report  # noqa: E402
 from harness.mdmemory.__main__ import main  # noqa: E402
-from harness.mdmemory.workspace import GLOBAL_ENV, global_root  # noqa: E402
+from harness.mdmemory.workspace import (  # noqa: E402
+    GLOBAL_ENV,
+    GlobalNamespaceError,
+    global_root,
+)
 
 TODAY = "2031-09-01"
 
@@ -92,8 +98,10 @@ def test_report_cli_writes_into_gitignored_scratch(tmp_path, capsys):
 
 
 def test_global_namespace_is_off_by_default_and_separate_when_on(tmp_path, monkeypatch):
-    assert global_root({}) is None
-    assert global_root({GLOBAL_ENV: str(tmp_path / "fehlt")}) is None
+    with pytest.raises(GlobalNamespaceError, match="is off"):
+        global_root({})
+    with pytest.raises(GlobalNamespaceError, match="no workspace"):
+        global_root({GLOBAL_ENV: str(tmp_path / "fehlt")})
     monkeypatch.delenv(GLOBAL_ENV, raising=False)
     try:
         main(["--global", "index"])

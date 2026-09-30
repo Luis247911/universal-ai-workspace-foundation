@@ -1,6 +1,6 @@
 # memory-contract.md — Wer besitzt, laedt und schreibt welches Gedaechtnis
 
-Dieser Vertrag bindet die Gedaechtnis-Regeln aus `AGENTS.md`, `session-contract.md`, `context-policy.md` und `knowledge-graph-policy.md` in einer Uebersicht zusammen (D-2026-09-30-08). Er fuehrt keine neuen Ablageorte ein. Bei Widerspruch im Detail gilt die jeweilige Policy, und dieser Vertrag wird nachgezogen.
+Dieser Vertrag bindet die Gedaechtnis-Regeln aus `AGENTS.md`, `session-contract.md`, `context-policy.md` und `knowledge-graph-policy.md` in einer Uebersicht zusammen (D-2026-09-30-08). Er fuehrt im Projekt keine neuen Ablageorte ein; der optionale globale Namespace (§5) liegt in einem eigenen Repo ausserhalb. Bei Widerspruch im Detail gilt die jeweilige Policy, und dieser Vertrag wird nachgezogen.
 
 ## 1. Die fuenf Festlegungen
 
@@ -44,7 +44,7 @@ Die Deckel stehen in `src/harness/mdmemory/limits.py`: `INDEX.md` hat hoechstens
 |---|---|---|
 | Modell / Hauptsession | Journal (anhaengen), `now.md`, Notizen, Tabellen | generierte Dateien von Hand, fremde Journale aendern |
 | Skill `merken` | Notizen, Einfrieren des Journals (`konsolidiert`) | ohne Quelle schreiben; bei den Faellen aus §1 Punkt 5 ohne Rueckfrage schreiben |
-| Skill `pflege` | Journal-Rollups, Bericht unter `scratch/maintenance/` | Notizen aendern, Auto-Merge |
+| Skill `pflege` | Journal-Rollups, Bericht unter `scratch/maintenance/` | Notizen aendern, Auto-Merge; Korrekturen aus dem Bericht (`confirm`, `supersede`, Archivieren) setzt die Hauptsession nach Bestaetigung um |
 | Hooks (D-2026-09-30-06) | `now.md` anlegen und kuerzen, Ueberlauf und Abschluss-Eintrag ins eigene Journal, eigene Marker | Notizen, Decisions, generierte Dateien, Flags |
 | `harness.mdmemory` (D-2026-09-30-05) | generierte Dateien; Skelette und Migrationen auf ausdruecklichen Aufruf | kanonische Inhalte umschreiben |
 | CI | nichts; prueft `lint`, Budget, Round-Trip | — |

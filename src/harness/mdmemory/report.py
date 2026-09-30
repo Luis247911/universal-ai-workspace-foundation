@@ -1,10 +1,10 @@
 """Weekly maintenance report (skill ``pflege``): read-only findings plus the monthly rollup.
 
 Sections: lint errors and warnings, stale notes, orphans, duplicate candidates, boot budget,
-unconsolidated journals. The only files the maintenance run writes are generated ones (journal
-rollups, D-2026-09-30-05) and, on request, the report itself under the gitignored
-``scratch/maintenance/<datum>-pflege.md``. Everything else is a suggestion for the main session
-or a PR; nothing is merged automatically.
+unconsolidated journals. On stdout the report only reads. With ``--write`` it stores itself
+under the gitignored ``scratch/maintenance/<datum>-pflege.md`` and refreshes the generated
+journal rollups (D-2026-09-30-05); notes are never changed. Everything else is a suggestion
+for the main session or a PR; nothing is merged automatically.
 """
 
 from __future__ import annotations
@@ -36,13 +36,20 @@ class Report:
     duplicates: list[tuple[float, Note, Note]] = field(default_factory=list)
     budget: budget.Report | None = None
     pending: list[consolidate.Pending] = field(default_factory=list)
+    running: set[Path] = field(default_factory=set)
     rollups: list[Path] = field(default_factory=list)
 
     @property
-    def clean(self) -> bool:
-        return not (
-            self.findings or self.stale or self.orphans or self.duplicates or self.pending
+    def ok(self) -> bool:
+        """False on lint errors or a broken hard boot limit (exit code 1 for cron/CI)."""
+        over = self.budget is not None and max(self.budget.actual, self.budget.worst_case) > (
+            self.budget.hard
         )
+        return not over and not any(f.level == "E" for f in self.findings)
+
+    @property
+    def clean(self) -> bool:
+        return not (self.findings or self.stale or self.orphans or self.duplicates or self.pending)
 
 
 def _days_before(day: str, days: int) -> str:
@@ -55,7 +62,7 @@ def stale(notes: list[Note], today: str) -> list[tuple[Note, str]]:
     for n in notes:
         if not n.active:
             continue
-        ra, lc = n.get("review_after"), n.get("last_confirmed")
+        ra, lc = n.get("review_after"), n.get("last_confirmed") or n.get("updated")
         if ra and DATE_RE.match(ra) and ra < today:
             out.append((n, f"review_after {ra} ueberschritten"))
         elif lc and DATE_RE.match(lc) and lc < cutoff:
@@ -71,6 +78,7 @@ def orphans(notes: list[Note], today: str) -> list[Note]:
     for n in notes:
         refs = n.items("links") + n.items("blocks") + n.items("supersedes")
         refs += [n.get("superseded_by")] if n.get("superseded_by") else []
+        refs += [s.split(":", 1)[1] for s in n.items("sources") if s.startswith("note:")]
         targets = {by_ref[r] for r in refs if r in by_ref}
         if targets:
             linked.add(n.id)
@@ -84,11 +92,19 @@ def orphans(notes: list[Note], today: str) -> list[Note]:
 
 
 def duplicates(notes: list[Note]) -> list[tuple[float, Note, Note]]:
+    """Similar active notes of one type; pairs that already have an open conflict are skipped."""
     active = [n for n in notes if n.active]
+    known = {
+        frozenset(n.items("links"))
+        for n in active
+        if n.type == "question" and n.get("kind") == "conflict"
+    }
     toks = {n.id: tokens(n.get("title") + " " + n.get("summary")) for n in active}
     out: list[tuple[float, Note, Note]] = []
     for a, b in combinations(active, 2):
         if a.type != b.type or not toks[a.id] or not toks[b.id]:
+            continue
+        if frozenset((a.id, b.id)) in known:
             continue
         score = len(toks[a.id] & toks[b.id]) / len(toks[a.id] | toks[b.id])
         if score >= DUPLICATE_THRESHOLD:
@@ -105,7 +121,9 @@ def build(root: Path, *, today: str | None = None, write_rollups: bool = True) -
     rep.orphans = orphans(notes, today)
     rep.duplicates = duplicates(notes)
     rep.budget = budget.measure(root)
-    rep.pending = consolidate.pending(root)
+    finished = {p.path for p in consolidate.pending(root, today=today)}
+    rep.pending = consolidate.pending(root, today=today, include_running=True)
+    rep.running = {p.path for p in rep.pending if p.path not in finished}
     if write_rollups:
         rep.rollups = rollup.write(root)
     return rep
@@ -113,8 +131,11 @@ def build(root: Path, *, today: str | None = None, write_rollups: bool = True) -
 
 def render(root: Path, rep: Report) -> str:
     def note_ref(n: Note) -> str:
-        alias = f" ({n.items('aliases')[0]})" if n.items("aliases") else ""
+        alias = f" ({n.items('aliases')[0]})" if n.items("aliases") and not n.sensitive else ""
         return f"`{n.id}`{alias}"
+
+    def title(n: Note) -> str:  # sensitive notes: id only, as in every index
+        return "(Inhalt nur in der Notiz)" if n.sensitive else n.get("title")
 
     lines = [f"# Pflege-Bericht {rep.today}", ""]
     lines.append("Nur Vorschlaege. Umsetzen in der Hauptsession oder per PR, nie auto-mergen.")
@@ -123,21 +144,26 @@ def render(root: Path, rep: Report) -> str:
     lines += ["", "## Veraltet (pruefen, bestaetigen oder ersetzen)", ""]
     lines += [f"- {note_ref(n)}: {why}" for n, why in rep.stale] or ["- nichts"]
     lines += ["", f"## Waisen (ohne Verbindung, aelter als {ORPHAN_MIN_AGE_DAYS} Tage)", ""]
-    lines += [f"- {note_ref(n)}: {n.get('title')}" for n in rep.orphans] or ["- keine"]
+    lines += [f"- {note_ref(n)}: {title(n)}" for n in rep.orphans] or ["- keine"]
     lines += ["", f"## Duplikat-Kandidaten (Aehnlichkeit >= {DUPLICATE_THRESHOLD})", ""]
     lines += [
         f"- {s:.2f}: {note_ref(a)} und {note_ref(b)} (pruefen: UPDATE, SUPERSEDE oder CONFLICT)"
         for s, a, b in rep.duplicates
     ] or ["- keine"]
     lines += ["", "## Nicht konsolidierte Journale (Skill `merken`)", ""]
-    lines += [f"- `{rel(root, p.path)}` ({p.entries} Eintraege)" for p in rep.pending] or [
-        "- keine"
-    ]
+    lines += [
+        f"- `{rel(root, p.path)}` ({p.entries} Eintraege)"
+        + (" · laeuft evtl. noch, nicht einfrieren" if p.path in rep.running else "")
+        for p in rep.pending
+    ] or ["- keine"]
     lines += ["", "## Boot-Budget", ""]
     if rep.budget:
-        lines.append(f"- {rep.budget.line()}")
+        over = max(rep.budget.actual, rep.budget.worst_case) > rep.budget.hard
+        lines.append(f"- {rep.budget.line()}" + (" · **harte Grenze gerissen**" if over else ""))
     lines += ["", "## Monats-Rollup", ""]
-    lines += [f"- neu erzeugt: `{rel(root, p)}`" for p in rep.rollups] or ["- aktuell"]
+    lines += [f"- neu erzeugt: `{rel(root, p)}`" for p in rep.rollups] or [
+        "- aktuell (oder nicht geprueft: Rollups schreibt nur `report --write`)"
+    ]
     return "\n".join(lines) + "\n"
 
 

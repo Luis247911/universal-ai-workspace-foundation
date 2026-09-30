@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
 WORKSPACE_DIR = ".ai-workspace"
@@ -11,15 +12,32 @@ WORKSPACE_DIR = ".ai-workspace"
 GLOBAL_ENV = "UAW_GLOBAL_MEMORY_DIR"
 
 
-def global_root(environ: dict[str, str] | None = None) -> Path | None:
-    """The global namespace's root (contains ``.ai-workspace/``), or None when switched off."""
-    import os
+class GlobalNamespaceError(RuntimeError):
+    """The global namespace is off, misconfigured, or points into the project."""
 
+
+def global_root(environ: dict[str, str] | None = None, *, project: Path | None = None) -> Path:
+    """The global namespace's root (contains ``.ai-workspace/``).
+
+    Raises :class:`GlobalNamespaceError` when the variable is unset, relative, names no workspace,
+    or points at (or into) ``project`` -- global notes must never land in the project repo.
+    """
     value = (environ if environ is not None else os.environ).get(GLOBAL_ENV, "").strip()
     if not value:
-        return None
+        raise GlobalNamespaceError(f"global namespace is off: set {GLOBAL_ENV} to a workspace root")
     path = Path(value).expanduser()
-    return path if (path / WORKSPACE_DIR).is_dir() else None
+    if not path.is_absolute():
+        raise GlobalNamespaceError(f"{GLOBAL_ENV} must be an absolute path: {value}")
+    path = path.resolve()
+    if not (path / WORKSPACE_DIR).is_dir():
+        raise GlobalNamespaceError(
+            f"{GLOBAL_ENV} points at no workspace ({WORKSPACE_DIR}/): {path}"
+        )
+    if project is not None:
+        proj = project.resolve()
+        if path == proj or proj in path.parents or path in proj.parents:
+            raise GlobalNamespaceError(f"{GLOBAL_ENV} must lie outside the project: {path}")
+    return path
 
 
 def find_root(start: Path | str | None = None) -> Path:

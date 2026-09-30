@@ -47,18 +47,23 @@ nicht aus, weil `.ai-workspace/` markdown-only ist und der Pfad maschinenabhaeng
 </plist>
 ```
 
-Laden: `launchctl load ~/Library/LaunchAgents/local.uaw.pflege.plist`; entfernen:
-`launchctl unload …` und Datei loeschen. Den Bericht liest man danach in einer normalen Session
+Laden: `launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/local.uaw.pflege.plist`;
+entfernen: `launchctl bootout gui/$(id -u)/local.uaw.pflege` und Datei loeschen. Der Lauf schreibt
+den Bericht und frische Journal-Rollups (generiert); die Rollups beim naechsten Commit mitnehmen. Den Bericht liest man danach in einer normalen Session
 mit dem Skill `pflege` (Schritt 2).
 
 ## Variante C: manuell
 
-`python -m harness.mdmemory report` (stdout) oder mit `--write`. Exit-Code 1 bei Lint-Fehlern,
-damit ein eigener Cron oder CI-Job darauf reagieren kann.
+`python -m harness.mdmemory report` (stdout, schreibt nichts) oder mit `--write` (Bericht +
+Rollups). Exit-Code 1 bei Lint-Fehlern oder gerissener harter Boot-Grenze, damit ein eigener Cron
+oder CI-Job darauf reagieren kann.
 
 ## Schwellen (in `src/harness/mdmemory/report.py`)
 
-- veraltet: `review_after` ueberschritten oder `last_confirmed` aelter als 180 Tage,
+- veraltet: `review_after` ueberschritten oder `last_confirmed` (leer: `updated`) aelter als
+  180 Tage,
 - Waise: aktiv, nicht angeheftet, aelter als 30 Tage, keine Verbindung in `links`, `blocks`,
-  `supersedes`, `superseded_by` (weder ein- noch ausgehend),
-- Duplikat-Kandidat: gleicher Typ, Wortueberlappung von Titel + Summary ≥ 0,6.
+  `supersedes`, `superseded_by` oder `sources: note:<id>` (weder ein- noch ausgehend),
+- Duplikat-Kandidat: gleicher Typ, Wortueberlappung von Titel + Summary ≥ 0,6; Paare mit einer
+  offenen `conflict`-Frage werden nicht erneut gemeldet.
+- In Bericht und PR erscheinen sensible Notizen (personal, restricted, extern) nur mit ihrer ID.

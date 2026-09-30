@@ -24,9 +24,11 @@ from .create import skeleton
 from .journal import is_frozen, iter_journals
 from .notes import Note, load_notes
 from .rollup import _entries
-from .workspace import rel
+from .workspace import GlobalNamespaceError, global_root, rel
 
 CHANGE = {"veraendert", "korrigiert"}
+#: ``konsolidiert_zu`` entry for a note in the optional global namespace (memory contract §5).
+GLOBAL_PREFIX = "global:"
 STOPWORDS = set(
     "der die das und oder ein eine einer eines ist sind wird werden mit fuer von zu im in am an auf"
     " nicht nur auch als bei aus dem den des the a an of to and or is are for with on in".split()
@@ -206,6 +208,15 @@ def mark(root: Path, journal_path: Path, note_ids: list[str]) -> bool:
     """
     notes = load_notes(root)
     by_ref = {n.id: n.id for n in notes} | {a: n.id for n in notes for a in n.items("aliases")}
+    if any(i.startswith(GLOBAL_PREFIX) for i in note_ids):
+        try:
+            groot = global_root(project=root)
+        except GlobalNamespaceError as exc:
+            raise KeyError(f"global ids need the global namespace: {exc}") from None
+        gnotes = load_notes(groot)
+        by_ref |= {GLOBAL_PREFIX + n.id: GLOBAL_PREFIX + n.id for n in gnotes}
+        for n in gnotes:
+            by_ref |= {GLOBAL_PREFIX + a: GLOBAL_PREFIX + n.id for a in n.items("aliases")}
     missing = [i for i in note_ids if i not in by_ref]
     if missing:
         raise KeyError("unknown note ids: " + ", ".join(missing))
@@ -238,6 +249,6 @@ def journal_refs(root: Path) -> list[tuple[Path, str]]:
         meta, _ = frontmatter.parse(p.read_text(encoding="utf-8"))
         refs = (meta or {}).get("konsolidiert_zu", [])
         for ref in refs if isinstance(refs, list) else []:
-            if ref not in known:
+            if ref not in known and not ref.startswith(GLOBAL_PREFIX):
                 out.append((p, ref))
     return out

@@ -17,7 +17,7 @@ from pathlib import Path
 
 from . import journal, now
 from .limits import NOW_MAX_BYTES
-from .workspace import find_root, legacy_session_path, rel
+from .workspace import find_root, journal_dir, legacy_session_path, rel
 
 
 def _root(args: argparse.Namespace) -> Path:
@@ -32,7 +32,8 @@ def _cmd_now(args: argparse.Namespace) -> int:
         return 0
     if args.action == "trim":
         now.ensure(root)
-        res = now.trim(root, session_id=args.session, limit=args.limit, tool=args.tool)
+        session = args.session or journal.new_session_id()
+        res = now.trim(root, session_id=session, limit=args.limit, tool=args.tool)
         if not res.changed:
             print(f"ok: state/now.md {res.before} B <= {args.limit} B")
         else:
@@ -56,15 +57,39 @@ def _cmd_now(args: argparse.Namespace) -> int:
 def _cmd_journal(args: argparse.Namespace) -> int:
     root = _root(args)
     if args.action == "new":
-        path, created = journal.ensure(
-            root, session_id=args.session, tool=args.tool, worktree=args.worktree
+        path, _ = journal.ensure(
+            root,
+            session_id=args.session or journal.new_session_id(),
+            tool=args.tool,
+            worktree=args.worktree,
         )
         print(rel(root, path))
-        return 0 if created or path.exists() else 1
+        return 0
     if args.action == "append":
-        journal.append(Path(args.path), args.kind, args.text)
+        path = _journal_file(root, args.path)
+        journal.append(path, args.kind, args.text)
         return 0
     return 2
+
+
+def _journal_file(root: Path, given: str) -> Path:
+    """Resolve a journal path (relative to cwd, else to the root); it must lie in journal/."""
+    path = Path(given)
+    if not path.is_absolute() and not path.exists():
+        path = root / path
+    base = journal_dir(root).resolve()
+    if base not in path.resolve().parents:
+        raise SystemExit(f"not a journal file under {rel(root, base)}/: {given}")
+    if not path.is_file():
+        raise SystemExit(f"journal not found: {given}")
+    return path
+
+
+def _limit(value: str) -> int:
+    n = int(value)
+    if n < now.MIN_LIMIT:
+        raise argparse.ArgumentTypeError(f"must be at least {now.MIN_LIMIT}")
+    return n
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -74,9 +99,11 @@ def main(argv: list[str] | None = None) -> int:
 
     np_ = sub.add_parser("now", help="Per-worktree live state state/now.md.")
     np_.add_argument("action", choices=["ensure", "trim", "migrate"])
-    np_.add_argument("--session", default="manual", help="session id for the overflow journal")
+    np_.add_argument(
+        "--session", default=None, help="session id for the overflow journal (default: random)"
+    )
     np_.add_argument("--tool", default="unbekannt")
-    np_.add_argument("--limit", type=int, default=NOW_MAX_BYTES)
+    np_.add_argument("--limit", type=_limit, default=NOW_MAX_BYTES)
     np_.add_argument("--remove-legacy", action="store_true")
 
     jp = sub.add_parser("journal", help="Append-only session journal.")
@@ -84,7 +111,7 @@ def main(argv: list[str] | None = None) -> int:
     jp.add_argument("path", nargs="?", help="journal file (append)")
     jp.add_argument("kind", nargs="?", choices=journal.KINDS, help="entry kind (append)")
     jp.add_argument("text", nargs="?", help="entry text (append)")
-    jp.add_argument("--session", default="manual")
+    jp.add_argument("--session", default=None, help="session id (default: random)")
     jp.add_argument("--tool", default="unbekannt")
     jp.add_argument("--worktree", default="")
 

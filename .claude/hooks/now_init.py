@@ -53,7 +53,7 @@ def main() -> int:
     except Exception:
         return 0  # engine not shipped in this project -> stay silent
 
-    session_id = str(data.get("session_id") or "manual")
+    session_id = str(data.get("session_id") or journal.new_session_id())
     tool = _tool()
     when = datetime.now()
     notes: list[str] = []
@@ -71,7 +71,8 @@ def main() -> int:
                 "Alte `state/current-session.md` gefunden. Migration: "
                 "`python -m harness.mdmemory now migrate --remove-legacy`, dann committen."
             )
-        jpath = journal.journal_path(root, when, journal.short_id(session_id))
+        kurzid = journal.short_id(session_id)
+        jpath = journal.session_journal(root, kurzid) or journal.journal_path(root, when, kurzid)
     except Exception:
         return 0
 

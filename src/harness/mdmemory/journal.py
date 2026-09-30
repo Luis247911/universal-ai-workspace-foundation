@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import hashlib
 import re
+import uuid
 from datetime import datetime
 from pathlib import Path
 
@@ -51,15 +52,47 @@ class JournalFrozenError(RuntimeError):
 
 
 def short_id(session_id: str) -> str:
-    """Stable 8-char id for file names: the first 8 hex digits, else a hash of the id."""
+    """Stable 8-char id for file names.
+
+    UUIDv4 (Claude Code): the first 8 hex digits. UUIDv7 (Codex) starts with a millisecond
+    timestamp, so two sessions started within about a minute share the first 8 digits; there the
+    last 8 (random) digits are used. Anything else: a hash of the whole id.
+    """
     hexchars = re.sub(r"[^0-9a-f]", "", session_id.lower())
+    if len(hexchars) == 32 and hexchars[12] == "7":
+        return hexchars[-8:]
     if len(hexchars) >= 8:
         return hexchars[:8]
     return hashlib.sha1(session_id.encode("utf-8")).hexdigest()[:8]
 
 
+def new_session_id() -> str:
+    """A random session id for manual CLI use (no hook, no tool session)."""
+    return uuid.uuid4().hex
+
+
 def journal_path(root: Path, day: datetime, kurzid: str) -> Path:
     return journal_dir(root) / f"{day:%Y}" / f"{day:%m}" / f"{day:%Y-%m-%d}-{kurzid}.md"
+
+
+def session_journals(root: Path, kurzid: str) -> list[Path]:
+    """All journals of one session, oldest first (continuations are ``<datum>-<kurzid>-<n>.md``)."""
+    base = journal_dir(root)
+    if not base.is_dir():
+        return []
+    hits = set(base.glob(f"*/*/*-{kurzid}.md")) | set(base.glob(f"*/*/*-{kurzid}-[0-9]*.md"))
+    return sorted(hits, key=lambda p: (p.name[:10], p.stem))
+
+
+def session_journal(root: Path, kurzid: str) -> Path | None:
+    """The open (not consolidated) journal of this session, or None."""
+    for path in reversed(session_journals(root, kurzid)):
+        try:
+            if not is_frozen(path.read_text(encoding="utf-8")):
+                return path
+        except OSError:
+            continue
+    return None
 
 
 def _template(root: Path) -> str:
@@ -108,17 +141,30 @@ def ensure(
     worktree: str = "",
     transcript: str = "",
 ) -> tuple[Path, bool]:
-    """Create the session journal if it does not exist yet. Never overwrites. (path, created)."""
+    """Return the open journal of this session, creating it if needed. (path, created).
+
+    A session keeps its journal across midnight and month ends. If its journal is consolidated
+    already, a continuation ``<datum>-<kurzid>-2.md`` (``-3`` ...) is started. Never overwrites.
+    """
     when = when or datetime.now()
-    path = journal_path(root, when, short_id(session_id))
-    if path.exists():
-        return path, False
+    kurzid = short_id(session_id)
+    existing = session_journal(root, kurzid)
+    if existing is not None:
+        return existing, False
+    path = journal_path(root, when, kurzid)
+    n = 2
+    while path.exists():
+        path = path.with_name(f"{when:%Y-%m-%d}-{kurzid}-{n}.md")
+        n += 1
     path.parent.mkdir(parents=True, exist_ok=True)
     text = render(
         root, session_id=session_id, when=when, tool=tool, worktree=worktree, transcript=transcript
     )
-    with path.open("x", encoding="utf-8", newline="\n") as fh:
-        fh.write(text)
+    try:
+        with path.open("x", encoding="utf-8", newline="\n") as fh:
+            fh.write(text)
+    except FileExistsError:  # a second process of the same session was faster
+        return path, False
     return path, True
 
 

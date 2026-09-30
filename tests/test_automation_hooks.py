@@ -42,6 +42,8 @@ def _run(
     """Run a hook as Claude Code would. Return (stdout, returncode)."""
     env = {k: v for k, v in os.environ.items() if k != "UAW_DISABLE_ONBOARDING"}
     env["CLAUDE_PROJECT_DIR"] = str(project_dir)
+    # The sandbox has no src/: point the hooks at this checkout's engine, not an installed one.
+    env["PYTHONPATH"] = str(REPO_ROOT / "src")
     if extra_env:
         env.update(extra_env)
     proc = subprocess.run(

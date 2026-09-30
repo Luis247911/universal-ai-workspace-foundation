@@ -26,17 +26,23 @@ class FrontmatterError(ValueError):
     """Raised when a frontmatter block cannot be parsed."""
 
 
+_OPEN = re.compile(r"---[ \t]*\n")
+_CLOSE = re.compile(r"\n---[ \t]*(?:\n|$)")
+
+
 def split(text: str) -> tuple[str | None, str]:
-    """Split ``text`` into (raw frontmatter without fences, body). ``None`` if there is none."""
-    text = text.replace("\r\n", "\n").replace("\r", "\n")
-    if not text.startswith(_FENCE + "\n"):
+    """Split ``text`` into (raw frontmatter without fences, body). ``None`` if there is none.
+
+    A leading UTF-8 BOM and trailing blanks after a fence are tolerated.
+    """
+    text = text.replace("\r\n", "\n").replace("\r", "\n").lstrip("\ufeff")
+    opening = _OPEN.match(text)
+    if not opening:
         return None, text
-    end = text.find("\n" + _FENCE + "\n", len(_FENCE))
-    if end == -1:
-        if text.endswith("\n" + _FENCE):
-            return text[len(_FENCE) + 1 : -len(_FENCE) - 1], ""
+    closing = _CLOSE.search(text, opening.end() - 1)
+    if not closing:
         return None, text
-    return text[len(_FENCE) + 1 : end], text[end + len(_FENCE) + 2 :]
+    return text[opening.end() : closing.start()], text[closing.end() :]
 
 
 def _unquote(raw: str) -> str:
@@ -58,17 +64,19 @@ def _unquote(raw: str) -> str:
 
 def _strip_comment(raw: str) -> str:
     """Drop a trailing `` # comment`` outside quotes."""
-    quote = ""
+    quote, esc = "", False
     for i, ch in enumerate(raw):
-        if quote:
+        if esc:
+            esc = False
+        elif quote:
             if ch == "\\" and quote == '"':
-                continue
-            if ch == quote:
+                esc = True
+            elif ch == quote:
                 quote = ""
         elif ch in "\"'":
             quote = ch
         elif ch == "#" and (i == 0 or raw[i - 1].isspace()):
-            return raw[:i].rstrip()
+            return raw[:i].strip()
     return raw.strip()
 
 
@@ -111,6 +119,8 @@ def parse_meta(raw: str) -> Meta:
             raise FrontmatterError(f"line {n}: only flat key: value lines allowed: {line!r}")
         key, _, rest = line.partition(":")
         key = key.strip()
+        if key in meta:
+            raise FrontmatterError(f"line {n}: duplicate key {key!r}")
         value = _strip_comment(rest)
         if value.startswith("[") and value.endswith("]"):
             meta[key] = _split_list(value[1:-1])
@@ -127,7 +137,14 @@ def parse(text: str) -> tuple[Meta | None, str]:
     return parse_meta(raw), body
 
 
+def _single_line(value: str) -> str:
+    if "\n" in value or "\r" in value:
+        raise FrontmatterError(f"line breaks are not allowed in frontmatter values: {value!r}")
+    return value
+
+
 def _scalar(value: str) -> str:
+    _single_line(value)
     if value == "":
         return ""
     if _NEEDS_QUOTES.search(value) or value == "[]":
@@ -136,6 +153,7 @@ def _scalar(value: str) -> str:
 
 
 def _item(value: str) -> str:
+    _single_line(value)
     if value == "" or re.search(r"""[,\[\]"'#]|^\s|\s$""", value):
         return '"' + value.replace("\\", "\\\\").replace('"', '\\"') + '"'
     return value

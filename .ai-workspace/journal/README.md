@@ -9,11 +9,16 @@ Gelesen wird gezielt, ueber einen Verweis (`sources: [journal:<id>]`) oder per S
 
 ```text
 journal/YYYY/MM/YYYY-MM-DD-<kurzid>.md     # eine Datei pro Session
+journal/YYYY/MM/YYYY-MM-DD-<kurzid>-2.md   # Fortsetzung, wenn das erste schon konsolidiert ist
 journal/YYYY/MM/YYYY-MM-DD-migration.md    # Sonderfall: Migrations-Journal
 ```
 
-- `<kurzid>` = die ersten 8 Hex-Zeichen der Session-ID des Tools. Der SessionStart-Hook
-  `now_init` nennt sie zu Beginn jeder Session. Ohne Hook: 8 zufaellige Hex-Zeichen.
+- `<kurzid>` = 8 Hex-Zeichen aus der Session-ID des Tools: die ersten 8 bei UUIDv4 (Claude
+  Code), die letzten 8 bei UUIDv7 (Codex; dort sind die ersten 8 ein Zeitstempel). Der
+  SessionStart-Hook `now_init` nennt sie zu Beginn jeder Session. Ohne Hook und ohne
+  `--session`: eine zufaellige ID.
+- Das Datum im Namen ist der Starttag. Eine Session ueber Mitternacht schreibt weiter in dieselbe
+  Datei.
 - Jede Session schreibt nur **ihre eigene** Datei. Parallele Sessions und Worktrees erzeugen
   deshalb nie einen Merge-Konflikt im Journal.
 - Anlegen: `python -m harness.mdmemory journal new --session <session-id> --tool <tool>`

@@ -32,6 +32,7 @@ ALL_HOOKS = [
     "external_content_guard.py",
     "compact_nudge.py",
     "session_state_guard.py",
+    "now_init.py",
 ]
 
 
@@ -41,6 +42,8 @@ def _run(
     """Run a hook as Claude Code would. Return (stdout, returncode)."""
     env = {k: v for k, v in os.environ.items() if k != "UAW_DISABLE_ONBOARDING"}
     env["CLAUDE_PROJECT_DIR"] = str(project_dir)
+    # The sandbox has no src/: point the hooks at this checkout's engine, not an installed one.
+    env["PYTHONPATH"] = str(REPO_ROOT / "src")
     if extra_env:
         env.update(extra_env)
     proc = subprocess.run(
@@ -64,7 +67,7 @@ def _sandbox(
     state.mkdir(parents=True, exist_ok=True)
     title = "<projekt-slug>" if placeholders else "my-real-project"
     (state / "project-index.md").write_text(f"title: {title}\n", encoding="utf-8")
-    (state / "current-session.md").write_text("active task: real\n", encoding="utf-8")
+    (state / "now.md").write_text("active task: real\n", encoding="utf-8")
     if marker is not None:
         (claude / ".onboarding-state.json").write_text(marker, encoding="utf-8")
     return tmp_path
@@ -250,7 +253,7 @@ def test_compact_nudge_inert_one_past_threshold(tmp_path):
 
 def test_state_guard_inert_when_fresh(tmp_path):
     ws = _sandbox(tmp_path, flags={"session_state_guard": True})
-    # _sandbox just wrote current-session.md -> mtime ~ now -> fresh -> silent.
+    # _sandbox just wrote now.md -> mtime ~ now -> fresh -> silent.
     stdout, code = _run("session_state_guard.py", ws)
     assert code == 0
     assert stdout == ""
@@ -258,7 +261,7 @@ def test_state_guard_inert_when_fresh(tmp_path):
 
 def test_state_guard_fires_when_stale(tmp_path):
     ws = _sandbox(tmp_path, flags={"session_state_guard": True})
-    state = ws / ".ai-workspace" / "state" / "current-session.md"
+    state = ws / ".ai-workspace" / "state" / "now.md"
     old = time.time() - 3600  # 1 hour ago -> stale past the 20-min default window
     os.utime(state, (old, old))
     stdout, code = _run("session_state_guard.py", ws)
@@ -269,7 +272,7 @@ def test_state_guard_fires_when_stale(tmp_path):
 
 def test_state_guard_throttled_after_recent_nudge(tmp_path):
     ws = _sandbox(tmp_path, flags={"session_state_guard": True})
-    state = ws / ".ai-workspace" / "state" / "current-session.md"
+    state = ws / ".ai-workspace" / "state" / "now.md"
     old = time.time() - 3600
     os.utime(state, (old, old))
     # A marker dated "now" means we already nudged within the window -> stay silent.
@@ -279,3 +282,37 @@ def test_state_guard_throttled_after_recent_nudge(tmp_path):
     stdout, code = _run("session_state_guard.py", ws)
     assert code == 0
     assert stdout == ""
+
+
+# --- now_init (default ON, SessionStart; creates + caps the per-worktree now.md) ---
+
+def test_now_init_creates_now_md_and_names_journal(tmp_path):
+    ws = _sandbox(tmp_path, flags={"now_init": True})
+    (ws / ".ai-workspace" / "state" / "now.md").unlink()
+    stdout, code = _run("now_init.py", ws, stdin='{"session_id": "abcdef12-3456"}')
+    assert code == 0
+    ctx = _assert_single_json(stdout)["hookSpecificOutput"]["additionalContext"]
+    assert "abcdef12" in ctx and "journal/" in ctx
+    assert (ws / ".ai-workspace" / "state" / "now.md").is_file()
+
+
+def test_now_init_trims_overflow_into_session_journal(tmp_path):
+    ws = _sandbox(tmp_path, flags={"now_init": True})
+    now_md = ws / ".ai-workspace" / "state" / "now.md"
+    actions = "\n".join(f"- aktion {i:03d} " + "x" * 80 for i in range(80))
+    now_md.write_text(f"# Now\n\n## Letzte Aktionen (neueste oben)\n\n{actions}\n", "utf-8")
+    stdout, code = _run("now_init.py", ws, stdin='{"session_id": "0badc0de"}')
+    assert code == 0
+    _assert_single_json(stdout)
+    assert len(now_md.read_bytes()) <= 4096
+    journals = list((ws / ".ai-workspace" / "journal").rglob("*-0badc0de.md"))
+    assert len(journals) == 1
+    moved = journals[0].read_text(encoding="utf-8")
+    assert "- aktion 079 " in moved and "- aktion 000 " not in moved  # oldest (bottom) moved
+
+
+def test_now_init_flags_legacy_current_session(tmp_path):
+    ws = _sandbox(tmp_path, flags={"now_init": True})
+    (ws / ".ai-workspace" / "state" / "current-session.md").write_text("old\n", "utf-8")
+    stdout, _ = _run("now_init.py", ws, stdin='{"session_id": "cafe0001"}')
+    assert "now migrate" in _assert_single_json(stdout)["hookSpecificOutput"]["additionalContext"]

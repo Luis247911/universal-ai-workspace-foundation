@@ -1,4 +1,29 @@
 ---
+id: j-2026-09-30-migration
+type: journal
+session: migration
+tool: migration
+worktree:
+started: 2026-09-30T09:30
+transcript:
+themen: [migration, now]
+konsolidiert: true
+konsolidiert_zu: []
+---
+# Journal 2026-09-30 · migration
+
+## Ziel
+
+Umzug von `state/current-session.md` (geteilt, getrackt) nach `state/now.md` (pro Worktree, gitignored). Der alte Inhalt steht unten unveraendert.
+
+## Eintraege
+
+### 09:30 · notiz
+
+Inhalt von `state/current-session.md` vor der Migration, byte-genau:
+
+````markdown
+---
 id: current-session
 type: current-session
 title: "Live-Zustand"
@@ -67,3 +92,9 @@ Was wurde an wen oder welche Tool-Instanz delegiert? Erwartete Rueckmeldung?
 - Artifacts: `artifact-index.md`.
 - Session-Lifecycle-Regeln: `../session-contract.md`.
 - Handoff-Template: `../templates/handoff.md`.
+````
+
+### 09:31 · notiz
+
+Foundation-Vorlage: der alte Inhalt besteht nur aus Platzhaltern, es gibt nichts zu
+konsolidieren. Deshalb direkt `konsolidiert: true` (siehe D-2026-09-30-01).

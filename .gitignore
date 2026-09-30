@@ -66,6 +66,9 @@ desktop.ini
 .ai-workspace/scratch/
 .ai-workspace/research/_drafts/
 
+# === Live-Zustand pro Worktree (D-2026-09-30-01; Historie steht in .ai-workspace/journal/) ===
+.ai-workspace/state/now.md
+
 # === Working / scratch docs (local only, never published) ===
 optimierungen-harness.md
 

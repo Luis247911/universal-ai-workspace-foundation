@@ -3,7 +3,7 @@ live session state fresh after a file mutation.
 
 Self-gated on the ``recitation_nudge`` flag. When false or missing -> inert (exit 0, no
 output). When true it injects a short reminder (via ``additionalContext``) to update
-``.ai-workspace/state/current-session.md`` if the working state changed, per
+the session journal and ``.ai-workspace/state/now.md`` if the working state changed, per
 session-contract.md section 3.
 
 The hook NEVER writes state itself -- it only reminds; the model decides and writes. This
@@ -30,10 +30,10 @@ def main() -> int:
         return 0  # inert: flag off
 
     reminder = (
-        "Recitation check: if this edit changed the active task, the next step, or any "
-        "decision, update .ai-workspace/state/current-session.md (active task + next step "
-        "+ evidence) per session-contract.md section 3. If nothing material changed, "
-        "ignore this."
+        "Recitation check: if this edit produced a relevant result (decision, fact, "
+        "correction, blocker), append an entry to this session's journal, then update "
+        ".ai-workspace/state/now.md (active task + next step + evidence) per "
+        "session-contract.md section 3. If nothing material changed, ignore this."
     )
     out = {
         "hookSpecificOutput": {

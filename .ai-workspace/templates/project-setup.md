@@ -14,7 +14,7 @@ Schritt-fuer-Schritt-Checkliste, die in der ersten Arbeitssession auf einem neu 
 
 ## Pre-Check
 
-- [ ] `state/project-index.md` und `state/current-session.md` sind als Stubs vorhanden.
+- [ ] `state/project-index.md` ist als Stub vorhanden; `templates/session-state.md` (Vorlage fuer `state/now.md`) und `journal/README.md` existieren.
 - [ ] Verzeichnisstruktur passt zu Foundation-Default.
 - [ ] Keine Parallelstruktur ausserhalb der Foundation-Mount-Points.
 
@@ -26,7 +26,8 @@ Schritt-fuer-Schritt-Checkliste, die in der ersten Arbeitssession auf einem neu 
 
 ## Schritt 2: Erste Session initialisieren
 
-- [ ] `state/current-session.md` aus `templates/session-state.md` befuellen.
+- [ ] `state/now.md` aus `templates/session-state.md` anlegen (oder vom Hook `now_init` anlegen lassen) und befuellen.
+- [ ] Session-Journal anlegen (`templates/journal-entry.md`).
 - [ ] Active-Task = "Initial setup".
 - [ ] Status = `in_progress`.
 
@@ -57,7 +58,7 @@ Schritt-fuer-Schritt-Checkliste, die in der ersten Arbeitssession auf einem neu 
 
 ## Schritt 6: Setup-Artefakte registrieren
 
-- [ ] Alle erzeugten Setup-Artefakte (project-index, current-session, decisions Eintraege, evtl. Root-MOC, evtl. Data-Space-Manifest, evtl. Adapter-README) in `state/artifact-index.md` mit Status `active` eintragen.
+- [ ] Alle erzeugten Setup-Artefakte (project-index, decisions Eintraege, evtl. Root-MOC, evtl. Data-Space-Manifest, evtl. Adapter-README) in `state/artifact-index.md` mit Status `active` eintragen.
 
 ## Schritt 7: Ignore-Files
 
@@ -66,8 +67,8 @@ Schritt-fuer-Schritt-Checkliste, die in der ersten Arbeitssession auf einem neu 
 
 ## Schritt 8: Setup-Session-Summary
 
-- [ ] `state/current-session.md` enthaelt die Setup-Summary (D-IDs, Q-IDs, Artefakt-Pfade, aktive Adapter, KG-/Data-Space-/Maintenance-/Normalization-Status, Resume-Anweisung).
-- [ ] Status in `current-session.md` auf `done` fuer die Setup-Phase oder auf `in_progress` mit naechstem Task.
+- [ ] Das Session-Journal enthaelt die Setup-Summary als Eintrag `ergebnis` (D-IDs, Q-IDs, Artefakt-Pfade, aktive Adapter, KG-/Data-Space-/Maintenance-/Normalization-Status, Resume-Anweisung).
+- [ ] Status in `now.md` auf `done` fuer die Setup-Phase oder auf `in_progress` mit naechstem Task.
 
 ## Cross-Links
 

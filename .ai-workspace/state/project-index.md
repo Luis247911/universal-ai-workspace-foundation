@@ -97,7 +97,7 @@ Liste der registrierten Maintenance-Routines. Format:
 
 ## Cross-Links
 
-- Live-Zustand: `current-session.md`.
+- Live-Zustand: `now.md` (lokal, gitignored). Historie: `../journal/`.
 - Setup: `../setup-protocol.md`.
 - Adapter: `../adapter-policy.md`, `../adapters/README.md`.
 - KG: `../knowledge/README.md`.

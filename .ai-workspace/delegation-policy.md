@@ -38,7 +38,7 @@ Adapter duerfen Subagents/Skills/Hooks/MCP-Configs/Maintenance-Routines/Normaliz
 ## 5. Verbotene Patterns
 
 - Persistente Subagent-Mailboxes ohne Approval-Gate.
-- "Latest-Run"-Auto-Resume ohne kanonischen Pointer in `state/current-session.md`.
+- "Latest-Run"-Auto-Resume ohne kanonischen Pointer in `state/now.md` bzw. im Session-Journal.
 - Subagent-Outputs ohne `templates/delegated-work-report.md`-Schema.
 - Auto-Promote-zu-State (z.B. ein delegated Call der direkt `state/decisions.md` schreibt).
 - Maintenance-Routines, die durable State direkt mutieren.

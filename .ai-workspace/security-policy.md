@@ -137,7 +137,7 @@ Tool- und Command-Namen (z.B. `npm`, `pip`, `package.json`, `Python`, `Node`, `c
 
 ## 13. Audit-Mode-Marker (Empfehlung, nicht Foundation-Mechanismus)
 
-Wenn die Hauptsession in einer Read-Only-/Audit-Session laeuft, kann der User in `state/current-session.md` ein Flag setzen, das destruktive Auto-Aktionen unterdrueckt. Foundation liefert keinen Mechanismus, dokumentiert aber das Pattern als Empfehlung — Adapter koennen dies aufgreifen.
+Wenn die Hauptsession in einer Read-Only-/Audit-Session laeuft, kann der User in `state/now.md` ein Flag setzen, das destruktive Auto-Aktionen unterdrueckt. Foundation liefert keinen Mechanismus, dokumentiert aber das Pattern als Empfehlung — Adapter koennen dies aufgreifen.
 
 ## Cross-Links
 

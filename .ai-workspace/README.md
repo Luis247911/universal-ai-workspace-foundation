@@ -30,6 +30,7 @@ Diese Datei ist eine reine Routing-Funktion. Sie erklaert, was unter `.ai-worksp
 | `deliverables/` | Kuratierte `.md`-Outputs | durable | Load on Explicit Request |
 | `scratch/` | Ephemere, untrusted Arbeit | 7 Tage | Never Auto-Load |
 | `archive/` | Inerte Historie | immutable | Never Auto-Load (ausser Anfrage) |
+| `journal/` | Episodisches Gedaechtnis, eine Datei pro Session | nur ergaenzt; nach Konsolidierung unveraenderlich | Never Auto-Load |
 | `adapters/` | Projektspezifische Erweiterungen | adapterspezifisch | nur aktive Adapter, registriert in `state/project-index.md` |
 
 ## Markdown-only-Regel
@@ -43,7 +44,7 @@ Vier Dateien werden beim Session-Start automatisch wahrgenommen:
 1. `../AGENTS.md`
 2. `../CLAUDE.md` (falls Tool = Claude)
 3. `state/project-index.md`
-4. `state/current-session.md`
+4. `state/now.md` (gitignored, pro Worktree)
 
 Alles andere wird auf Relevanz, auf Anfrage oder gar nicht geladen. Siehe `context-policy.md`.
 

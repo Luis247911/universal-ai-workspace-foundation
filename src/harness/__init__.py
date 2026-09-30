@@ -10,9 +10,10 @@ small, dependency-light, teaching-grade reference for one framework area:
     router         model-group routing + typed fallbacks + cache-breakpoint hints
     memory         scope x type memory with an in/out-of-context boundary
     orchestrator   node/edge graph + the canonical workflow shapes
+    mdmemory       the Markdown memory of THIS workspace (journal, now.md, notes, indexes)
 
 Patterns are reimplemented from public OSS ideas (see /sources/credits.md and /NOTICE);
 no third-party agent library is required. Everything runs offline in mock mode by default.
 """
 
-__version__ = "3.2.1"
+__version__ = "3.3.0a1"

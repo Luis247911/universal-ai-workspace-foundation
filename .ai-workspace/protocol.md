@@ -27,7 +27,7 @@ Diese Datei ist die operative Verhaltens-Definition fuer jede Session, die auf d
 
 ## 4. Update-Pflichten
 
-- Vor `/compact`, vor Handoff, vor Task-Wechsel, nach jeder groesseren Aktion: aktualisiere `state/current-session.md` gemaess `session-contract.md`.
+- Vor `/compact`, vor Handoff, vor Task-Wechsel, nach jeder groesseren Aktion: Journal-Eintrag anhaengen und `state/now.md` aktualisieren gemaess `session-contract.md` §3.
 - Bei jeder neuen Erkenntnis, die ein State-Eintrag wird (Decision, Open Question, Annahme, Risiko, Quelle, Artefakt): direkt im richtigen `state/`-File registrieren.
 - Bei Erstellung eines Artefakts in `research/`, `deliverables/`, `knowledge/` oder `data-space/`: Eintrag in `state/artifact-index.md`.
 

@@ -1,57 +1,40 @@
 ---
-id: <session-state-slug>
-type: current-session
-title: "Live-Zustand"
-status: active
-created: <YYYY-MM-DD>
-updated: <YYYY-MM-DD>
-owner: <user>
+id: now
+type: now
+title: "Live-Zustand dieses Worktrees"
+updated: <YYYY-MM-DD HH:MM>
+session: <session-kurzid>
+journal: <journal-pfad>
 ---
+# Now
 
-# Current Session
+Live-Zustand dieses Worktrees: gitignored, nicht geteilt, max. 4 KB. Episoden gehoeren ins
+Journal, nicht hierher. Regeln: `../session-contract.md` §3.
 
-Vorlage fuer `state/current-session.md` bei Reset oder neuem Projekt. Inhalt-Stub mit allen Pflicht-Sektionen.
+## Aktive Aufgabe
 
-## 1. Last Update
+<1 Satz>
 
-`<YYYY-MM-DD HH:MM>`
+## Status
 
-## 2. Active Task
+<in_progress / blocked / waiting_for_user / paused / done>
 
-`<beschreibung>`
+## Reboot-Test
 
-## 3. Status
+- **Wo bin ich?** <...>
+- **Was ist das Ziel?** <...>
+- **Was hat sich geaendert?** <...>
+- **Was bleibt offen?** <...>
+- **Welche Evidenz?** <...>
 
-`<in_progress / blocked / waiting_for_user / paused / done>`
+## Naechste Schritte
 
-## 4. Reboot-Test-Antworten
+- <...>
 
-- **Wo bin ich?** `<...>`
-- **Was ist das Ziel?** `<...>`
-- **Was hat sich geaendert?** `<...>`
-- **Was bleibt offen?** `<...>`
-- **Welche Evidenz?** `<...>`
+## Offene Handoffs
 
-## 5. Recent Actions
+(keine)
 
-(noch keine)
-
-## 6. Resume Notes
-
-`<text>`
-
-## 7. Open Handoffs
+## Letzte Aktionen (neueste oben, max. 10)
 
 (noch keine)
-
-## 8. Pointer auf relevante State-/KG-Eintraege
-
-- Decisions: `<>`
-- Open Questions: `<>`
-- Risks: `<>`
-- Knowledge: `<>`
-
-## Cross-Links
-
-- Session-Lifecycle-Regeln: `../session-contract.md`.
-- Identitaet: `../state/project-index.md`.

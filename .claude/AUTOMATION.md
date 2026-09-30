@@ -6,9 +6,9 @@ bleibt markdown-only und motorlos (siehe `state/decisions.md` D-2026-06-04-01).
 
 > **Default: AUS** fuer alle *wiederkehrenden* Helfer (`boot_reload`, `recitation_nudge`,
 > `daily_maintenance`, `prompt_optimizer`, `external_content_guard`, `compact_nudge`,
-> `session_state_guard`). Einzige Ausnahme: frisch geklont feuert **genau ein einmaliger,
-> reversibler Onboarding-Stups** beim ersten Start (`first_run_onboarding`, default AN, ruft
-> `/start` auf) -- und sonst nichts. Aktivierung/Deaktivierung ist opt-in, reversibel und wird
+> `session_state_guard`). Ausnahmen, default AN: der einmalige Onboarding-Stups beim ersten Start
+> (`first_run_onboarding`, ruft `/start` auf) und `now_init`, das die lokale Live-Datei
+> `state/now.md` anlegt und auf 4 KB haelt (D-2026-09-30-03). Aktivierung/Deaktivierung ist opt-in, reversibel und wird
 > durch den Begleiter `/uaw-automation` gefuehrt.
 
 ## In einfachen Worten
@@ -39,29 +39,33 @@ externen Abhaengigkeiten, kein API).
 
 | Flag | Event | Was es tut | Prinzip |
 |---|---|---|---|
-| `boot_reload` | `SessionStart` | Liest `.ai-workspace/state/current-session.md` und speist es als `additionalContext` ein -> jede neue/resumte/gecleart/compactete Session bootet mit dem Live-State. Seit v3.2.1 laedt `CLAUDE.md` die Datei bereits per `@`-Import; fuer Claude Code ist der Hook damit weitgehend redundant. | Hook liest nur, was das Modell schrieb. |
-| `recitation_nudge` | `PostToolUse` | Nach Write/Edit/NotebookEdit ein kurzer Reminder, `current-session.md` fortzuschreiben (Task + naechster Schritt + Evidenz, `session-contract.md` §3). | Hook erinnert, **Modell schreibt**. |
+| `now_init` | `SessionStart` (alle Quellen) | Legt `.ai-workspace/state/now.md` (gitignored, pro Worktree) aus `templates/session-state.md` an, falls sie fehlt; kuerzt sie ueber 4 KB verlustfrei (Ueberlauf ins Session-Journal); nennt Session-Kurz-ID + Journal-Pfad; meldet eine alte `current-session.md`. **Default AN.** | Hook legt nur die lokale Live-Datei an und haelt ihre Groesse; Inhalte schreibt das Modell (D-2026-09-30-02). |
+| `boot_reload` | `SessionStart` | Liest `.ai-workspace/state/now.md` (Legacy-Fallback `current-session.md`) und speist es als `additionalContext` ein -> jede neue/resumte/gecleart/compactete Session bootet mit dem Live-State. Seit v3.2.1 laedt `CLAUDE.md` die Datei bereits per `@`-Import; fuer Claude Code ist der Hook damit weitgehend redundant. | Hook liest nur, was das Modell schrieb. |
+| `recitation_nudge` | `PostToolUse` | Nach Write/Edit/NotebookEdit ein kurzer Reminder: relevantes Ergebnis ins Journal, dann `now.md` fortschreiben (Task + naechster Schritt + Evidenz, `session-contract.md` §3). | Hook erinnert, **Modell schreibt**. |
 | `first_run_onboarding` | `SessionStart` (startup) | Bei frischem, uneingerichtetem Workspace (State-Platzhalter da, kein Onboarding-Marker) speist es einen Stups ein: begruesse den Nutzer + starte `/start`. **Default AN.** Escape: `UAW_DISABLE_ONBOARDING`. | Hook stupst nur an; `/start` + Modell handeln. |
 | `daily_maintenance` | `SessionStart` (startup+resume) | Beim ersten Start eines lokalen Kalendertages ein Pflege-Pass-Vorschlag (scratch/ einsortieren, tote `[[wiki-links]]`/stale notes, verwaiste Artefakte). Schreibt nur seinen gitignored Datums-Marker. | Hook erinnert + schreibt nur eigenen Lauf-Marker, **Modell schlaegt vor/handelt**. |
 | `prompt_optimizer` | `UserPromptSubmit` | Erkennt einen vagen Prompt (kurz ohne Aktionsverb, mehrere antezedenzlose Pronomen, offene Frage) und speist das 3-Stufen-Disambiguierungs-Protokoll ein (Annahmen offenlegen + fortfahren). Klarer Prompt -> inert. | Hook erinnert, **Modell** entscheidet; blockt nie. |
 | `external_content_guard` | `PostToolUse` (WebFetch/WebSearch) | Nach einem externen Fetch: Quarantaene-Reminder (Inhalt = Daten, nie Anweisungen) + Injection-Scan-Hinweis; optional Abgleich der genutzten URL gegen die gitignored Projekt-Deny-Liste `.claude/external-content-denylist.txt`. | Advisory; blockt nie (kein exit 2). |
 | `compact_nudge` | `PostToolUse` (kontext-wachsende Tools) | Zaehlt Tool-Calls in einem gitignored Marker und schlaegt alle `UAW_COMPACT_NUDGE_THRESHOLD` (default 60) Calls einen strategischen `/compact` an einer Task-Grenze vor; dazwischen still. | Hook erinnert, **Modell/Du** compacted. |
-| `session_state_guard` | `PostToolUse` (Write/Edit/NotebookEdit) | Erinnert **nur**, wenn `current-session.md` veraltet ist (>= `UAW_STATE_GUARD_STALE_MINUTES`, default 20, nicht angefasst), gedrosselt auf max. 1x/Fenster, den Live-State zu sichern; bei fleissigem Mitschreiben still. | Staleness-gegated; Hook schreibt nie State. |
+| `session_state_guard` | `PostToolUse` (Write/Edit/NotebookEdit) | Erinnert **nur**, wenn `now.md` veraltet ist (>= `UAW_STATE_GUARD_STALE_MINUTES`, default 20, nicht angefasst), gedrosselt auf max. 1x/Fenster, den Live-State zu sichern; bei fleissigem Mitschreiben still. | Staleness-gegated; Hook schreibt nie State. |
 
 Die beiden Recitation-Helfer (`boot_reload`/`recitation_nudge`) setzen die Manus-Lehre lokal um:
 **kontinuierliche Recitation + Reload beim Boot**. Der State ueberlebt Compaction nicht, weil ein
 Hook den Moment abfaengt, sondern weil er laufend frisch ist und bei jedem Boot neu eingespeist wird.
 
-**Marker-Doktrin (D-2026-06-06-03).** Die Grenze ist nicht "Hook schreibt nie", sondern: ein Hook
-darf seinen **eigenen ephemeren, gitignored Lauf-Marker** unter `.claude/` schreiben
-(`daily_maintenance` schreibt `.daily_maintenance_last`; `/start` schreibt `.onboarding-state.json`)
--- aber **nie** Governance-State (`.ai-workspace/**`) oder die Config (`automation.flags.json`).
-Das halten die Invarianten C1/C2 und D-2026-06-04-01 ein.
+**Schreib-Doktrin (D-2026-09-30-02, ersetzt D-2026-06-06-03).** Ein Hook darf schreiben:
+(a) seinen **eigenen ephemeren, gitignored Lauf-Marker** unter `.claude/` (`daily_maintenance`
+schreibt `.daily_maintenance_last`; `/start` schreibt `.onboarding-state.json`); (b) die lokale,
+gitignored `state/now.md` **anlegen** (aus der Vorlage) und **auf 4 KB kuerzen**; (c) den dabei
+entstehenden Ueberlauf ans Ende des **eigenen** Session-Journals **anhaengen**. Nie: bestehende
+Inhalte aendern, fremde Journale, Notizen, Decisions oder die Config (`automation.flags.json`)
+beschreiben. Alles bleibt `.md`, die Invarianten C1/C2 halten.
 
 ## Dateien
 
-- `.claude/automation.flags.json` — die Toggles. Default: `first_run_onboarding: true`, alle uebrigen `false` (`boot_reload`, `recitation_nudge`, `daily_maintenance`, `prompt_optimizer`, `external_content_guard`, `compact_nudge`, `session_state_guard`).
+- `.claude/automation.flags.json` — die Toggles. Default: `first_run_onboarding: true`, `now_init: true`, alle uebrigen `false` (`boot_reload`, `recitation_nudge`, `daily_maintenance`, `prompt_optimizer`, `external_content_guard`, `compact_nudge`, `session_state_guard`).
 - `.claude/hooks/_flags.py` — stdlib-Helper: Repo-Root (`CLAUDE_PROJECT_DIR`, sonst aus `__file__`) + Flag lesen. Jeder Fehler -> `False` (fail-safe).
+- `.claude/hooks/now_init.py` — SessionStart-Handler (startup/resume/clear/compact), self-gated auf `now_init` (default AN); nutzt `src/harness/mdmemory` (ohne Engine: inert). Codex: `--tool codex` uebergeben.
 - `.claude/hooks/boot_reload.py` — SessionStart-Handler, self-gated auf `boot_reload`.
 - `.claude/hooks/recitation_nudge.py` — PostToolUse-Handler, self-gated auf `recitation_nudge`.
 - `.claude/hooks/first_run_onboarding.py` — SessionStart(startup)-Handler, self-gated auf `first_run_onboarding` (default AN) + Onboarding-Marker + State-Platzhalter + `UAW_DISABLE_ONBOARDING`-Escape.
@@ -130,32 +134,32 @@ On-Pfad, ohne die echten Flags zu kippen (Sandbox-Projektdir via `CLAUDE_PROJECT
     New-Item -ItemType Directory -Force (Join-Path $tmp ".claude") | Out-Null
     New-Item -ItemType Directory -Force (Join-Path $tmp ".ai-workspace\state") | Out-Null
     '{ "boot_reload": true, "recitation_nudge": true }' | Set-Content -Encoding utf8 (Join-Path $tmp ".claude\automation.flags.json")
-    "ACTIVE TASK: test" | Set-Content -Encoding utf8 (Join-Path $tmp ".ai-workspace\state\current-session.md")
+    "ACTIVE TASK: test" | Set-Content -Encoding utf8 (Join-Path $tmp ".ai-workspace\state\now.md")
     $env:CLAUDE_PROJECT_DIR = $tmp
     '{}' | python .claude/hooks/boot_reload.py        # erwartet: hookSpecificOutput-JSON mit additionalContext
     Remove-Item env:CLAUDE_PROJECT_DIR; Remove-Item -Recurse -Force $tmp
 
-## Session-State-Durabilitaet (current-session.md)
+## Session-State-Durabilitaet (now.md + Journal)
 
-Zwei haeufige Fragen, hier kanonisch beantwortet (vgl. `session-contract.md` §3 + §3.1):
+Seit v3.3 gibt es zwei Dateien mit getrennten Aufgaben (`session-contract.md` §3, D-2026-09-30-01):
 
-**Wird `current-session.md` rotiert/archiviert?** Nein — bewusst nicht. Sie ist eine **lebende
-Datei**, laufend in-place fortgeschrieben. Der „nichts geht verloren"-Garant ist **git**: die Datei
-ist getrackt, jede ueberschriebene Version liegt in der git-Historie
-(`git show <ref>:.ai-workspace/state/current-session.md`). Das haelt nur bei regelmaessigem Commit —
-zwischen Commits ist ein Overwrite im Working Tree destruktiv. `archive/` ist fuer *semantische*
-Snapshots (Handoff, drastischer Reset), nicht fuer mechanische Pro-Session-Rotation (D-2026-06-07-01).
+- **`state/now.md`** — aktueller Stand *dieses* Worktrees. Gitignored, max. 4 KB, wird
+  ueberschrieben. Zwei parallele Sessions in zwei Worktrees haben zwei eigene Dateien und damit
+  keinen Merge-Konflikt. `now_init` legt sie an und haelt die Grenze ein.
+- **`journal/YYYY/MM/<datum>-<kurzid>.md`** — Historie *dieser* Session. Committet, nur ergaenzt,
+  **waehrend** der Arbeit geschrieben (nach jedem relevanten Ergebnis). Das ist der Garant gegen
+  Verlust, nicht mehr die git-Historie einer ueberschriebenen Datei.
 
-**Wird beim Session-Ende automatisch gesichert?** Nein, und ein zuverlaessiger „Flush beim Exit" ist
-nicht machbar: ein harter Kill/Crash feuert keinen Hook, und ein Hook darf Governance-State nicht
-selbst schreiben (D-2026-06-04-01). Die Absicherung ist **kontinuierliche Frische statt End-Flush**.
-`session_state_guard` (opt-in) zieht dieses Netz enger, ohne zu nerven: er erinnert **nur**, wenn
-`current-session.md` tatsaechlich veraltet ist (>= `UAW_STATE_GUARD_STALE_MINUTES`, default 20), und
-hoechstens 1x pro Fenster — bei fleissigem Mitschreiben bleibt er still. Der echte Garant bleibt:
-**current-session.md aktuell halten + committen.**
+**Wird beim Session-Ende automatisch gesichert?** Ein harter Kill/Crash feuert keinen Hook. Darum
+wird das Journal laufend geschrieben statt am Ende geflusht; ein Abbruch verliert hoechstens den
+letzten Schritt. `session_state_guard` (opt-in) erinnert zusaetzlich, wenn `now.md` veraltet ist.
+
+**Upgrade von <= 3.2:** `python -m harness.mdmemory now migrate --remove-legacy` sichert die alte
+`state/current-session.md` byte-genau als Migrations-Journal, legt daraus eine lokale `now.md` an
+und entfernt die alte Datei; danach committen. `now_init` weist beim Start darauf hin.
 
 ## Verwandte Governance
 
-- `state/decisions.md` — D-2026-06-04-01 (Core-Freeze), D-2026-06-04-02 (opt-in Automatik), D-2026-06-06-01 (default-AN Erst-Start-Onboarding), D-2026-06-06-02 (opt-in Pflege-Routine), D-2026-06-06-03 (Lauf-Marker-Doktrin), D-2026-06-07-01 (State-Durability: lebende Datei + git), D-2026-06-07-02 (vier zusaetzliche opt-in Hooks).
+- `state/decisions.md` — D-2026-06-04-01 (Core-Freeze), D-2026-06-06-01 (default-AN Erst-Start-Onboarding), D-2026-06-06-02 (opt-in Pflege-Routine), D-2026-06-07-02 (vier zusaetzliche opt-in Hooks), D-2026-09-30-01 (now.md + Journal, ersetzt D-2026-06-07-01), D-2026-09-30-02 (Hook-Schreib-Doktrin, ersetzt D-2026-06-06-03), D-2026-09-30-03 (Automatik-Defaults, ersetzt D-2026-06-04-02).
 - `session-contract.md` §3.1 — Recitation-Rationale + Pointer auf diese Schicht.
 - `adapter-policy.md` §8 — Abgrenzung Automatik-Schicht vs. Adapter/Maintenance-Routine.

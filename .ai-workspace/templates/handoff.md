@@ -12,7 +12,7 @@ verification_status: unverified
 
 # Handoff
 
-Vorlage fuer einen ausfuehrlichen Session-Handoff. Wird genutzt, wenn die Uebergabe komplexer ist, als `state/current-session.md` allein leisten kann (z.B. an eine andere Person, eine andere Tool-Instanz, eine spaetere Wiederaufnahme nach laengerer Pause).
+Vorlage fuer einen ausfuehrlichen Session-Handoff. Wird genutzt, wenn die Uebergabe komplexer ist, als `state/now.md` und das Session-Journal allein leisten koennen (z.B. an eine andere Person, eine andere Tool-Instanz, eine spaetere Wiederaufnahme nach laengerer Pause).
 
 ## Aktueller Task
 
@@ -53,6 +53,6 @@ Was wurde noch nicht verifiziert? Welche Aussagen sollten skeptisch betrachtet w
 
 ## Cross-Links
 
-- Live-Zustand: `../state/current-session.md`.
+- Live-Zustand: `../state/now.md` (lokal). Historie: `../journal/`.
 - Session-Lifecycle: `../session-contract.md`.
 - Lifecycle: `../file-lifecycle.md`.

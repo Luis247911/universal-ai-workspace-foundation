@@ -2,7 +2,8 @@
 
 Self-gated on the ``boot_reload`` flag (``.claude/automation.flags.json``). When the flag
 is false or missing it prints nothing and exits 0 -> fully inert. When true it reads
-``.ai-workspace/state/current-session.md`` and returns it as SessionStart
+``.ai-workspace/state/now.md`` (per worktree; legacy fallback ``current-session.md``) and returns
+it as SessionStart
 ``additionalContext``, so a new / resumed / cleared / compacted session boots with the
 current state already in view.
 
@@ -30,14 +31,19 @@ def main() -> int:
     if not flag("boot_reload"):
         return 0  # inert: flag off
 
-    state = project_dir() / ".ai-workspace" / "state" / "current-session.md"
-    try:
-        text = state.read_text(encoding="utf-8")
-    except OSError:
+    state_dir = project_dir() / ".ai-workspace" / "state"
+    text = None
+    for name in ("now.md", "current-session.md"):  # current-session.md = pre-3.3 legacy
+        try:
+            text = (state_dir / name).read_text(encoding="utf-8")
+            break
+        except OSError:
+            continue
+    if text is None:
         return 0  # nothing to inject; stay silent
 
     context = (
-        "## Live session state (auto-reloaded from .ai-workspace/state/current-session.md)\n"
+        f"## Live session state (auto-reloaded from .ai-workspace/state/{name})\n"
         "Re-orient to this before continuing. It is the file-as-memory of this project; "
         "keep it current per session-contract.md section 3.\n\n"
     ) + text

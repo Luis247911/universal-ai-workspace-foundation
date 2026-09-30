@@ -48,7 +48,7 @@ Eine MOC-Datei (Map of Content) ist Einstiegspunkt fuer ein Topic. MOCs **duerfe
 
 ## 6. Kein Parallel-State
 
-Der Knowledge Graph darf **nicht** `current-session.md`, `decisions.md`, `source-registry.md`, `artifact-index.md` oder andere State-Dateien ersetzen. Er darf sie nur referenzieren.
+Der Knowledge Graph darf **nicht** `now.md`, `journal/`, `decisions.md`, `source-registry.md`, `artifact-index.md` oder andere State-Dateien ersetzen. Er darf sie nur referenzieren.
 
 Beispiel: Eine Decision lebt als Zeile in `state/decisions.md` mit ID `D-YYYY-MM-DD-NN`. Eine Knowledge-Note kann diese Decision via `[[D-YYYY-MM-DD-NN]]` referenzieren und in narrativem Kontext einordnen, aber den Decision-Inhalt nicht duplizieren.
 
@@ -201,7 +201,7 @@ Prueft, ob neue Research Reports, Source Notes, Decisions, Deliverables, Normali
 
 #### Blueprint 3: session-memory-review
 
-Prueft, ob wichtige Erkenntnisse aus Session-Verlaeufen, Handoffs oder `current-session.md` in durable State, Decisions, Assumptions, Knowledge Notes oder Open Questions uebernommen werden sollten.
+Prueft, ob wichtige Erkenntnisse aus Session-Verlaeufen, Handoffs, `journal/` oder `now.md` in durable State, Decisions, Assumptions, Knowledge Notes oder Open Questions uebernommen werden sollten.
 
 #### Blueprint 4: source-artifact-hygiene
 

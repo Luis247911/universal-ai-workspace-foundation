@@ -20,13 +20,14 @@ def main() -> int:
         return 0
     if str(data.get("trigger") or "") == "auto":
         msg = (
-            "Automatischer Compact: danach pruefen, ob Journal und state/now.md den Stand "
-            "enthalten; dauerhafte Erkenntnisse mit `merken` sichern."
+            "Automatischer Compact laeuft. Danach erinnert memory_boot das Modell, Journal und "
+            "state/now.md zu pruefen; dauerhafte Erkenntnisse mit `merken` sichern."
         )
     else:
         msg = (
-            "Compact: vorher Journal-Eintrag anhaengen und state/now.md aktualisieren; "
-            "dauerhafte Erkenntnisse mit `merken` sichern."
+            "Compact laeuft. Danach erinnert memory_boot das Modell, Journal und state/now.md zu "
+            "pruefen und Dauerhaftes mit `merken` zu sichern. Tipp fuers naechste Mal: vor "
+            "/compact kurz 'Journal und now.md sichern' sagen."
         )
     print(json.dumps({"systemMessage": msg}))
     return 0

@@ -131,14 +131,14 @@ def _journal(root: Path, sid: str = "b" * 32) -> Path:
 def test_pending_and_mark_are_idempotent(tmp_path):
     root = _ws(tmp_path)
     jpath = _journal(root)
-    assert [p.path for p in consolidate.pending(root)] == [jpath]
+    assert [p.path for p in consolidate.pending(root, today="2031-12-31")] == [jpath]
     ref = _note(root, "Protokolle nur als Markdown", "decision")
     assert consolidate.mark(root, jpath, [ref])
     text = jpath.read_text("utf-8")
     assert "konsolidiert: true" in text and f"konsolidiert_zu: [{ref}]" in text
     assert consolidate.mark(root, jpath, [ref]) is False
     assert jpath.read_text("utf-8") == text
-    assert consolidate.pending(root) == []
+    assert consolidate.pending(root, today="2031-12-31") == []
     with pytest.raises(journal.JournalFrozenError):
         journal.append(jpath, "notiz", "zu spaet")
     with pytest.raises(KeyError):
@@ -226,7 +226,8 @@ def test_journal_stub_creates_nothing_and_respects_frozen_journals(tmp_path):
 
 def test_memory_boot_lists_other_pending_journals(tmp_path):
     root = _ws(tmp_path, flags={"memory_boot": True})
-    _journal(root, sid="d" * 32)
+    other = _journal(root, sid="d" * 32)
+    journal.append(other, "uebergabe", "Session beendet.")  # finished (journal_stub)
     out, code, _ = _hook("memory_boot.py", root, {"session_id": "e" * 32, "source": "startup"})
     assert code == 0
     ctx = json.loads(out)["hookSpecificOutput"]["additionalContext"]

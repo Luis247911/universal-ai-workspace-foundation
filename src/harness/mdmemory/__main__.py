@@ -104,6 +104,13 @@ def _journal_file(root: Path, given: str) -> Path:
     return path
 
 
+def _iso_date(value: str) -> str:
+    try:
+        return date.fromisoformat(value).isoformat()
+    except ValueError:
+        raise argparse.ArgumentTypeError(f"not a date YYYY-MM-DD: {value!r}") from None
+
+
 def _limit(value: str) -> int:
     n = int(value)
     if n < now.MIN_LIMIT:
@@ -198,7 +205,7 @@ def _cmd_import(args: argparse.Namespace) -> int:
 
 def _cmd_pending(args: argparse.Namespace) -> int:
     root = _root(args)
-    items = consolidate.pending(root)
+    items = consolidate.pending(root, include_running=args.all)
     for p in items:
         print(f"{rel(root, p.path)} · {p.entries} Eintraege · {', '.join(p.kinds)}")
     print(f"{len(items)} nicht konsolidierte Journale")
@@ -242,7 +249,7 @@ def _cmd_conflict(args: argparse.Namespace) -> int:
 
 def _cmd_consolidated(args: argparse.Namespace) -> int:
     root = _root(args)
-    changed = consolidate.mark(root, Path(args.journal), args.ids)
+    changed = consolidate.mark(root, _journal_file(root, args.journal), args.ids)
     print(("marked: " if changed else "unchanged: ") + args.journal)
     return 0
 
@@ -286,7 +293,9 @@ def main(argv: list[str] | None = None) -> int:
     )
     sp = sub.add_parser("split-decisions", help="Legacy registers -> atomic notes.")
     sp.add_argument("--register", default="all", choices=["all", *REGISTERS])
-    sp.add_argument("--date", default=date.today().isoformat(), help="migration date")
+    sp.add_argument(
+        "--date", type=_iso_date, default=date.today().isoformat(), help="migration date"
+    )
     ep = sub.add_parser("export-legacy", help="Old register format from the notes.")
     ep.add_argument("register", choices=list(REGISTERS))
     rp = sub.add_parser("rollup", help="Monthly journal rollup.")
@@ -295,7 +304,8 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--source", default=None, help="folder (default: Claude's project memory)")
     ap.add_argument("--dry-run", action="store_true")
 
-    sub.add_parser("pending", help="Journals not consolidated yet.")
+    pp = sub.add_parser("pending", help="Finished journals not consolidated yet.")
+    pp.add_argument("--all", action="store_true", help="also journals of running sessions")
     cap = sub.add_parser("candidates", help="Notes similar to a statement.")
     cap.add_argument("text")
     cap.add_argument("--limit", type=int, default=5)
@@ -303,16 +313,16 @@ def main(argv: list[str] | None = None) -> int:
     sup.add_argument("old")
     sup.add_argument("new")
     sup.add_argument("--change", required=True, choices=sorted(consolidate.CHANGE))
-    sup.add_argument("--date", default=None)
+    sup.add_argument("--date", type=_iso_date, default=None)
     cfp = sub.add_parser("confirm", help="Set last_confirmed of a note.")
     cfp.add_argument("ref")
-    cfp.add_argument("--date", default=None)
+    cfp.add_argument("--date", type=_iso_date, default=None)
     cop = sub.add_parser("conflict", help="Record a contradiction as a pinned question.")
     cop.add_argument("a")
     cop.add_argument("b")
     cop.add_argument("title")
     cop.add_argument("--source", required=True)
-    cop.add_argument("--date", default=None)
+    cop.add_argument("--date", type=_iso_date, default=None)
     cdp = sub.add_parser("consolidated", help="Freeze a journal after consolidation.")
     cdp.add_argument("journal")
     cdp.add_argument("ids", nargs="*")
@@ -340,8 +350,9 @@ def main(argv: list[str] | None = None) -> int:
     }
     try:
         return handlers[args.cmd](args)
-    except FrontmatterError as exc:
-        print(f"error: {exc}", file=sys.stderr)
+    except (FrontmatterError, KeyError, ValueError) as exc:
+        msg = exc.args[0] if isinstance(exc, KeyError) and exc.args else exc
+        print(f"error: {msg}", file=sys.stderr)
         return 2
 
 

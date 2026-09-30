@@ -29,11 +29,11 @@ erledigt `python -m harness.mdmemory`; das Urteil faellst du.
 
 | Operation | Wann | Was tun |
 |---|---|---|
-| NOOP | Steht schon so da | nichts schreiben; bei erneuter Bestaetigung `mdmemory confirm <id>` |
-| ADD | Neu, widerspricht nichts | `mdmemory new <typ> "<titel>" --source journal:<pfad>`, Koerper fuellen |
+| NOOP | Steht schon so da | nichts schreiben; bei erneuter Bestaetigung `python -m harness.mdmemory confirm <id>` |
+| ADD | Neu, widerspricht nichts | `python -m harness.mdmemory new <typ> "<titel>" --source journal:<pfad>`, Koerper fuellen |
 | UPDATE | Gleiche Aussage, genauer oder ergaenzt | Notiz editieren, `updated` setzen, Zeile unter `## Verlauf` |
-| SUPERSEDE | Alte Aussage gilt nicht mehr | neue Notiz (ADD), dann `mdmemory supersede <alt> <neu> --change veraendert\|korrigiert` |
-| CONFLICT | Widerspruch, unklar welche gilt | `mdmemory conflict <a> <b> "<frage>" --source …` (angeheftete Frage, nichts ueberschreiben) |
+| SUPERSEDE | Alte Aussage gilt nicht mehr | neue Notiz (ADD), dann `python -m harness.mdmemory supersede <alt> <neu> --change <veraendert oder korrigiert>` |
+| CONFLICT | Widerspruch, unklar welche gilt | `python -m harness.mdmemory conflict <a> <b> "<frage>" --source …` (angeheftete Frage, nichts ueberschreiben; ein zweiter Aufruf fuer dasselbe Paar legt nichts neu an) |
 
    `veraendert`: die Welt hat sich geaendert, die alte Notiz war damals richtig.
    `korrigiert`: die alte Notiz war falsch.
@@ -46,7 +46,10 @@ erledigt `python -m harness.mdmemory`; das Urteil faellst du.
    Alles andere schreibst du direkt und nennst es danach in einer Zeile.
 5. **Abschluss**: `python -m harness.mdmemory index`, dann `python -m harness.mdmemory lint`
    (muss 0 Fehler zeigen). Ein Journal, dessen Eintraege alle verarbeitet sind, einfrieren:
-   `python -m harness.mdmemory consolidated <journal> <notiz-ids…>`.
+   `python -m harness.mdmemory consolidated <journal> <notiz-ids…>`. **Nur abgeschlossene
+   Journale** einfrieren: das eigene am Ende dieser Session oder die, die `pending` nennt
+   (mit `uebergabe`-Eintrag oder aelter als heute). Das Journal einer Session, die in einem
+   anderen Worktree noch laeuft, bleibt offen; sonst kann sie nicht weiterschreiben.
 
 ## Regeln
 

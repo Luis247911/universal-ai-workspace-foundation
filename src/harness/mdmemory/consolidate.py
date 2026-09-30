@@ -3,18 +3,20 @@
 The judgement (NOOP / ADD / UPDATE / SUPERSEDE / CONFLICT) is made by the model following the
 skill; these helpers do the mechanical, error-prone parts deterministically and idempotently:
 
-* ``pending``     journals that are not consolidated yet (oldest first)
+* ``pending``     finished journals that are not consolidated yet (oldest first)
 * ``candidates``  existing notes that look like the new statement (token overlap, stdlib)
 * ``supersede``   set both sides of a supersede chain (a second call changes nothing)
 * ``confirm``     NOOP with confirmation: ``last_confirmed`` only
-* ``conflict``    a pinned ``question`` note of kind ``conflict`` linking both statements
+* ``conflict``    a pinned ``question`` note of kind ``conflict`` linking both statements (once)
 * ``mark``        freeze a journal: ``konsolidiert: true`` + ``konsolidiert_zu: [ids]``
 """
 
 from __future__ import annotations
 
 import re
+from collections.abc import Iterable
 from dataclasses import dataclass
+from datetime import date
 from pathlib import Path
 
 from . import frontmatter
@@ -41,18 +43,34 @@ class Pending:
     kinds: tuple[str, ...]
 
 
-def pending(root: Path, *, exclude: Path | None = None) -> list[Pending]:
-    """Unconsolidated journals with at least one entry, oldest first."""
+def pending(
+    root: Path,
+    *,
+    exclude: Iterable[Path] = (),
+    today: str | None = None,
+    include_running: bool = False,
+) -> list[Pending]:
+    """Unconsolidated journals with at least one entry, oldest first.
+
+    By default only *finished* journals count: with a closing ``uebergabe`` entry (hook
+    ``journal_stub``) or started before ``today``. A journal of a session that is still running
+    in another worktree is left alone, so a parallel session never freezes it.
+    """
+    today = today or date.today().isoformat()
+    skip = {p.resolve() for p in exclude}
     out: list[Pending] = []
     for p in iter_journals(root):
-        if exclude is not None and p.resolve() == exclude.resolve():
+        if p.resolve() in skip:
             continue
         text = p.read_text(encoding="utf-8")
         if is_frozen(text):
             continue
         _, body = frontmatter.parse(text)
         entries = _entries(body)
-        if entries:
+        if not entries:
+            continue
+        finished = entries[-1][0] == "uebergabe" or p.name[:10] < today
+        if finished or include_running:
             out.append(Pending(p, len(entries), tuple(sorted({k for k, _ in entries}))))
     return out
 
@@ -118,6 +136,10 @@ def supersede(root: Path, old_ref: str, new_ref: str, *, change: str, day: str) 
         raise ValueError("a note cannot supersede itself")
     if old.get("superseded_by") not in ("", new.id):
         raise ValueError(f"{old.id} is already superseded by {old.get('superseded_by')}")
+    if new.get("superseded_by"):
+        raise ValueError(f"{new.id} is itself superseded by {new.get('superseded_by')}")
+    if new.get("change") and new.get("change") != change:
+        raise ValueError(f"{new.id} already has change: {new.get('change')} (one value per note)")
     changed: list[Path] = []
     if old.id not in new.items("supersedes"):
         new.meta["supersedes"] = [*new.items("supersedes"), old.id]
@@ -147,8 +169,21 @@ def confirm(root: Path, ref: str, *, day: str) -> list[Path]:
 def conflict(
     root: Path, a_ref: str, b_ref: str, *, title: str, source: str, day: str
 ) -> Path:
-    """A pinned question note (kind conflict) that links two contradicting notes or aliases."""
+    """A pinned question note (kind conflict) that links two contradicting notes or aliases.
+
+    Idempotent: an active conflict note for the same pair is returned instead of a second one.
+    """
     a, b = find(root, a_ref), find(root, b_ref)
+    if a.id == b.id:
+        raise ValueError("a conflict needs two different notes")
+    for n in load_notes(root):
+        if (
+            n.type == "question"
+            and n.get("kind") == "conflict"
+            and n.active
+            and set(n.items("links")) == {a.id, b.id}
+        ):
+            return n.path
     note = skeleton(root, "question", title, source=source, day=day, kind="conflict")
     note.meta["links"] = [a.id, b.id]
     note.meta["pinned"] = "true"
@@ -165,11 +200,16 @@ def conflict(
 
 
 def mark(root: Path, journal_path: Path, note_ids: list[str]) -> bool:
-    """Freeze a journal after consolidation. Idempotent; the ids must exist. True if changed."""
-    known = {n.id for n in load_notes(root)}
-    missing = [i for i in note_ids if i not in known]
+    """Freeze a journal after consolidation. Idempotent; ids or aliases must exist.
+
+    Returns True if the journal changed.
+    """
+    notes = load_notes(root)
+    by_ref = {n.id: n.id for n in notes} | {a: n.id for n in notes for a in n.items("aliases")}
+    missing = [i for i in note_ids if i not in by_ref]
     if missing:
         raise KeyError("unknown note ids: " + ", ".join(missing))
+    note_ids = [by_ref[i] for i in note_ids]
     text = journal_path.read_text(encoding="utf-8")
     meta, _ = frontmatter.parse(text)
     if meta is None:

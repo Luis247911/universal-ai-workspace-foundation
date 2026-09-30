@@ -5,8 +5,9 @@ journal (``journal/YYYY/MM/*-<kurzid>.md``) that is not consolidated yet, it app
 ``### HH:MM · uebergabe`` saying the session ended and the journal still needs consolidation
 (skill ``merken``). Nothing else:
 
-* no journal -> nothing is created (a session without entries leaves no trace),
+* no journal, or a journal without entries -> nothing is created or appended,
 * consolidated (frozen) journal -> nothing is appended,
+* last entry is already an ``uebergabe`` (resume/exit cycles, ``/clear``) -> nothing is appended,
 * no content of the work, no transcript path (local paths would leak into a public repo).
 
 Budget: Claude Code gives all SessionEnd hooks 1.5 s together, Codex 1 s by default (max 3 s).
@@ -28,21 +29,21 @@ def main() -> int:
     root = project_dir()
     sys.path.insert(0, str(root / "src"))
     try:
-        from harness.mdmemory import journal
-        from harness.mdmemory.workspace import journal_dir
+        from harness.mdmemory import frontmatter, journal
+        from harness.mdmemory.rollup import _entries
     except Exception:
         return 0
     session_id = str(data.get("session_id") or "")
     if not session_id:
         return 0
     try:
-        kurzid = journal.short_id(session_id)
-        hits = sorted(journal_dir(root).glob(f"*/*/*-{kurzid}.md"))
-        if not hits:
+        path = journal.session_journal(root, journal.short_id(session_id))
+        if path is None:  # no journal, or consolidated already
             return 0
-        path = hits[-1]
-        if journal.is_frozen(path.read_text(encoding="utf-8")):
-            return 0
+        _, body = frontmatter.parse(path.read_text(encoding="utf-8"))
+        entries = _entries(body)
+        if not entries or entries[-1][0] == "uebergabe":
+            return 0  # nothing written yet, or already closed (resume/exit cycles)
         reason = str(data.get("reason") or "other")
         journal.append(
             path,

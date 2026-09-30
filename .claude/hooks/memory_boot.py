@@ -1,7 +1,8 @@
 """SessionStart hook: point at journals that still wait for consolidation.
 
 Self-gated on the ``memory_boot`` flag (default ON, D-2026-09-30-06). Read-only. It lists up to
-five unconsolidated journals of *other* sessions (oldest first) and suggests the skill
+five finished, unconsolidated journals of *other* sessions (oldest first; journals of sessions
+that are still running elsewhere are left out) and suggests the skill
 ``merken``. After a compaction (``source: compact``) it adds a reminder to check the journal and
 ``now.md``, because a PreCompact hook can only message the user, not the model. Silent when there
 is nothing to say. Output stays far below the context caps (Claude Code 10,000 characters, Codex
@@ -12,7 +13,6 @@ from __future__ import annotations
 
 import json
 import sys
-from datetime import datetime
 
 from _flags import flag, payload, project_dir
 
@@ -23,17 +23,15 @@ def main() -> int:
     data = payload()
     if not flag("memory_boot"):
         return 0
+    lines: list[str] = []
     root = project_dir()
     sys.path.insert(0, str(root / "src"))
     try:
         from harness.mdmemory import consolidate, journal
         from harness.mdmemory.workspace import rel
-    except Exception:
-        return 0
-    lines: list[str] = []
-    try:
-        session_id = str(data.get("session_id") or "manual")
-        own = journal.journal_path(root, datetime.now(), journal.short_id(session_id))
+
+        kurzid = journal.short_id(str(data.get("session_id") or ""))
+        own = journal.session_journals(root, kurzid) if data.get("session_id") else []
         todo = consolidate.pending(root, exclude=own)
         if todo:
             lines.append(
@@ -44,13 +42,13 @@ def main() -> int:
                 lines.append(f"  - `{rel(root, p.path)}` ({p.entries} Eintraege)")
             if len(todo) > MAX_LISTED:
                 lines.append(f"  - … und {len(todo) - MAX_LISTED} weitere")
-        if data.get("source") == "compact":
-            lines.append(
-                "- Kontext wurde gerade kompaktiert: pruefen, ob Journal und `state/now.md` den "
-                "Stand enthalten; dauerhafte Erkenntnisse mit `merken` sichern."
-            )
     except Exception:
-        return 0
+        pass  # engine missing or broken: the compact reminder below still goes out
+    if data.get("source") == "compact":
+        lines.append(
+            "- Kontext wurde gerade kompaktiert: pruefen, ob Journal und `state/now.md` den "
+            "Stand enthalten; dauerhafte Erkenntnisse mit `merken` sichern."
+        )
     if not lines:
         return 0
     out = {

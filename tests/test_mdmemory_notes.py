@@ -456,8 +456,13 @@ def test_import_automemory_never_touches_the_source_and_is_idempotent(tmp_path):
 
 
 def test_default_automemory_source_follows_claude_code_naming(tmp_path):
-    src = automemory.default_source(Path("/Users/beispiel/projekt"), home=tmp_path)
-    assert src == tmp_path / ".claude" / "projects" / "-Users-beispiel-projekt" / "memory"
+    assert automemory.project_slug("/Users/beispiel/projekt") == "-Users-beispiel-projekt"
+    assert automemory.project_slug("C:\\Users\\beispiel") == "C--Users-beispiel"
+    project = tmp_path / "projekt"
+    project.mkdir()
+    src = automemory.default_source(project, home=tmp_path)
+    expected = automemory.project_slug(str(project.resolve()))
+    assert src == tmp_path / ".claude" / "projects" / expected / "memory"
 
 
 # --- CLI -----------------------------------------------------------------------------------------

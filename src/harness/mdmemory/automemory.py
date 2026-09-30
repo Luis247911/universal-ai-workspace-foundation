@@ -26,9 +26,14 @@ from .workspace import journal_dir
 INDEX_FILE = "MEMORY.md"
 
 
+def project_slug(path: str) -> str:
+    """Claude Code's folder name for a project path: separators and ``:`` become ``-``."""
+    return path.replace("/", "-").replace("\\", "-").replace(":", "-")
+
+
 def default_source(root: Path, home: Path | None = None) -> Path:
     """Claude Code's auto-memory folder for the project at ``root``."""
-    slug = str(root.resolve()).replace("/", "-").replace("\\", "-").replace(":", "-")
+    slug = project_slug(str(root.resolve()))
     return (home or Path.home()) / ".claude" / "projects" / slug / "memory"
 
 

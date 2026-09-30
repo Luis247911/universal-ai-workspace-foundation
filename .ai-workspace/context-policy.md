@@ -18,7 +18,7 @@ Diese Datei definiert pro Pfad die Lade-Regel. Ziel: kleiner stabiler Kontext be
 | `AGENTS.md` | Always Load | Tool-agnostischer Root-Contract. |
 | `CLAUDE.md` (falls Tool=Claude) | Always Load | Tool-Delta. |
 | `state/project-index.md` | Always Load | Projekt-Identitaet. |
-| `state/current-session.md` | Always Load | Live-Zustand. |
+| `state/now.md` | Always Load | Live-Zustand dieses Worktrees (gitignored, max. 4 KB). |
 | `protocol.md` | Load on Relevance | Operative Verhaltens-Detailregeln. |
 | `setup-protocol.md` | Load on Relevance | Bei Setup oder Strukturentscheidungen. |
 | `session-contract.md` | Load on Relevance | Bei Compact, Handoff, Resume. |
@@ -46,6 +46,7 @@ Diese Datei definiert pro Pfad die Lade-Regel. Ziel: kleiner stabiler Kontext be
 | `deliverables/*` | Load on Explicit Request | Bei Auslieferung-Vorbereitung. |
 | `scratch/*` | Never Auto-Load | Ephemer, untrusted. |
 | `archive/*` | Never Auto-Load | Inerte Historie. |
+| `journal/**` | Never Auto-Load | Episoden, eine Datei pro Session. Gezielt ueber `sources`-Verweise oder Suche lesen, nie den Ordner durchlesen. |
 | `adapters/<aktiv>/adapter.md` | Load on Relevance | Wenn Adapter aktiviert + Aufgabe im Adapter-Scope. |
 | `adapters/<aktiv>/<sonstige>.md` | Load on Explicit Request | Adapter-Inhalte jenseits adapter.md. |
 | `adapters/<inaktiv>/**` | Never Auto-Load | Inaktive Adapter werden ignoriert. |

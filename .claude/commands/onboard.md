@@ -92,7 +92,7 @@ Danach **warte auf die ausdrueckliche Bestaetigung des Users.** Ohne ein explizi
 ### Schritt 5 — Migration ausfuehren (nur nach Bestaetigung, schrittweise)
 
 - Arbeite den Plan Schritt fuer Schritt ab. Vor jedem Schreib-/Verschiebe-/Loesch-Schritt kurz ankuendigen.
-- **Governance zuerst:** `.ai-workspace/state/project-index.md` + `current-session.md` aus den Templates
+- **Governance zuerst:** `.ai-workspace/state/project-index.md` + `now.md` aus den Templates
   befuellen; bestehende Notizen/Docs/Wissen in die passenden Mount-Points migrieren (`knowledge/`,
   `research/`, `deliverables/`, …); Entscheidungen in `state/decisions.md` festhalten; die vier
   Setup-Fragen (`setup-protocol.md` §2) beantworten.
@@ -101,5 +101,5 @@ Danach **warte auf die ausdrueckliche Bestaetigung des Users.** Ohne ein explizi
   .claude/skills` pruefen.
 - Nichts loeschen ohne Rueckfrage. Bei Unsicherheit ueber einen Ablageort: Mount-Point-Decision-Tree —
   und im Zweifel fragen, nicht raten.
-- Zum Abschluss: Setup-Session-Summary in `current-session.md` (`setup-protocol.md` §6), erzeugte
+- Zum Abschluss: Setup-Session-Summary als Journal-Eintrag (`setup-protocol.md` §6), erzeugte
   Artefakte in `state/artifact-index.md` registrieren.

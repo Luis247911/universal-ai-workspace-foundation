@@ -1,8 +1,8 @@
 # file-lifecycle.md — Wo wohnt welcher Artefakttyp; Lifecycle-Regeln
 
-Definiert die sechs Lifecycle-Zonen, Naming-Konventionen, Promotion-Pfade, Retention-Defaults und Stale-Reviews. Alle Foundation-Artefakte sind `.md`.
+Definiert die sieben Lifecycle-Zonen, Naming-Konventionen, Promotion-Pfade, Retention-Defaults und Stale-Reviews. Alle Foundation-Artefakte sind `.md`.
 
-## 1. Sechs Lifecycle-Zonen
+## 1. Sieben Lifecycle-Zonen
 
 | Zone | Pfad | Trust | Retention-Default | Promote nach |
 |------|------|-------|-------------------|---------------|
@@ -10,6 +10,7 @@ Definiert die sechs Lifecycle-Zonen, Naming-Konventionen, Promotion-Pfade, Reten
 | Research | `research/` | untrusted bis verifiziert | Review-Trigger nach 90 Tagen | `deliverables/`, `knowledge/` oder `archive/` |
 | Deliverables | `deliverables/` | verified bis trusted | keine | `archive/` wenn supersedet |
 | Archive | `archive/` | historisch, immutable | keine | nur Retrieval |
+| Journal | `journal/YYYY/MM/` | Episoden, eine Datei pro Session; nur ergaenzt, nach Konsolidierung immutable | keine | Kandidaten werden in `knowledge/` konsolidiert; Datei bleibt |
 | Knowledge | `knowledge/` | durable, KG-verbunden | keine; Stale-Trigger nach 180 Tagen | nicht promoted; updated; bei Veraltung nach `archive/` |
 | Data-Space | `data-space/` | durable Manifest, Pointer auf externe Originale | keine; Stale-Trigger nach 180 Tagen | bei Deaktivierung `archive/` |
 
@@ -92,7 +93,7 @@ Foundation-Core-Dateien werden nur ueber `setup-protocol.md` oder einen explizit
 
 ## 10. Harness-Schicht: Code-Lifecycle statt Markdown-Zonen
 
-Die Execution-Schicht (`AGENTS.md` §2.5) folgt **nicht** den sechs Markdown-Zonen (§1) — sie ist Code und folgt dem Code-Lifecycle:
+Die Execution-Schicht (`AGENTS.md` §2.5) folgt **nicht** den sieben Markdown-Zonen (§1) — sie ist Code und folgt dem Code-Lifecycle:
 
 - `src/harness/**`, `.claude/skills/**`, `tests/**`, `examples/**`, `pyproject.toml` werden ueber Versionskontrolle, Review, CI und SemVer gepflegt (siehe `skills-authoring-policy.md`, `quality-gates.md` §11). Sie sind **keine** `.md`-Workspace-Artefakte und unterliegen nicht der Markdown-only-Regel (§2), die weiterhin strikt fuer `.ai-workspace/**` gilt.
 - **Skill-Outputs** dagegen folgen sehr wohl dem Zonen-Lifecycle: Run-Artefakte der Engine liegen in `./.uaw-runs/<run-id>/` (ephemer, gitignored), inhaltliche Vorschlaege landen in `scratch/`/`research/` als untrusted und werden nur via Hauptsession + Quality-Gates promoted (State-Write-Contract, `skills-authoring-policy.md` §6).

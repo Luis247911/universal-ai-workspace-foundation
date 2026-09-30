@@ -82,6 +82,8 @@ Eine Referenz, **kein** zweiter Regeltext: jede Zeile zeigt nur, *was* ein Begri
 | **Execution** | Die Schicht, die *läuft*: Skills + Engine (Code) | `.claude/` + `src/harness/` | `AGENTS.md` §2.5 |
 | **State** | Operativer kanonischer Projektzustand — das **Gedächtnis dieses Workspaces** | `.ai-workspace/state/` | `protocol.md` §4, `security-policy.md` §11 |
 | **Memory** (Engine) | **Baukasten**, um einem Agenten, den *du baust*, ein Gedächtnis zu geben (Typ × Scope, in-context/archival). **Nicht** `state/` | `src/harness/memory/`, Skill `memory-architect` | `skills-authoring-policy.md` |
+| **Now** | Live-Zustand *dieses* Worktrees: klein (≤ 4 KB), gitignored, überschrieben | `.ai-workspace/state/now.md` (lokal) | `session-contract.md` §3 |
+| **Journal** | Episodisches Gedächtnis: eine Datei pro Session, nur ergänzt, während der Arbeit geschrieben | `.ai-workspace/journal/YYYY/MM/` | `journal/README.md`, `session-contract.md` §3 |
 | **Knowledge** | Dauerhaftes, verlinktes Langzeitwissen (`[[wiki-links]]`, MOCs) | `.ai-workspace/knowledge/` | `knowledge-graph-policy.md` |
 | **Data-Space** | Manifest-only: Pointer auf *externe* Originaldaten, nie die Rohdaten selbst | `.ai-workspace/data-space/` | `knowledge-graph-policy.md`, `security-policy.md` §11 |
 | **Source** | Registrierte externe Quelle (Datei/URL/Binär) mit Trust-Level | Eintrag in `state/source-registry.md` | `source-policy.md` |
@@ -94,7 +96,7 @@ Eine Referenz, **kein** zweiter Regeltext: jede Zeile zeigt nur, *was* ein Begri
 
 **Execution-Schicht (neu in v3.0):**
 
-- Eine lauffähige Engine `src/harness/` mit acht Bereichen: `eval`, `router`, `hitl`, `guardrails`, `observability`, `memory`, `orchestrator`, `skills`.
+- Eine lauffähige Engine `src/harness/` mit neun Bereichen: `eval`, `router`, `hitl`, `guardrails`, `observability`, `memory`, `orchestrator`, `skills` und `mdmemory` (das Markdown-Gedächtnis *dieses* Workspaces: Journal, `now.md`).
 - Viele echte Claude-Code-Skills unter `.claude/skills/<slug>/` mit offiziellem SKILL.md-Frontmatter — engine-gestützte und reine Pattern-Skills (Katalog weiter unten).
 - **stdlib-first**: ein nacktes `pip install -e .` zieht **null** Third-Party-Wheels.
 - **mock-offline by default** (`UAW_LLM=mock`): ruft ein Skill ein LLM auf, antwortet im Default ein deterministischer Mock, ohne Netz und ohne Key (grüne CI). Echte LLM-Calls sind opt-in (siehe [`install-harness.md`](install-harness.md)).
@@ -168,7 +170,7 @@ install-harness.md             pip install + Demos ausführen
 pyproject.toml                 Paket "uaw-harness", deps=[] (stdlib-first)
 .ai-workspace/                 GOVERNANCE: Markdown-only (Kern unverändert)
 .claude/                       EXECUTION: Skills, settings.json (gesegneter Mount)
-src/harness/                   die importierbare Engine (8 Bereiche, getestet)
+src/harness/                   die importierbare Engine (9 Bereiche, getestet)
 examples/                      eine Offline-Demo pro Bereich
 tests/                         pytest + goldene Eval-Suiten (Repo dogfoodet sein Gate)
 sources/credits.md             jede geliehene Struktur-Idee attribuiert
@@ -201,7 +203,7 @@ Aufbau, Anpassung und die vollständigen Skripte stehen in [`.ai-workspace/templ
 Das Kit bringt ein paar kleine, **standardmäßig ausgeschaltete** Helfer mit. Sie wirken nur in diesem Projekt, sind jederzeit umkehrbar und schreiben nie etwas von allein — sie erinnern Claude nur, den Faden zu halten. Beispiele:
 
 - **„Stand wieder laden"** (`boot_reload`): Beim Neustart liest Claude automatisch die Projekt-Notiz wieder, woran ihr zuletzt gearbeitet habt.
-- **„Ans Mitschreiben erinnern"** (`recitation_nudge`): Nach einer Datei-Änderung ein kleiner Stups, `current-session.md` aktuell zu halten.
+- **„Ans Mitschreiben erinnern"** (`recitation_nudge`): Nach einer Datei-Änderung ein kleiner Stups, Journal und `now.md` aktuell zu halten.
 - **Fortgeschrittene Helfer** (alle default AUS): tägliche Pflege-Erinnerung (`daily_maintenance`), Vage-Prompt-Schärfung (`prompt_optimizer`), Schutz beim Abrufen externer Inhalte (`external_content_guard`), Compaction-Vorschlag in langen Sessions (`compact_nudge`) und ein dezenter Reminder, den Live-Stand zu sichern — **nur wenn er veraltet** (`session_state_guard`).
 
 Einzige Ausnahme von „default AUS": beim allerersten Start in einem frischen Projekt begrüßt dich ein einmaliges Onboarding (`first_run_onboarding`, ruft `/start`) — danach inert.

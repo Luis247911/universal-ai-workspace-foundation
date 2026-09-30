@@ -45,6 +45,9 @@ desktop.ini
 .ai-workspace/scratch/
 .ai-workspace/research/_drafts/
 
+# === Live-Zustand pro Worktree (nie committen; Historie steht im Journal) ===
+.ai-workspace/state/now.md
+
 # === Generated Outputs ausserhalb der Foundation (Projektspezifisch) ===
 # (Foundation-Tree enthaelt keinen _generated/-Ordner; falls ein Projekt
 #  Generated Outputs ausserhalb der Foundation produziert, hier ergaenzen.)

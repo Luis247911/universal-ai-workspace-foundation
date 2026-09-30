@@ -4,6 +4,56 @@ All notable changes to this project are documented here. Format based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); this project follows
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.3.0a1] — 2026-09-30
+
+Phase 1 of the long-term memory (3.3.0 line): episodes are kept, parallel sessions no longer
+conflict. The shared, overwritten `state/current-session.md` is replaced by a per-worktree
+`state/now.md` plus an append-only session journal.
+
+### Added
+
+- **`journal/` mount** — `.ai-workspace/journal/YYYY/MM/<datum>-<kurzid>.md`, one file per session,
+  append-only, written *during* the work after each relevant result, Never Auto-Load, frozen after
+  consolidation. Registered in `AGENTS.md` §2, `context-policy.md`, `setup-protocol.md` (decision
+  tree 6b), `file-lifecycle.md` (seventh zone) and `.ai-workspace/README.md`. Template
+  `templates/journal-entry.md`, rules in `journal/README.md`.
+- **`harness.mdmemory`** (stdlib) — `now ensure|trim|migrate`, `journal new|append`; a
+  deterministic frontmatter subset; all budgets and tool limits with doc links in `limits.py`.
+  Console script `uaw-mdmemory`.
+- **`now_init` hook** — SessionStart (all sources), **default ON**: creates the gitignored
+  `state/now.md` from `templates/session-state.md`, trims it to 4 KB (overflow goes to the session
+  journal, never dropped), names session short id + journal path, flags a leftover
+  `current-session.md`.
+- **Merge test** `tests/test_parallel_sessions.py` — real `git merge` of two worktrees. Measured
+  with `--runs 60`: before 60/60 runs with a session-state conflict, after 0/60.
+- Decisions D-2026-09-30-01 (now.md + journal, supersedes D-2026-06-07-01), -02 (hook write
+  doctrine, supersedes D-2026-06-06-03), -03 (automation defaults, supersedes D-2026-06-04-02).
+
+### Changed
+
+- **Boot file 4** is `state/now.md` (was `state/current-session.md`); `CLAUDE.md` imports it.
+- **`session-contract.md`** — journal first, then `now.md`; "check/scan decisions.md and
+  open-questions.md" is replaced by "read the index, then grep; never read files over 1,000 lines
+  in full" (§1.4, §5.3).
+- `boot_reload`, `recitation_nudge`, `session_state_guard` point at `now.md` / the journal
+  (`boot_reload` falls back to a legacy `current-session.md`).
+- `templates/session-state.md` is now the `now.md` template (≤ 4 KB).
+- `.gitignore` and `templates/gitignore-template.md` ignore `.ai-workspace/state/now.md`.
+
+### Removed (with migration path)
+
+- `state/current-session.md` — its content is preserved byte for byte in
+  `journal/2026/09/2026-09-30-migration.md`.
+
+### Migration from 3.2.x
+
+1. `python -m harness.mdmemory now migrate` — copies `state/current-session.md` verbatim into
+   `journal/<yyyy>/<mm>/<datum>-migration.md` and seeds a local `state/now.md` from it.
+2. Rerun with `--remove-legacy` (deletes the old file only after checking the journal holds it
+   byte for byte), add `.ai-workspace/state/now.md` to `.gitignore`, commit.
+3. Replace `@.ai-workspace/state/current-session.md` with `@.ai-workspace/state/now.md` in
+   `CLAUDE.md`.
+
 ## [3.2.1] — 2026-09-29
 
 Quick wins from a repo review: a deterministic boot, a current live-model default, and a type

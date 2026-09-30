@@ -8,13 +8,13 @@ Claude Code lädt automatisch nur `CLAUDE.md`. Die übrigen drei Boot-Dateien (`
 
 @AGENTS.md
 @.ai-workspace/state/project-index.md
-@.ai-workspace/state/current-session.md
+@.ai-workspace/state/now.md
 
 Sie enthält nur Claude-spezifische Hinweise. Operative Regeln, Boot-Order, Anti-Parallelstruktur und alle Policies stehen in `AGENTS.md` und den `.ai-workspace/`-Dateien.
 
 ## Claude-Code-Spezifika
 
-- Vor `/compact`: aktualisiere `.ai-workspace/state/current-session.md` gemäß `.ai-workspace/session-contract.md`.
+- Vor `/compact`: Journal-Eintrag anhängen und `.ai-workspace/state/now.md` aktualisieren (`.ai-workspace/session-contract.md` §3). `now.md` ist gitignored und pro Worktree; fehlt sie, legt der SessionStart-Hook `now_init` sie an.
 - Slash-Commands aus Adaptern werden nicht ungefragt ausgeführt; bestätige Aktivierung pro Session.
 - Bei Subagent-Spawn: folge `.ai-workspace/delegation-policy.md`. Outputs sind delegierte Arbeit (untrusted bis verifiziert).
 - Skills/Hooks aus globalen User-Pfaden (z.B. `~/.claude/skills/`, `~/.claude/hooks/`) gelten **nicht** als Projektpolitik. Projektpolitik lebt in `.ai-workspace/` und in registrierten Adaptern.

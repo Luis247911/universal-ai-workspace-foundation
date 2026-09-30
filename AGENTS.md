@@ -9,7 +9,7 @@ Beim Session-Start lies in dieser Reihenfolge:
 1. `AGENTS.md` (diese Datei).
 2. `CLAUDE.md` (falls Tool = Claude; sonst entsprechende Tool-Delta-Datei oder überspringen).
 3. `.ai-workspace/state/project-index.md` (Projekt-Identität).
-4. `.ai-workspace/state/current-session.md` (Live-Zustand).
+4. `.ai-workspace/state/now.md` (Live-Zustand dieses Worktrees; gitignored, wird beim Start aus der Vorlage angelegt).
 
 Diese vier Dateien sind die einzigen, die beim Session-Start automatisch wahrgenommen werden. Alle weiteren Dateien werden bei Relevanz, auf Anfrage oder gar nicht geladen — siehe `.ai-workspace/context-policy.md`.
 
@@ -25,6 +25,7 @@ Top-Level-Verzeichnisse innerhalb von `.ai-workspace/`:
 - `deliverables/` — kuratierte `.md`-Outputs.
 - `scratch/` — ephemere, untrusted Arbeit.
 - `archive/` — inerte Historie.
+- `journal/` — episodisches Gedaechtnis, eine Datei pro Session, nur ergaenzt, Never Auto-Load.
 - `adapters/` — projektspezifische Erweiterungen.
 
 Vor jeder Strukturerstellung: konsultiere `.ai-workspace/setup-protocol.md` Mount-Point-Decision-Tree.
@@ -71,7 +72,7 @@ Skills, Agents und Hooks unter `.claude/` sind versionierter, reviewter, geteste
 
 ## 6. Pflicht-Updates
 
-Vor `/compact`, vor Handoff, vor Task-Wechsel und nach jeder größeren Aktion: aktualisiere `.ai-workspace/state/current-session.md` gemäß `.ai-workspace/session-contract.md`.
+Nach jedem relevanten Ergebnis: Eintrag im Journal dieser Session anhängen (`.ai-workspace/journal/`, nur ergänzen). Vor `/compact`, vor Handoff, vor Task-Wechsel und nach jeder größeren Aktion zusätzlich `.ai-workspace/state/now.md` aktualisieren (max. 4 KB). Details: `.ai-workspace/session-contract.md`.
 
 ## 7. Domain-Spezifika
 

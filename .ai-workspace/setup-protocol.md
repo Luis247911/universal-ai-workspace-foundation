@@ -8,7 +8,7 @@ Lineare Schritte:
 
 1. **Pre-Check.** Foundation in leeres oder neu-initialisiertes Projektverzeichnis kopieren. Falls bereits ein `.ai-workspace/` existiert: Setup abbrechen und Konflikt eskalieren.
 2. **`state/project-index.md`** befuellen aus `templates/project-brief.md` — mindestens Slug, Zweck, Scope, Goals, Owner.
-3. **`state/current-session.md`** initialisieren aus `templates/session-state.md` — Active-Task = "Initial setup", Status = `in_progress`.
+3. **`state/now.md`** initialisieren aus `templates/session-state.md` (gitignored, pro Worktree; der Hook `now_init` legt sie sonst beim ersten Start an) — Aktive Aufgabe = "Initial setup", Status = `in_progress`. Das Setup wird zusaetzlich im Journal der Session festgehalten (`journal/README.md`).
 4. **Setup-Decisions** in `state/decisions.md` festhalten (z.B. "Wir starten ohne Adapter", "Datenraum wird extern gehalten").
 5. **Setup-Open-Questions** in `state/open-questions.md` festhalten.
 6. **Setup-Risks** in `state/risks-and-constraints.md` festhalten (z.B. wenn Projekt regulierte Daten beruehrt).
@@ -16,7 +16,7 @@ Lineare Schritte:
 8. **Adapter-Entscheidung.** Wenn Adapter sofort noetig: `adapters/<slug>/adapter.md` aus `templates/adapter-readme.md` anlegen + in `state/project-index.md` Sektion "Aktive Adapter" eintragen. Sonst: spaeter entscheiden, Verzicht in `decisions.md`.
 9. **Vier KG/Data-Space/Maintenance/Normalization-Setup-Fragen** (Section 2 dieser Datei).
 10. **Setup-Artefakte registrieren** in `state/artifact-index.md`.
-11. **Setup-Session-Summary** in `current-session.md` schreiben, Status auf `done` fuer die Initial-Setup-Phase.
+11. **Setup-Session-Summary** als Journal-Eintrag `ergebnis` schreiben (dauerhaft, committet) und in `now.md` uebernehmen, Status auf `done` fuer die Initial-Setup-Phase.
 
 ## 2. Vier Setup-Fragen
 
@@ -58,6 +58,7 @@ Frage 3: Gehoert das nach research/?           -> Ja: dorthin. Stop.
 Frage 4: Gehoert das nach deliverables/?       -> Ja: dorthin. Stop.
 Frage 5: Gehoert das nach scratch/?            -> Ja: dorthin. Stop.
 Frage 6: Gehoert das nach archive/?            -> Ja: dorthin. Stop.
+Frage 6b: Ist es eine Episode einer Session?   -> Ja: journal/YYYY/MM/ (eine Datei pro Session). Stop.
 Frage 7: Gehoert das nach knowledge/?          -> Ja: dorthin. Stop.
 Frage 8: Gehoert das nach data-space/?         -> Ja (nur als .md-Manifest). Stop.
 Frage 9: Gehoert das nach templates/?          -> Ja (nur bei Foundation-Erweiterung). Stop.
@@ -86,7 +87,7 @@ Falls solche Konzepte trotzdem noetig sind: gehoeren in `adapters/<slug>/` als S
 
 ## 6. First-Session-Setup-Summary-Format
 
-Am Ende der Setup-Session enthaelt `current-session.md`:
+Am Ende der Setup-Session enthaelt das Journal der Setup-Session (Eintrag `ergebnis`, Kurzfassung auch in `now.md`):
 
 - Liste angelegter Setup-Decisions (D-IDs).
 - Liste offener Setup-Questions (Q-IDs).
@@ -105,6 +106,7 @@ Ein Workspace entspricht **einem** Bounded Context (einer kohaerenten Domaene od
 ## Cross-Links
 
 - Adapter: `adapter-policy.md`.
-- State-Dateien: `state/project-index.md`, `state/current-session.md`, `state/decisions.md`, `state/open-questions.md`, `state/risks-and-constraints.md`, `state/source-registry.md`, `state/artifact-index.md`.
-- Templates: `templates/project-brief.md`, `templates/project-setup.md`, `templates/session-state.md`, `templates/data-space.md`, `templates/maintenance-routine.md`, `templates/adapter-readme.md`, `templates/gitignore-template.md`, `templates/claudeignore-template.md`.
+- State-Dateien: `state/project-index.md`, `state/now.md` (lokal), `state/decisions.md`, `state/open-questions.md`, `state/risks-and-constraints.md`, `state/source-registry.md`, `state/artifact-index.md`.
+- Journal: `journal/README.md`.
+- Templates: `templates/project-brief.md`, `templates/project-setup.md`, `templates/session-state.md`, `templates/journal-entry.md`, `templates/data-space.md`, `templates/maintenance-routine.md`, `templates/adapter-readme.md`, `templates/gitignore-template.md`, `templates/claudeignore-template.md`.
 - Knowledge-Graph + Document-Normalization: `knowledge-graph-policy.md`.

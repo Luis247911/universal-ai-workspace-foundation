@@ -55,9 +55,9 @@ The execution layer also ships an **optional, committed session-automation layer
 default**. Nothing fires on a fresh clone; you opt in per capability. Both are local and
 model-driven: *the hook reminds, the model writes* — no script ever mutates state.
 
-- **boot_reload** (`SessionStart`) re-injects `.ai-workspace/state/current-session.md` so a
+- **boot_reload** (`SessionStart`) re-injects `.ai-workspace/state/now.md` so a
   new / resumed / compacted session boots with the live state in view.
-- **recitation_nudge** (`PostToolUse`) nudges you to keep `current-session.md` current after a
+- **recitation_nudge** (`PostToolUse`) nudges you to keep `now.md` and the session journal current after a
   file edit, per `session-contract.md` section 3.
 
 Toggle it through the `/uaw-automation` companion, or edit `.claude/automation.flags.json`:

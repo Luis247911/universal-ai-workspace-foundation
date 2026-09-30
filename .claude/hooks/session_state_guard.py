@@ -2,14 +2,14 @@
 keep the live session state fresh -- so an accidental CLI close loses as little as possible.
 
 Self-gated on the ``session_state_guard`` flag (default OFF). Unlike a per-event nudge, it speaks
-ONLY when ``.ai-workspace/state/current-session.md`` has gone stale -- not modified for at least
+ONLY when ``.ai-workspace/state/now.md`` has gone stale -- not modified for at least
 ``STALE_MINUTES`` (default 20) of active work -- and then at most once per that interval (throttled
 via its own gitignored marker ``.claude/.session_state_guard``). During diligent recitation it stays
 completely silent, so it does not nag after every edit.
 
-Honest limit: a hard kill / crash fires no hook, and a hook may not write governance state itself
-(decisions.md D-2026-06-04-01 / D-2026-06-06-03) -- the real durability guarantee is the git history
-of current-session.md (commit regularly). This only tightens the continuous-recitation net. Tunable
+Honest limit: a hard kill / crash fires no hook. The durability guarantee is the session journal
+(append-only, committed, written during the work; D-2026-09-30-01), not now.md, which is local and
+gets overwritten. This only tightens the continuous-recitation net. Tunable
 via ``UAW_STATE_GUARD_STALE_MINUTES``. Any error -> inert. Reads only repo-relative paths; never
 touches ``~/.claude/``.
 """
@@ -41,7 +41,7 @@ def main() -> int:
     if not flag("session_state_guard"):
         return 0  # inert: flag off
 
-    state = project_dir() / ".ai-workspace" / "state" / "current-session.md"
+    state = project_dir() / ".ai-workspace" / "state" / "now.md"
     try:
         mtime = datetime.fromtimestamp(state.stat().st_mtime)
     except OSError:
@@ -68,12 +68,10 @@ def main() -> int:
 
     nudge = (
         "## Session-state freshness\n"
-        f"current-session.md has not been updated in ~{_stale_minutes()}+ min of edits. If the "
-        "active task, the next step, or a decision changed, update it now (Reboot-Test, "
-        "session-contract.md section 3) and commit -- so an accidental close loses nothing. "
-        "The git history of this file is the durability guarantee; this is only the reminder. "
-        "If nothing "
-        "material changed, ignore this."
+        f"now.md has not been updated in ~{_stale_minutes()}+ min of edits. If the active "
+        "task, the next step, or a decision changed: append a journal entry first (that is "
+        "what survives an accidental close), then update now.md (Reboot-Test, "
+        "session-contract.md section 3). If nothing material changed, ignore this."
     )
     out = {
         "hookSpecificOutput": {

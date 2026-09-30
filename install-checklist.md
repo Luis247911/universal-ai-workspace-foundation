@@ -28,7 +28,8 @@ Dieses Repo kann die Execution-Schicht mitliefern (siehe `AGENTS.md` §2.5): `.c
 ## Initiale Befüllung
 
 - [ ] `.ai-workspace/state/project-index.md` ausfüllen unter Verwendung von `.ai-workspace/templates/project-brief.md` als Vorlage. Mindestens Slug, Zweck, Scope, Goals, Owner.
-- [ ] `.ai-workspace/state/current-session.md` initialisieren unter Verwendung von `.ai-workspace/templates/session-state.md`. Active-Task = "Initial setup", Status = `in_progress`.
+- [ ] `.ai-workspace/state/now.md` anlegen aus `.ai-workspace/templates/session-state.md` (gitignored; mit Harness legt der Hook `now_init` sie beim ersten Start an). Aktive Aufgabe = "Initial setup", Status = `in_progress`.
+- [ ] `.ai-workspace/state/now.md` in das projektspezifische `.gitignore` aufnehmen (siehe `gitignore-template.md`).
 - [ ] `.ai-workspace/state/decisions.md` als leeren Append-only-Log mit Kopfzeile vorbereiten.
 - [ ] `.ai-workspace/state/open-questions.md`, `assumptions.md`, `risks-and-constraints.md`, `source-registry.md`, `artifact-index.md` als leere Stubs vorbereiten.
 
@@ -72,11 +73,11 @@ Dieses Repo kann die Execution-Schicht mitliefern (siehe `AGENTS.md` §2.5): `.c
 
 ## Setup-Artefakte registrieren
 
-- [ ] Alle erzeugten Setup-Artefakte (project-index.md, current-session.md, decisions.md erste Einträge, evtl. neu erzeugte MOCs/Data-Space-Manifeste) in `.ai-workspace/state/artifact-index.md` mit Status `active` eintragen.
+- [ ] Alle erzeugten Setup-Artefakte (project-index.md, decisions.md erste Einträge, evtl. neu erzeugte MOCs/Data-Space-Manifeste) in `.ai-workspace/state/artifact-index.md` mit Status `active` eintragen.
 
 ## Setup-Session-Summary
 
-- [ ] `current-session.md` enthält am Ende:
+- [ ] Das Journal der Setup-Session (`.ai-workspace/journal/`) enthält am Ende einen Eintrag `ergebnis` mit:
   - Liste angelegter Setup-Decisions (D-IDs)
   - Liste offener Setup-Questions (Q-IDs)
   - Liste registrierter Setup-Artefakte (Pfade)
@@ -90,7 +91,7 @@ Dieses Repo kann die Execution-Schicht mitliefern (siehe `AGENTS.md` §2.5): `.c
 ## Verifikation
 
 - [ ] `AGENTS.md` und `CLAUDE.md` als Boot-Dateien vorhanden.
-- [ ] `state/project-index.md` und `state/current-session.md` befüllt.
+- [ ] `state/project-index.md` befüllt; `state/now.md` lokal vorhanden und gitignored.
 - [ ] Keine Parallelstruktur ausserhalb der Foundation-Mount-Points entstanden (Harness-Ausnahme `.claude/` + Infra-Allowlist siehe `setup-protocol.md` §4).
 - [ ] Alle Dateien innerhalb `.ai-workspace/` haben `.md`-Endung (Governance-Schicht markdown-only).
 - [ ] Keine Originalbinärdateien im `.ai-workspace/`-Tree (Originale leben extern oder im deklarierten Project Data Space).

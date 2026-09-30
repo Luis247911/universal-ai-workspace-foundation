@@ -50,7 +50,7 @@ credentials/
 
 ## Hinweise
 
-- **Niemals** den gesamten `.ai-workspace/` ignorieren — die Boot-Dateien (AGENTS.md, CLAUDE.md, state/project-index.md, state/current-session.md) muessen lesbar bleiben.
+- **Niemals** den gesamten `.ai-workspace/` ignorieren — die Boot-Dateien (AGENTS.md, CLAUDE.md, state/project-index.md, state/now.md) muessen lesbar bleiben.
 - PII-Patterns sind projektspezifisch und gehoeren in den projektspezifischen Adapter, nicht in den Foundation-Default.
 - Adapter, die mit besonders sensiblen Inhalten arbeiten, koennen erweiterte PII-Patterns in `adapters/<slug>/claudeignore-additions.md` (Markdown-Anleitung) bereitstellen.
 

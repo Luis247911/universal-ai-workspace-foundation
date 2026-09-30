@@ -128,7 +128,10 @@ class Note:
 
 
 def load_note(path: Path) -> Note:
-    meta, body = frontmatter.parse(path.read_text(encoding="utf-8"))
+    try:
+        meta, body = frontmatter.parse(path.read_text(encoding="utf-8"))
+    except (frontmatter.FrontmatterError, UnicodeDecodeError) as exc:
+        raise frontmatter.FrontmatterError(f"{path.as_posix()}: {exc}") from exc
     return Note(path, meta or {}, body)
 
 

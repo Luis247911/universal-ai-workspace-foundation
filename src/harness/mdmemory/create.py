@@ -89,6 +89,10 @@ def skeleton(
         }
     )
     meta.update(TYPE_DEFAULTS.get(note_type, {}))
+    if meta["sensitivity"] in {"personal", "restricted"}:
+        # The id is visible in every index: no words from the title for sensitive notes.
+        note_id = f"{PREFIX[note_type]}-{day}-{secrets.token_hex(4)}"
+        meta["id"] = note_id
     if kind:
         if note_type != "question" or kind not in ENUMS["kind"]:
             raise ValueError(f"--kind needs type question and one of {sorted(ENUMS['kind'])}")

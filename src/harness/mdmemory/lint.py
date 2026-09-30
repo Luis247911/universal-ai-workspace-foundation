@@ -12,7 +12,10 @@ Checks (E = error, W = warning):
 * E at most one active note per type and title; aliases unique; links/blocks resolve
 * E generated files (INDEX, sub indexes, register views) are up to date
 * E/W boot budget: hard limit is an error, above target a warning
-* W person note with ``sensitivity: normal``; active note past ``review_after``
+* E ``@path`` tokens in title/summary/aliases (Claude Code imports them from the boot index);
+  INDEX.md above its byte/line cap
+* W person note with ``sensitivity: normal``; sensitive note with a speaking id; active note past
+  ``review_after``
 """
 
 from __future__ import annotations
@@ -24,7 +27,7 @@ from pathlib import Path
 
 from . import budget, frontmatter
 from . import index as index_mod
-from .limits import SUMMARY_MAX_CHARS
+from .limits import INDEX_MAX_BYTES, INDEX_MAX_LINES, SUMMARY_MAX_CHARS
 from .notes import (
     DATE_FIELDS,
     DATE_RE,
@@ -44,6 +47,9 @@ from .workspace import rel
 EXTRA_ALLOWED = {"legacy_keys"}
 NONEMPTY = ("id", "type", "title", "summary", "status", "valid_from", "updated")
 TITLE_MAX_CHARS = 100
+ALIAS_MAX_CHARS = 60
+AT_RE = re.compile(r"(^|\s)@\S")
+NEUTRAL_ID_RE = re.compile(r"^[a-z]{3}-\d{4}-\d{2}-\d{2}-[0-9a-f]{4,8}$")
 URL_RE = re.compile(r"https?://|www\.", re.I)
 INJECTION_RE = re.compile(
     r"ignore (all )?previous instructions|vergiss (alle )?vorherigen? anweisungen"
@@ -113,6 +119,16 @@ def _check_note(root: Path, n: Note) -> list[Finding]:
     for k in ("title", "summary"):
         if INJECTION_RE.search(n.get(k)):
             err(f"{k} contains a prompt-injection phrase (security-policy §2)")
+    for k in ("title", "summary"):
+        if AT_RE.search(n.get(k)):
+            err(f"{k} contains an @path token (Claude Code would import it from the boot index)")
+    for a in n.items("aliases"):
+        if AT_RE.search(a) or len(a) > ALIAS_MAX_CHARS:
+            err(f"alias {a[:50]!r} needs <= {ALIAS_MAX_CHARS} characters and no @path token")
+    if n.get("sensitivity") in {"personal", "restricted"} and not NEUTRAL_ID_RE.match(n.id):
+        out.append(
+            Finding("W", where, "sensitive note with a speaking id (the id is shown in indexes)")
+        )
     if len(n.get("title")) > TITLE_MAX_CHARS:
         err(f"title has more than {TITLE_MAX_CHARS} characters")
     if bool(n.get("superseded_by")) != (n.get("status") == "superseded"):
@@ -185,6 +201,13 @@ def run(root: Path, *, today: str | None = None, check_budget: bool = True) -> l
         notes.append(n)
         out += _check_note(root, n)
     out += _check_graph(root, notes, today)
+    index_file = root / ".ai-workspace" / "knowledge" / "INDEX.md"
+    if index_file.exists():
+        data = index_file.read_bytes()
+        if len(data) > INDEX_MAX_BYTES or data.count(b"\n") > INDEX_MAX_LINES:
+            out.append(
+                Finding("E", rel(root, index_file), f"larger than {INDEX_MAX_BYTES} B / lines")
+            )
     if not any(f.level == "E" for f in out):
         for p in index_mod.stale(root):
             out.append(

@@ -16,6 +16,7 @@ their id, never with title or summary, in every generated file.
 
 from __future__ import annotations
 
+import re
 from collections.abc import Callable
 from pathlib import Path
 
@@ -43,9 +44,22 @@ def _sort_recent(notes: list[Note]) -> list[Note]:
     return sorted(notes, key=lambda n: (n.get("updated"), n.id), reverse=True)
 
 
+#: Longest alias shown in an index line (aliases are free text; the cap keeps INDEX.md bounded).
+ALIAS_MAX_CHARS = 40
+
+_AT_TOKEN = re.compile(r"(^|\s)(@\S+)")
+
+
+def safe(text: str) -> str:
+    """Wrap ``@path`` tokens in backticks: Claude Code would import them from the boot index."""
+    return _AT_TOKEN.sub(lambda m: f"{m.group(1)}`{m.group(2).replace('`', '')}`", text)
+
+
 def _label(n: Note) -> str:
     alias = n.items("aliases")[0] if n.items("aliases") else ""
-    return f"{alias} · " if alias else ""
+    if len(alias) > ALIAS_MAX_CHARS:
+        alias = alias[: ALIAS_MAX_CHARS - 1] + "…"
+    return f"{safe(alias)} · " if alias else ""
 
 
 def entry_line(n: Note, link_prefix: str) -> str:
@@ -58,25 +72,31 @@ def entry_line(n: Note, link_prefix: str) -> str:
         return f"- [{n.id}]({href}) — ({why}, Inhalt nur in der Notiz) · {date}{status}"
     title, summary = n.get("title"), n.get("summary")
     same = summary == title or title.endswith("…") and summary.startswith(title[:-1])
-    text = "" if same else f"{summary} · "
-    return f"- [{title}]({href}) — {_label(n)}{text}{date}{status}"
+    text = "" if same else f"{safe(summary)} · "
+    return f"- [{safe(title)}]({href}) — {_label(n)}{text}{date}{status}"
 
 
 def render_index(notes: list[Note]) -> str:
-    """Boot index. Drops the oldest "recent" lines until INDEX_MAX_BYTES/LINES hold."""
+    """Boot index. Drops the oldest "recent" lines, then pinned lines from the end, until
+    INDEX_MAX_BYTES/LINES hold. Only active notes are pinned in the index."""
+    pinned_all = [n for n in notes if n.pinned and n.active]
     recent_all = [n for n in _sort_recent([n for n in notes if n.active]) if not n.pinned]
     keep = min(len(recent_all), INDEX_MAX_RECENT)
+    pin = min(len(pinned_all), INDEX_MAX_PINNED)
     while True:
-        text = _render_index(notes, recent_all[:keep])
+        text = _render_index(notes, recent_all[:keep], pin)
         fits = len(text.encode("utf-8")) <= INDEX_MAX_BYTES and text.count("\n") <= INDEX_MAX_LINES
-        if fits or keep == 0:
+        if fits or keep == pin == 0:
             return text
-        keep -= 1
+        if keep:
+            keep -= 1
+        else:
+            pin -= 1
 
 
-def _render_index(notes: list[Note], recent: list[Note]) -> str:
+def _render_index(notes: list[Note], recent: list[Note], pin_limit: int = INDEX_MAX_PINNED) -> str:
     active = [n for n in notes if n.active]
-    pinned = sorted([n for n in notes if n.pinned], key=lambda n: (n.type, n.id))
+    pinned = sorted([n for n in notes if n.pinned and n.active], key=lambda n: (n.type, n.id))
     stand = max((n.get("updated") for n in notes), default="")
     lines = [
         GENERATED,
@@ -90,9 +110,9 @@ def _render_index(notes: list[Note], recent: list[Note]) -> str:
         "## Angeheftet",
         "",
     ]
-    lines += [entry_line(n, "") for n in pinned[:INDEX_MAX_PINNED]] or ["(keine)"]
-    if len(pinned) > INDEX_MAX_PINNED:
-        lines.append(f"- … {len(pinned) - INDEX_MAX_PINNED} weitere in den Unterindizes")
+    lines += [entry_line(n, "") for n in pinned[:pin_limit]] or ["(keine)"]
+    if len(pinned) > pin_limit:
+        lines.append(f"- … {len(pinned) - pin_limit} weitere in den Unterindizes")
     lines += ["", f"## Zuletzt geaendert ({len(recent)} neueste, ohne angeheftete)", ""]
     lines += [entry_line(n, "") for n in recent] or ["(keine)"]
     counts = []
@@ -169,8 +189,11 @@ VIEWS: dict[str, tuple[str, str, Callable[[Note], bool], str]] = {
 
 def _view_line(n: Note, alias_of: dict[str, str]) -> str:
     alias = alias_of.get(n.id, n.id)
+    if n.sensitive and not re.fullmatch(r"[A-Z]-\d{4}-\d{2}-\d{2}-\d+", alias):
+        alias = n.id
+    alias = safe(alias)
     href = f"../knowledge/{n.type}/{n.id}.md"
-    title = n.id if n.sensitive else n.get("title")
+    title = n.id if n.sensitive else safe(n.get("title"))
     tail = ""
     if n.get("superseded_by"):
         tail = f" → abgeloest durch {alias_of.get(n.get('superseded_by'), n.get('superseded_by'))}"

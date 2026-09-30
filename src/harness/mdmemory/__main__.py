@@ -26,6 +26,7 @@ from pathlib import Path
 
 from . import automemory, budget, create, journal, lint, now, rollup, split
 from . import index as index_mod
+from .frontmatter import FrontmatterError
 from .legacy import REGISTERS
 from .limits import NOW_MAX_BYTES
 from .notes import TYPES
@@ -252,7 +253,11 @@ def main(argv: list[str] | None = None) -> int:
         "rollup": _cmd_rollup,
         "import-automemory": _cmd_import,
     }
-    return handlers[args.cmd](args)
+    try:
+        return handlers[args.cmd](args)
+    except FrontmatterError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 2
 
 
 if __name__ == "__main__":

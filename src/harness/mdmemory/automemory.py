@@ -17,6 +17,8 @@ Auto-memory may hold personal data. Review the journal before committing it (sec
 from __future__ import annotations
 
 import hashlib
+import re
+import subprocess
 from datetime import datetime
 from pathlib import Path
 
@@ -27,14 +29,33 @@ INDEX_FILE = "MEMORY.md"
 
 
 def project_slug(path: str) -> str:
-    """Claude Code's folder name for a project path: separators and ``:`` become ``-``."""
-    return path.replace("/", "-").replace("\\", "-").replace(":", "-")
+    """Claude Code's folder name for a project path: every character except ASCII letters and
+    digits becomes ``-`` (``/Users/a/My Proj/.x`` -> ``-Users-a-My-Proj--x``)."""
+    return re.sub(r"[^A-Za-z0-9]", "-", path)
+
+
+def _main_worktree(root: Path) -> Path:
+    """Auto-memory is shared per git repository: map a linked worktree to the main checkout."""
+    try:
+        out = subprocess.run(
+            ["git", "-C", str(root), "rev-parse", "--path-format=absolute", "--git-common-dir"],
+            capture_output=True,
+            text=True,
+            timeout=5,
+            check=True,
+        ).stdout.strip()
+    except (OSError, subprocess.SubprocessError):
+        return root
+    common = Path(out)
+    return common.parent if common.name == ".git" else root
 
 
 def default_source(root: Path, home: Path | None = None) -> Path:
-    """Claude Code's auto-memory folder for the project at ``root``."""
-    slug = project_slug(str(root.resolve()))
-    return (home or Path.home()) / ".claude" / "projects" / slug / "memory"
+    """Claude Code's auto-memory folder for the project at ``root`` (main checkout first)."""
+    base = (home or Path.home()) / ".claude" / "projects"
+    candidates = [_main_worktree(root.resolve()), root.resolve()]
+    paths = [base / project_slug(str(c)) / "memory" for c in candidates]
+    return next((p for p in paths if p.is_dir()), paths[0])
 
 
 def collect(source: Path) -> list[tuple[str, str]]:

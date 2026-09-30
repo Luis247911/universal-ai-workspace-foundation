@@ -87,4 +87,4 @@ Wartungsroutinen sind Blueprints (`.ai-workspace/knowledge-graph-policy.md`), ak
 
 ## Cross-Links
 
-`.ai-workspace/`: `protocol.md` · `setup-protocol.md` · `session-contract.md` · `context-policy.md` · `file-lifecycle.md` · `source-policy.md` · `security-policy.md` · `delegation-policy.md` · `adapter-policy.md` · `quality-gates.md` · `knowledge-graph-policy.md`
+`.ai-workspace/`: `protocol.md` · `setup-protocol.md` · `session-contract.md` · `context-policy.md` · `file-lifecycle.md` · `source-policy.md` · `security-policy.md` · `delegation-policy.md` · `adapter-policy.md` · `quality-gates.md` · `knowledge-graph-policy.md` · `memory-contract.md`

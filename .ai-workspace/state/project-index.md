@@ -72,4 +72,4 @@ Format: `- <routine> | adapter: <slug> | Spezifikation: adapters/<slug>/maintena
 
 ## Cross-Links
 
-Live-Zustand `now.md` (lokal) · Historie `../journal/` · Gedaechtnis `../knowledge/INDEX.md` · Setup `../setup-protocol.md` · Adapter `../adapter-policy.md` · Data-Space `../data-space/README.md`
+`../setup-protocol.md` · `../adapter-policy.md` · `../memory-contract.md`

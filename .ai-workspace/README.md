@@ -18,6 +18,7 @@ Diese Datei ist eine reine Routing-Funktion. Sie erklaert, was unter `.ai-worksp
 | `file-lifecycle.md` | Wo wohnt welcher Artefakttyp | statisch | Load on Relevance |
 | `source-policy.md` | Externe Quellen-Behandlung + Trust-Levels | statisch | Load on Relevance |
 | `security-policy.md` | Untrusted-Content + Secrets + Execution-Boundaries | statisch | Load on Relevance |
+| `memory-contract.md` | Besitz, Ladevertrag, Schreibwege und fuenf Festlegungen des Gedaechtnisses | statisch | Load on Relevance |
 | `delegation-policy.md` | Generische Regeln fuer delegierte Arbeit | statisch | Load on Relevance |
 | `adapter-policy.md` | Adapter-Vertrag + Boundaries | statisch | Load on Relevance |
 | `quality-gates.md` | Verifikationsstufen | statisch | Load on Relevance |

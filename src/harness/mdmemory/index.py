@@ -124,12 +124,14 @@ def _render_index(notes: list[Note], recent: list[Note], pin_limit: int = INDEX_
     for t in TYPES:
         of_type = [n for n in notes if n.type == t]
         n_active = sum(1 for n in of_type if n.active)
-        counts.append(f"{t} {n_active}/{len(of_type)}")
+        if of_type:
+            counts.append(f"{t} {n_active}/{len(of_type)}")
     lines += [
         "",
         "## Typen",
         "",
-        f"Aktiv/gesamt: {' · '.join(counts)}. Unterindex je Typ: `{TYPE_DIR}/<typ>.md`.",
+        f"Aktiv/gesamt: {' · '.join(counts) or 'keine'}. Unterindex je Typ:"
+        f" `{TYPE_DIR}/<typ>.md` (Typen: {', '.join(TYPES)}).",
     ]
     return "\n".join(lines) + "\n"
 

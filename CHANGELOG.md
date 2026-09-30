@@ -4,6 +4,40 @@ All notable changes to this project are documented here. Format based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); this project follows
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.3.0] — 2026-09-30
+
+Phase 4 of the long-term memory: maintenance and division of labour. Completes the 3.3.0 line
+(phases 1–4: journal + now.md, atomic notes + tiered index, consolidation, maintenance).
+
+### Added
+
+- **`memory-contract.md`** — ownership table, load contract and write paths for every memory
+  (now.md, journal, notes, generated files, tables, external systems, auto-memory, optional
+  global namespace), plus the five defaults: Markdown in git is canonical (operational data
+  only by pointer), Claude auto-memory off, `scope`/`sensitivity` with an optional global
+  namespace (off; private content belongs in a separate repo), local only with a later
+  read-only MCP that may only write journal proposals, `merken` writes directly but asks first
+  for person, global preference, supersede/correction and conflict.
+- **`"autoMemoryEnabled": false`** in `.claude/settings.json` (per machine also
+  `CLAUDE_CODE_DISABLE_AUTO_MEMORY=1`); existing auto-memory comes in via `import-automemory`.
+- **Skill `pflege`** (weekly; `evaluate.md`, `reference.md` for `/schedule` and launchd) and
+  **`python -m harness.mdmemory report [--write]`**: lint, stale notes (`review_after`,
+  `last_confirmed` > 180 days), orphans, duplicate candidates, unconsolidated journals, boot
+  budget, monthly rollup. Result is a report under the gitignored `scratch/maintenance/` or a PR,
+  never an auto-merge.
+- **Optional global namespace** — `--global` on every `harness.mdmemory` command, rooted at
+  `$UAW_GLOBAL_MEMORY_DIR`; off unless set.
+- **`templates/recall-set.md`** — 30 questions with expected notes; full-text or vector search
+  only below 90 % hit rate (documented, not built).
+- Decision D-2026-09-30-08 (memory contract).
+
+### Changed
+
+- `CLAUDE.md`, `state/project-index.md` and the boot index tightened again (INDEX lists only
+  non-empty types); boot 4,944 tokens (target 5,000), worst case 8,707 (hard 12,000).
+- `context-policy.md`, `.ai-workspace/README.md`, `AGENTS.md` cross-links, README glossary and
+  `knowledge-graph-policy.md` §12 reference the contract and the `pflege` skill.
+
 ## [3.3.0a3] — 2026-09-30
 
 Phase 3 of the long-term memory: consolidation. Journal entries become notes through one

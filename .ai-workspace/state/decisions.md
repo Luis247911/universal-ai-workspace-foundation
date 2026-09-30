@@ -13,6 +13,7 @@ generated: true
 
 ## Aktiv
 
+- D-2026-09-30-08 · 2026-09-30 · [Memory-Vertrag: Besitz, Ladevertrag, Schreibwege und fuenf Festlegungen](../knowledge/decision/dec-2026-09-30-memory-vertrag-besitz-ladevertrag-2a34.md)
 - D-2026-09-30-07 · 2026-09-30 · [.codex/ ist zweiter Execution-Mount, nur fuer die Hook-Konfiguration von Codex](../knowledge/decision/dec-2026-09-30-codex-ist-zweiter-execution-mount-nur-6a3b.md)
 - D-2026-09-30-06 · 2026-09-30 · [Gedaechtnis-Hooks default AN; Hooks duerfen einen Abschluss-Eintrag ins eigene Journal schreiben](../knowledge/decision/dec-2026-09-30-gedaechtnis-hooks-sind-default-an-hooks-ec11.md) · ersetzt D-2026-09-30-02, D-2026-09-30-03
 - D-2026-09-30-05 · 2026-09-30 · [Skripte unter src/ duerfen abgeleitete Markdown-Dateien in .ai-workspace/ schreiben](../knowledge/decision/dec-2026-09-30-05-skripte-unter-src-duerfen.md) · ersetzt D-2026-06-04-01

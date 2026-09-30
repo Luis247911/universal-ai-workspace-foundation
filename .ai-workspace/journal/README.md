@@ -21,7 +21,8 @@ journal/YYYY/MM/YYYY-MM-DD-migration.md    # Sonderfall: Migrations-Journal
   Datei.
 - Jede Session schreibt nur **ihre eigene** Datei. Parallele Sessions und Worktrees erzeugen
   deshalb nie einen Merge-Konflikt im Journal.
-- Anlegen: `python -m harness.mdmemory journal new --session <session-id> --tool <tool>`
+- Eintrag anhaengen und die Datei dabei anlegen: `python3 .claude/uaw/mdm.py journal add --session <session-id> <art> "<text>"`
+  (gleich `python -m harness.mdmemory`). Nur anlegen: `journal new --session <session-id> --tool <tool>`
   (legt nie ueber eine bestehende Datei), oder die Vorlage `../templates/journal-entry.md` kopieren.
 
 ## Schreibregeln

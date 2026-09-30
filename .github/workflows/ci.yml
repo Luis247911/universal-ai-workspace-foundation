@@ -44,3 +44,24 @@ jobs:
           python-version: "3.12"
       - run: pip install -e .
       - run: python examples/eval_demo.py
+
+  stock-macos-python:
+    # The hooks run with whatever python3 the machine has. A stock Mac only has the Command Line
+    # Tools' /usr/bin/python3 (3.9): the memory engine, the hooks and adopt must work there, with
+    # no pip install of this package.
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v5
+      - run: /usr/bin/python3 --version
+      - run: /usr/bin/python3 -m venv /tmp/py39 && /tmp/py39/bin/pip install -q pytest
+      - name: Memory engine, hooks and adopt on the system python
+        env:
+          PYTHONPATH: src
+        run: >-
+          /tmp/py39/bin/python -m pytest -q tests/test_mdmemory_now.py
+          tests/test_mdmemory_now_edgecases.py tests/test_mdmemory_notes.py
+          tests/test_mdmemory_notes_edgecases.py tests/test_mdmemory_consolidate.py
+          tests/test_mdmemory_consolidate_edgecases.py tests/test_mdmemory_maintenance.py
+          tests/test_mdmemory_maintenance_edgecases.py tests/test_automation_hooks.py
+          tests/test_autopilot_e2e.py
+      - run: /usr/bin/python3 .claude/uaw/mdm.py lint

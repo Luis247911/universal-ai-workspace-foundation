@@ -36,6 +36,7 @@ ALL_HOOKS = [
     "journal_stub.py",
     "memory_boot.py",
     "precompact_reminder.py",
+    "index_refresh.py",
 ]
 
 

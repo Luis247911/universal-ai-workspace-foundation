@@ -24,7 +24,7 @@ from .create import skeleton
 from .journal import is_frozen, iter_journals
 from .notes import Note, load_notes
 from .rollup import _entries
-from .workspace import GlobalNamespaceError, global_root, rel
+from .workspace import GlobalNamespaceError, global_root, rel, write_lf
 
 CHANGE = {"veraendert", "korrigiert"}
 #: ``konsolidiert_zu`` entry for a note in the optional global namespace (memory contract §5).
@@ -115,7 +115,7 @@ def _save(n: Note) -> bool:
     old = n.path.read_text(encoding="utf-8") if n.path.exists() else None
     if new == old:
         return False
-    n.path.write_text(new, encoding="utf-8", newline="\n")
+    write_lf(n.path, new)
     return True
 
 
@@ -237,7 +237,7 @@ def mark(root: Path, journal_path: Path, note_ids: list[str]) -> bool:
     new = "---\n" + "\n".join(lines) + "\n---\n" + body
     if new == text:
         return False
-    journal_path.write_text(new, encoding="utf-8", newline="\n")
+    write_lf(journal_path, new)
     return True
 
 

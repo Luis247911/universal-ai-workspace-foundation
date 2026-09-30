@@ -20,10 +20,15 @@ Optionaler Hinweis des Users: $ARGUMENTS
 
 Details: `AGENTS.md` §2.5.
 
-> **Optionale Automatik (opt-in, default AUS):** Die Execution-Schicht bringt eine schaltbare
-> Session-Automatik mit (Boot-Reload des Live-States + Recitation-Reminder). Sie ist **kein**
-> Pflicht-Teil des Onboardings. Wer sie spaeter aktivieren oder nur verstehen will, ruft
-> `/uaw-automation` auf — steuert nur dieses Repo, nie globale `~/.claude/`-Konfiguration.
+> **Automatik:** Die Gedaechtnis-Hooks (`now_init`, `index_refresh`, `memory_boot`,
+> `journal_stub`, `precompact_reminder`) laufen schon, default AN. Weitere Helfer sind opt-in und
+> **kein** Pflicht-Teil des Onboardings: `/uaw-automation` — steuert nur dieses Repo, nie globale
+> `~/.claude/`-Konfiguration.
+>
+> **Liegt das bestehende Projekt in einem anderen Ordner?** Dann ist der kuerzeste Weg `adopt`:
+> `python3 .claude/uaw/mdm.py adopt <pfad> --dry-run`, Liste mit dem User durchgehen, dann ohne
+> `--dry-run` (README, Weg B). `adopt` ergaenzt nur, ueberschreibt nichts und ist idempotent;
+> Schritt 1–4 unten gelten fuer die Inhalte, die `adopt` nicht abdeckt.
 
 ## Harte Regeln (nicht verhandelbar)
 
@@ -95,8 +100,9 @@ Danach **warte auf die ausdrueckliche Bestaetigung des Users.** Ohne ein explizi
 - **Governance zuerst:** `.ai-workspace/state/project-index.md` + `now.md` aus den Templates
   befuellen; bestehende Notizen/Docs/Wissen in die passenden Mount-Points migrieren (`knowledge/`,
   `research/`, `deliverables/`, …); Entscheidungen als Notizen unter `knowledge/decision/` anlegen
-  (`python -m harness.mdmemory new decision "<titel>"`, danach `python -m harness.mdmemory index`;
-  `state/decisions.md` ist nur eine generierte Sicht); die vier
+  (`python3 .claude/uaw/mdm.py new decision "<titel>"`; den Index erneuert der Hook
+  `index_refresh`, sonst `python3 .claude/uaw/mdm.py index`; `state/decisions.md` ist nur eine
+  generierte Sicht); die vier
   Setup-Fragen (`setup-protocol.md` §2) beantworten.
 - **Execution nur, falls in Schritt 3 gewaehlt:** `.claude/` + `src/harness/` + `pyproject.toml` etc.
   uebernehmen, gemaess `install-harness.md` `pip install -e .`, danach `python -m harness.skills lint

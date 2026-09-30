@@ -25,6 +25,7 @@ credentials/
 .claude/.daily_maintenance_last
 .claude/.compact_nudge_state
 .claude/.session_state_guard
+.claude/.pflege_hint
 
 # === Python build / packaging ===
 __pycache__/

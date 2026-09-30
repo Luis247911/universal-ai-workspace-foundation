@@ -16,4 +16,4 @@ Patterns are reimplemented from public OSS ideas (see /sources/credits.md and /N
 no third-party agent library is required. Everything runs offline in mock mode by default.
 """
 
-__version__ = "3.3.0"
+__version__ = "3.4.0"

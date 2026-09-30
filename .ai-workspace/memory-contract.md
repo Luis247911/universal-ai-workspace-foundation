@@ -17,7 +17,7 @@ Dieser Vertrag bindet die Gedaechtnis-Regeln aus `AGENTS.md`, `session-contract.
 | Live-Zustand | `state/now.md` (gitignored, pro Worktree, max. 4 KB) | aktuelle Aufgabe dieses Worktrees | Modell; Hook `now_init` legt an und kuerzt | ueberschrieben |
 | Journal | `journal/YYYY/MM/<datum>-<kurzid>.md` | was in einer Session geschah | Modell (nur anhaengen); Hooks nur Ueberlauf und Abschluss-Eintrag | dauerhaft, nach Konsolidierung eingefroren |
 | Notizen | `knowledge/<typ>/<id>.md` | Wissen, Decisions, Praeferenzen, Fragen, Annahmen, Risiken | Modell ueber `merken` bzw. Hauptsession | dauerhaft, ersetzen statt loeschen |
-| Generierte Dateien | `knowledge/INDEX.md`, `knowledge/_typen/`, Register-Sichten in `state/`, `journal/*/*/_rollup.md` | nichts; abgeleitet | nur `python -m harness.mdmemory` | jederzeit neu erzeugbar |
+| Generierte Dateien | `knowledge/INDEX.md`, `knowledge/_typen/`, Register-Sichten in `state/`, `journal/*/*/_rollup.md` | nichts; abgeleitet | nur `harness.mdmemory` (auch ueber den Hook `index_refresh`) | jederzeit neu erzeugbar |
 | Tabellen | `state/source-registry.md`, `state/artifact-index.md`, `state/project-index.md` | Quellen, Artefakte, Projekt-Identitaet | Hauptsession | dauerhaft |
 | Pflege-Berichte | `scratch/maintenance/<datum>-pflege.md` (gitignored) | nichts; Vorschlaege | Skill `pflege` | ephemer |
 | Operative Daten | externe Systeme | Tasks, Status, KPIs | dort | dort |
@@ -45,8 +45,8 @@ Die Deckel stehen in `src/harness/mdmemory/limits.py`: `INDEX.md` hat hoechstens
 | Modell / Hauptsession | Journal (anhaengen), `now.md`, Notizen, Tabellen | generierte Dateien von Hand, fremde Journale aendern |
 | Skill `merken` | Notizen, Einfrieren des Journals (`konsolidiert`) | ohne Quelle schreiben; bei den Faellen aus §1 Punkt 5 ohne Rueckfrage schreiben |
 | Skill `pflege` | Journal-Rollups, Bericht unter `scratch/maintenance/` | Notizen aendern, Auto-Merge; Korrekturen aus dem Bericht (`confirm`, `supersede`, Archivieren) setzt die Hauptsession nach Bestaetigung um |
-| Hooks (D-2026-09-30-06) | `now.md` anlegen und kuerzen, Ueberlauf und Abschluss-Eintrag ins eigene Journal, eigene Marker | Notizen, Decisions, generierte Dateien, Flags |
-| `harness.mdmemory` (D-2026-09-30-05) | generierte Dateien; Skelette und Migrationen auf ausdruecklichen Aufruf | kanonische Inhalte umschreiben |
+| Hooks (D-2026-09-30-09) | `now.md` anlegen und kuerzen, Ueberlauf und Abschluss-Eintrag ins eigene Journal, eigene Marker, generierte Dateien neu erzeugen (`index_refresh`) | Notizen, Decisions, Flags |
+| `harness.mdmemory` (D-2026-09-30-10; in `src/` oder als Kopie in `.claude/uaw/`) | generierte Dateien; Skelette, Migrationen und `adopt` auf ausdruecklichen Aufruf | kanonische Inhalte umschreiben; in einem fremden Projekt etwas ersetzen, das dieses selbst besitzt |
 | CI | nichts; prueft `lint`, Budget, Round-Trip | — |
 | MCP-Server (spaeter, §6) | Journal-Vorschlaege | Notizen, State, generierte Dateien |
 

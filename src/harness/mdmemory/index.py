@@ -28,7 +28,7 @@ from .limits import (
     SUBINDEX_MAX_ENTRIES,
 )
 from .notes import TYPES, Note, load_notes
-from .workspace import knowledge_dir, state_dir
+from .workspace import knowledge_dir, state_dir, write_lf
 
 GENERATED = "<!-- GENERIERT von harness.mdmemory index · nicht von Hand editieren -->"
 TYPE_DIR = "_typen"
@@ -277,7 +277,7 @@ def write(root: Path) -> list[Path]:
         old = path.read_text(encoding="utf-8") if path.exists() else None
         if old != text:
             path.parent.mkdir(parents=True, exist_ok=True)
-            path.write_text(text, encoding="utf-8", newline="\n")
+            write_lf(path, text)
             changed.append(path)
     for extra in _stale_parts(root, wanted):
         extra.unlink()

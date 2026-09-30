@@ -12,6 +12,9 @@ Woechentliche Pflege des Workspace-Gedaechtnisses (`memory-contract.md`). Der Sk
 Probleme und schlaegt Loesungen vor. Er selbst aendert keine Notiz; Korrekturen setzt die
 Hauptsession nach Bestaetigung um, und nichts wird automatisch gemergt.
 
+Befehle: `python3 .claude/uaw/mdm.py <befehl>` (ohne Installation, gleich
+`python -m harness.mdmemory`; auf Systemen ohne `python3` heisst der Aufruf `python`).
+
 ## Wann
 
 - Einmal pro Woche, manuell oder geplant (Planung: `reference.md`).
@@ -20,16 +23,16 @@ Hauptsession nach Bestaetigung um, und nichts wird automatisch gemergt.
 
 ## Ablauf
 
-1. **Bericht erzeugen**: `python -m harness.mdmemory report --write`. Er landet unter
+1. **Bericht erzeugen**: `python3 .claude/uaw/mdm.py report --write`. Er landet unter
    `scratch/maintenance/<datum>-pflege.md` (gitignored). Dabei wird der Monats-Rollup
-   `journal/YYYY/MM/_rollup.md` neu erzeugt; das ist eine generierte Datei (D-2026-09-30-05).
+   `journal/YYYY/MM/_rollup.md` neu erzeugt; das ist eine generierte Datei (D-2026-09-30-10).
    Ohne `--write` gibt `report` den Bericht nur aus und schreibt nichts.
 2. **Bericht lesen** und je Abschnitt entscheiden:
 
 | Abschnitt | Vorschlag |
 |---|---|
-| Lint-Fehler | beheben; meist `python -m harness.mdmemory index` oder eine fehlende Rueckverknuepfung |
-| Veraltet | Inhalt pruefen: noch wahr → `python -m harness.mdmemory confirm <id>`; nicht mehr wahr → Nachfolger + `supersede`; ungeklaert → Frage-Notiz |
+| Lint-Fehler | beheben; meist `python3 .claude/uaw/mdm.py index` oder eine fehlende Rueckverknuepfung |
+| Veraltet | Inhalt pruefen: noch wahr → `python3 .claude/uaw/mdm.py confirm <id>`; nicht mehr wahr → Nachfolger + `supersede`; ungeklaert → Frage-Notiz |
 | Waisen | verlinken (`links`), anheften, archivieren (`status: archived`) oder bewusst so lassen |
 | Duplikat-Kandidaten | gleiche Aussage → UPDATE der einen und SUPERSEDE der anderen; Widerspruch → `conflict` |
 | Nicht konsolidierte Journale | Skill `merken` ausfuehren; Eintraege mit "laeuft evtl. noch" nicht einfrieren |
@@ -55,6 +58,7 @@ Hauptsession nach Bestaetigung um, und nichts wird automatisch gemergt.
 ## Abgrenzung
 
 - Konsolidierung Journal → Notiz: [[merken]]. `pflege` findet nur, was dort liegen geblieben ist.
-- Der Hook `daily_maintenance` (opt-in) ist eine allgemeine taegliche Aufraeum-Erinnerung; er
-  startet `pflege` nicht. `pflege` ist der woechentliche Pass.
+- Der Hook `memory_boot` (default AN) erinnert beim Start, wenn der letzte Bericht unter
+  `scratch/maintenance/` aelter als 7 Tage ist (hoechstens einmal pro Tag); `pflege` ist der
+  Pass selbst. `daily_maintenance` (opt-in) ist eine allgemeine taegliche Aufraeum-Erinnerung.
 - Boot-Budget-Optimierung jenseits des Gedaechtnisses: [[harness-optimizer]].

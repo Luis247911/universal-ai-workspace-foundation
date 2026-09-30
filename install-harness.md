@@ -49,12 +49,25 @@ python -m harness.eval run --suite tests/goldens/repo.suite.json --threshold 0.9
   On models that support it, a server-side refusal fallback (`fallbacks="default"`) is enabled;
   a remaining refusal raises `HarnessError`.
 
+## The workspace memory needs no install
+
+The memory engine `harness.mdmemory` and its hooks use the standard library only and run with any
+Python >= 3.9 (including the stock macOS `/usr/bin/python3`), straight from the checkout:
+
+```bash
+python3 .claude/uaw/mdm.py lint          # same as: python -m harness.mdmemory lint
+python3 .claude/uaw/mdm.py adopt ../other-project --dry-run
+```
+
+Hooks run as `sh .claude/hooks/run.sh <hook>.py`; the launcher picks `$UAW_PYTHON`, `python3` or
+`python`. On by default: `now_init`, `index_refresh`, `memory_boot`, `journal_stub`,
+`precompact_reminder` (see `.claude/AUTOMATION.md`). `adopt` copies the engine to
+`.claude/uaw/` of another project, so that project needs no install either.
+
 ## Optional: session automation (opt-in)
 
-The execution layer also ships an **optional, committed session-automation layer**. The helpers
-below are **off by default**; you opt in per capability. Both are local and model-driven: *the
-hook reminds, the model writes*. On by default is only the small `now_init` hook, which creates
-the gitignored `state/now.md` and keeps it under 4 KB (overflow goes to the session journal).
+The execution layer also ships **optional** session helpers, **off by default**; you opt in per
+capability. Both are local and model-driven: *the hook reminds, the model writes*.
 
 - **boot_reload** (`SessionStart`) re-injects `.ai-workspace/state/now.md` so a
   new / resumed / compacted session boots with the live state in view.
@@ -69,8 +82,8 @@ Toggle it through the `/uaw-automation` companion, or edit `.claude/automation.f
 
 The hooks are registered in `.claude/settings.json` but do nothing while their flag is `false`
 (they exit immediately with no output), so a fresh clone stays silent until you opt in. Being
-committed, they also run in web/cloud sessions; the launcher is `python` (use `python3` where
-that is the only name). They touch only this repo, never your global `~/.claude/`. Full operator
+committed, they also run in web/cloud sessions; the launcher `run.sh` picks `python3` or
+`python`. They touch only this repo, never your global `~/.claude/`. Full operator
 docs: [`.claude/AUTOMATION.md`](.claude/AUTOMATION.md).
 
 ## Layout

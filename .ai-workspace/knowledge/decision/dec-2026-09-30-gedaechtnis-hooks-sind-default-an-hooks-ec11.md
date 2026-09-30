@@ -4,11 +4,11 @@ type: decision
 title: Gedaechtnis-Hooks default AN; Hooks duerfen einen Abschluss-Eintrag ins eigene Journal schreiben
 summary: memory_boot, journal_stub und precompact_reminder laufen standardmaessig; alles andere bleibt opt-in
 aliases: [D-2026-09-30-06]
-status: active
+status: superseded
 valid_from: 2026-09-30
-valid_until:
+valid_until: 2026-09-30
 supersedes: [dec-2026-09-30-02-schreib-doktrin-fuer-execution, dec-2026-09-30-03-die-automatik-schicht-unter]
-superseded_by:
+superseded_by: dec-2026-09-30-hooks-halten-den-gedaechtnis-index-c464
 change: veraendert
 confidence: bestaetigt
 sources: [user:auftrag-2026-09-30-memory-phase-3]
@@ -70,3 +70,4 @@ Ersetzt D-2026-09-30-02 (Schreib-Doktrin) und D-2026-09-30-03 (Defaults). Deren 
 - 2026-09-30 · angelegt
 - 2026-09-30 · ersetzt dec-2026-09-30-02-schreib-doktrin-fuer-execution (veraendert)
 - 2026-09-30 · ersetzt dec-2026-09-30-03-die-automatik-schicht-unter (veraendert)
+- 2026-09-30 · abgeloest durch dec-2026-09-30-hooks-halten-den-gedaechtnis-index-c464 (veraendert)

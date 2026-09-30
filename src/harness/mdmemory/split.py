@@ -32,7 +32,7 @@ from .legacy import (
     to_notes,
 )
 from .notes import Note, load_notes
-from .workspace import state_dir, ws
+from .workspace import state_dir, write_lf, ws
 
 KEY_ORDER: dict[str, list[str]] = {
     "decisions": [
@@ -107,6 +107,13 @@ def _archive(root: Path, reg: Register, day: str) -> Path:
     return dst
 
 
+def _zip_same(a: list, b: list) -> list:
+    """``zip(..., strict=True)`` for Python 3.9."""
+    if len(a) != len(b):
+        raise ValueError(f"length mismatch: {len(a)} entries, {len(b)} notes")
+    return list(zip(a, b))  # noqa: B905 (strict= needs Python 3.10)
+
+
 def id_to_alias(notes: list[Note]) -> dict[str, str]:
     return {n.id: n.items("aliases")[0] for n in notes if n.items("aliases")}
 
@@ -114,7 +121,7 @@ def id_to_alias(notes: list[Note]) -> dict[str, str]:
 def check_round_trip(reg: Register, entries: list[Entry], notes: list[Note]) -> None:
     """Raise if any entry changes on the way entry -> rendered note -> entry."""
     back_map = id_to_alias(notes)
-    for entry, note in zip(entries, notes, strict=True):
+    for entry, note in _zip_same(entries, notes):
         meta, body = frontmatter.parse(note.render())
         back = entry_from_note(reg, Note(note.path, meta or {}, body), back_map)
         if normalize(back) != normalize(entry):
@@ -141,13 +148,13 @@ def split(root: Path, day: str, only: list[str] | None = None) -> list[SplitResu
         res.entries = len(entries)
         notes = to_notes(root, reg, entries, day)
         check_round_trip(reg, entries, notes)
-        for entry, note in zip(entries, notes, strict=True):
+        for entry, note in _zip_same(entries, notes):
             alias = entry.get("ID", "")
             if note.id in known or (alias and alias in known) or note.path.exists():
                 res.skipped += 1
                 continue
             note.path.parent.mkdir(parents=True, exist_ok=True)
-            note.path.write_text(note.render(), encoding="utf-8", newline="\n")
+            write_lf(note.path, note.render())
             res.written.append(note.path)
     if any(r.archived for r in results):
         index_mod.write(root)

@@ -11,7 +11,10 @@ status: experimental
 Ueberfuehrt Journal-Eintraege oder eine Aussage des Users in atomare Notizen unter
 `.ai-workspace/knowledge/<typ>/` (Schema `templates/knowledge-note.md`, D-2026-09-30-04). Das
 Verfahren ist tool-neutral (auch fuer Codex, `AGENTS.md` §6). Die mechanischen Schritte
-erledigt `python -m harness.mdmemory`; das Urteil faellst du.
+erledigt `python3 .claude/uaw/mdm.py`; das Urteil faellst du.
+
+Befehle: `python3 .claude/uaw/mdm.py <befehl>` (ohne Installation, gleich
+`python -m harness.mdmemory`; auf Systemen ohne `python3` heisst der Aufruf `python`).
 
 ## Wann
 
@@ -23,17 +26,17 @@ erledigt `python -m harness.mdmemory`; das Urteil faellst du.
 
 1. **Kandidat formulieren**: eine Aussage, ein Satz. Typ waehlen: `person`, `preference`,
    `project`, `decision`, `reference`, `concept`, `question` (mit `kind`).
-2. **Bestand pruefen**: `python -m harness.mdmemory candidates "<aussage>"` und bei Bedarf
+2. **Bestand pruefen**: `python3 .claude/uaw/mdm.py candidates "<aussage>"` und bei Bedarf
    `grep` in `knowledge/`. Die Treffer-Notizen lesen, nicht nur ihre Titel.
 3. **Entscheiden** (genau eine Operation):
 
 | Operation | Wann | Was tun |
 |---|---|---|
-| NOOP | Steht schon so da | nichts schreiben; bei erneuter Bestaetigung `python -m harness.mdmemory confirm <id>` |
-| ADD | Neu, widerspricht nichts | `python -m harness.mdmemory new <typ> "<titel>" --source journal:<pfad>`, Koerper fuellen |
+| NOOP | Steht schon so da | nichts schreiben; bei erneuter Bestaetigung `python3 .claude/uaw/mdm.py confirm <id>` |
+| ADD | Neu, widerspricht nichts | `python3 .claude/uaw/mdm.py new <typ> "<titel>" --source journal:<pfad>`, Koerper fuellen |
 | UPDATE | Gleiche Aussage, genauer oder ergaenzt | Notiz editieren, `updated` setzen, Zeile unter `## Verlauf` |
-| SUPERSEDE | Alte Aussage gilt nicht mehr | neue Notiz (ADD), dann `python -m harness.mdmemory supersede <alt> <neu> --change <veraendert oder korrigiert>` |
-| CONFLICT | Widerspruch, unklar welche gilt | `python -m harness.mdmemory conflict <a> <b> "<frage>" --source …` (angeheftete Frage, nichts ueberschreiben; ein zweiter Aufruf fuer dasselbe Paar legt nichts neu an) |
+| SUPERSEDE | Alte Aussage gilt nicht mehr | neue Notiz (ADD), dann `python3 .claude/uaw/mdm.py supersede <alt> <neu> --change <veraendert oder korrigiert>` |
+| CONFLICT | Widerspruch, unklar welche gilt | `python3 .claude/uaw/mdm.py conflict <a> <b> "<frage>" --source …` (angeheftete Frage, nichts ueberschreiben; ein zweiter Aufruf fuer dasselbe Paar legt nichts neu an) |
 
    `veraendert`: die Welt hat sich geaendert, die alte Notiz war damals richtig.
    `korrigiert`: die alte Notiz war falsch.
@@ -44,9 +47,9 @@ erledigt `python -m harness.mdmemory`; das Urteil faellst du.
    - SUPERSEDE und jeder Korrektur (`change: korrigiert`),
    - CONFLICT.
    Alles andere schreibst du direkt und nennst es danach in einer Zeile.
-5. **Abschluss**: `python -m harness.mdmemory index`, dann `python -m harness.mdmemory lint`
+5. **Abschluss**: `python3 .claude/uaw/mdm.py index`, dann `python3 .claude/uaw/mdm.py lint`
    (muss 0 Fehler zeigen). Ein Journal, dessen Eintraege alle verarbeitet sind, einfrieren:
-   `python -m harness.mdmemory consolidated <journal> <notiz-ids…>`. **Nur abgeschlossene
+   `python3 .claude/uaw/mdm.py consolidated <journal> <notiz-ids…>`. **Nur abgeschlossene
    Journale** einfrieren: das eigene am Ende dieser Session oder die, die `pending` nennt
    (mit `uebergabe`-Eintrag oder aelter als heute). Das Journal einer Session, die in einem
    anderen Worktree noch laeuft, bleibt offen; sonst kann sie nicht weiterschreiben.
@@ -62,10 +65,10 @@ erledigt `python -m harness.mdmemory`; das Urteil faellst du.
 - **`summary`** ist ein Satz mit hoechstens 120 Zeichen und ohne URL; er landet im Boot-Index.
 - **Globale Praeferenzen** (`scope: global`): Ist der optionale globale Namespace aktiv
   (`UAW_GLOBAL_MEMORY_DIR`, `memory-contract.md` §5), nach Rueckfrage dort anlegen
-  (`python -m harness.mdmemory --global new preference "<titel>" --source user:<datum>`; die
+  (`python3 .claude/uaw/mdm.py --global new preference "<titel>" --source user:<datum>`; die
   Quelle ist `user:`, weil das Projekt-Journal in einem anderen Repo liegt), sonst im Projekt mit
   `scope: global`. Das Projekt-Journal verweist dann mit `global:<id>` darauf:
-  `python -m harness.mdmemory consolidated <journal> global:<id>`.
+  `python3 .claude/uaw/mdm.py consolidated <journal> global:<id>`.
 - **Operative Daten** (Tasks, Status, KPIs) werden keine Notizen; `project`-Notizen halten nur
   einen Verweis (`external_ref`).
 - **Idempotent**: Ein zweiter Durchlauf ueber dasselbe Journal aendert nichts. Eingefrorene

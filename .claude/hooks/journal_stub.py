@@ -16,10 +16,9 @@ The hook does one directory glob and one append; any error -> exit 0, no output.
 
 from __future__ import annotations
 
-import sys
 from datetime import datetime
 
-from _flags import flag, payload, project_dir, tool
+from _flags import flag, load_engine, payload, project_dir, tool
 
 
 def main() -> int:
@@ -27,7 +26,8 @@ def main() -> int:
     if not flag("journal_stub"):
         return 0
     root = project_dir()
-    sys.path.insert(0, str(root / "src"))
+    if not load_engine(root):
+        return 0
     try:
         from harness.mdmemory import frontmatter, journal
         from harness.mdmemory.rollup import _entries

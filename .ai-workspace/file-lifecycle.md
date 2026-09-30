@@ -60,7 +60,7 @@ data-space/ --(deaktiviert)-->                                archive/YYYY-MM-DD
 - Generierte Outputs (PDF, PPTX, DOCX, Renders, Builds) leben **ausserhalb** der Foundation oder im projektspezifisch deklarierten Project Data Space.
 - Canonical Source-Files bleiben sortiert in `deliverables/<slug>/` oder `knowledge/<topic>/<slug>.md`.
 - Foundation-Core bietet keine `_generated/`-Substruktur als Default.
-- Ausnahme: abgeleitete `.md`-Dateien mit Marke `GENERIERT` (`knowledge/INDEX.md`, `knowledge/_typen/`, die Register-Sichten unter `state/`), geschrieben nur von `python -m harness.mdmemory` (D-2026-09-30-05). Kanonisch bleiben die Notizen unter `knowledge/<typ>/`.
+- Ausnahme: abgeleitete `.md`-Dateien mit Marke `GENERIERT` (`knowledge/INDEX.md`, `knowledge/_typen/`, die Register-Sichten unter `state/`), geschrieben nur von `harness.mdmemory`, auch ueber den Hook `index_refresh` (D-2026-09-30-09, D-2026-09-30-10). Kanonisch bleiben die Notizen unter `knowledge/<typ>/`.
 
 ## 7. Stale-Review-Cadence
 

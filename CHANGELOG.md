@@ -4,6 +4,79 @@ All notable changes to this project are documented here. Format based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); this project follows
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.4.0] — 2026-09-30
+
+Phase 5 of the long-term memory: autopilot. The memory now runs by itself in both ways in: a
+fresh clone needs no `pip install`, and an existing project gets everything with one idempotent
+command. Manual steps per way in: fresh clone 7 → 2, existing project 20 → 4 (README,
+"Was automatisch läuft").
+
+### Added
+
+- **`adopt`** (`python3 <foundation>/.claude/uaw/mdm.py adopt <projekt> [--dry-run]`,
+  D-2026-09-30-10): brings the memory into an existing project and only adds or merges. Governance
+  skeleton where missing; existing `AGENTS.md`/`CLAUDE.md` keep their content and get one marked
+  block (`<!-- uaw:begin -->`); the v3.2 `@current-session.md` import becomes `@now.md`; memory
+  hooks, skills `merken` and `pflege`; `settings.json`, `automation.flags.json`, `.gitignore`,
+  `.gitattributes` merged; migrations `now migrate`, `split-decisions`, optionally
+  `import-automemory`, then `index`; CI template `.github/workflows/uaw-memory.yml` when the
+  project uses GitHub. Files the foundation owns are listed with sha256 in
+  `.claude/uaw/manifest.json`; an upgrade replaces only untouched ones. Second run: no diff.
+- **Engine copy `.claude/uaw/`**: `harness.mdmemory` vendored by `adopt` (stdlib only), shim
+  `.claude/uaw/mdm.py` (`python3 .claude/uaw/mdm.py <befehl>` = `python -m harness.mdmemory`,
+  no install; in the foundation it uses `src/`). Registered in `AGENTS.md` §2.5,
+  `context-policy.md` and `setup-protocol.md`.
+- **Launcher `.claude/hooks/run.sh`**: every hook runs as `sh .../run.sh <hook>.py` and picks
+  `$UAW_PYTHON`, `python3` or `python` (>= 3.9). Before, hooks called `python`, which a stock Mac
+  does not have.
+- **Hook `index_refresh`** (default ON, D-2026-09-30-09): regenerates the generated files after an
+  edit to a note (PostToolUse) and heals a stale index at start (after `git pull`/merge).
+- **`memory_boot`** nudges the skill `pflege` when the last report is older than 7 days (once a
+  day at most).
+- **`journal add KIND TEXT --session ID`**: appends and creates the session journal on first use;
+  `now_init` names the exact command.
+- **Python 3.9 support for the memory engine and hooks** (the stock macOS `python3`): new CI job
+  `stock-macos-python` runs the memory, hook and end-to-end tests on `/usr/bin/python3`.
+- **`tests/test_autopilot_e2e.py`**: Weg A (fresh clone, no install) and Weg B (fictional v3.2
+  project with own AGENTS/CLAUDE, legacy registers, `current-session.md`, own settings hook,
+  auto-memory folder): dry run changes nothing, adopt is lossless, second run has no diff, upgrade
+  keeps edited files, a whole session runs through the hooks with only `python3` on the PATH.
+- Decisions D-2026-09-30-09 (hooks keep the index current; supersedes -06) and
+  D-2026-09-30-10 (engine copy per `adopt`; supersedes -05).
+
+### Fixed (review of the 3.3.0 phases; fixed in their own branches)
+
+- Phase 1: lossy frontmatter parse of `\"` before ` #`; BOM/blank after fences; duplicate keys
+  and line breaks now rejected; `now trim` endless loop on multibyte lines and tiny limits;
+  bullets moved with their continuation lines; CRLF size; Codex UUIDv7 short ids collided within
+  ~1 min, CLI default session `manual` collided; a session over midnight got two journals;
+  `now migrate` byte-exact via bytes + sha256, idempotent across days, seeds a template-only
+  `now.md`; `journal append` limited to `journal/`.
+- Phase 2: INDEX cap not guaranteed with many pinned notes; finished pinned notes stayed in the
+  boot index; `@path` in summaries would be imported via the boot index; sensitive notes had
+  speaking ids; `import-automemory` used a wrong folder name (spaces, dots, worktrees); broken
+  note -> traceback.
+- Phase 3: `memory_boot` listed the own journal after midnight and a parallel session could
+  freeze a running journal (`pending` now lists finished journals only); `conflict` not
+  idempotent; supersede cycles; unvalidated `--date`; `consolidated` ignored aliases and root;
+  `journal_stub` appended on every exit; compact reminder lost without the engine.
+- Phase 4: `report` ignored the hard boot limit in its exit code, wrote rollups in stdout mode
+  and showed titles of sensitive notes; `--global` could point into the project and ignored it
+  for path arguments; orphan/duplicate false positives.
+
+### Changed
+
+- All hook commands in `.claude/settings.json` and `.codex/hooks.json` go through `run.sh`.
+- `AUTOMATION.md`, `memory-contract.md`, `session-contract.md`, the skills and the policies
+  reference D-2026-09-30-09/-10. README rewritten around the two ways in.
+- Boot 4,990 tokens (target 5,000), worst case 8,748 (hard 12,000).
+
+### Upgrade from 3.2.x or 3.3.0
+
+Run the starter prompt (README) or, from a fresh foundation clone,
+`python3 <klon>/.claude/uaw/mdm.py adopt <projekt> --dry-run`, then without `--dry-run`. It
+covers every step of "Migration from 3.2.x" below. The foundation repo itself: pull, nothing else.
+
 ## [3.3.0] — 2026-09-30
 
 Phase 4 of the long-term memory: maintenance and division of labour. Completes the 3.3.0 line

@@ -14,8 +14,11 @@ lossless and a second dump produces no diff. That is the property the generated 
 from __future__ import annotations
 
 import re
+from typing import Union
 
-Value = str | list[str]
+# typing.Union on purpose: the hooks run this module with any Python >= 3.9 (the stock macOS
+# python3), where ``str | list[str]`` fails at runtime.
+Value = Union[str, list[str]]  # noqa: UP007
 Meta = dict[str, Value]
 
 _FENCE = "---"

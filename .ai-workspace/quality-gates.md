@@ -67,7 +67,7 @@ Vor Promotion einer Normalized-Markdown-Datei in `knowledge/` muss `verification
 
 ## 10. Tool- und Command-Begriffe
 
-In der **Governance-Schicht** erscheinen Tool-/Command-Namen **ausschliesslich** in `security-policy.md` als Beispiele fuer verbotene oder genehmigungspflichtige Ausfuehrung. Sie erscheinen nicht in `quality-gates.md` als Lint-Tool-Empfehlung, nicht in anderen Governance-Policies als Setup-/Workflow-Default. Domain-spezifische Tool-Empfehlungen leben in Adaptern. **Ausnahme: die mitgelieferte Harness-Schicht** (`pyproject.toml`, `src/`, `.claude/`, `tests/`, `.github/`, `install-harness.md`) — dort sind Tool-Namen legitim, weil es ein echtes Paket ist (siehe `security-policy.md` §12). Governance-Dateien duerfen ausserdem die `harness.mdmemory`-Befehle nennen, mit denen Notizen angelegt und GENERIERT-Dateien abgeleitet werden (D-2026-09-30-05).
+In der **Governance-Schicht** erscheinen Tool-/Command-Namen **ausschliesslich** in `security-policy.md` als Beispiele fuer verbotene oder genehmigungspflichtige Ausfuehrung. Sie erscheinen nicht in `quality-gates.md` als Lint-Tool-Empfehlung, nicht in anderen Governance-Policies als Setup-/Workflow-Default. Domain-spezifische Tool-Empfehlungen leben in Adaptern. **Ausnahme: die mitgelieferte Harness-Schicht** (`pyproject.toml`, `src/`, `.claude/`, `tests/`, `.github/`, `install-harness.md`) — dort sind Tool-Namen legitim, weil es ein echtes Paket ist (siehe `security-policy.md` §12). Governance-Dateien duerfen ausserdem die `harness.mdmemory`-Befehle nennen, mit denen Notizen angelegt und GENERIERT-Dateien abgeleitet werden (D-2026-09-30-10).
 
 ## 11. CI als Verification-Gate (Harness-Schicht)
 

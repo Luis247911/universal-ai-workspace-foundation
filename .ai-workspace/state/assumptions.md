@@ -1,34 +1,20 @@
 ---
 id: assumptions
 type: assumptions
-title: "Aktive Annahmen"
+title: "Aktive Annahmen (generierte Sicht)"
 status: active
-created: <YYYY-MM-DD>
-updated: <YYYY-MM-DD>
-owner: <user>
+generated: true
 ---
+<!-- GENERIERT von harness.mdmemory index · nicht von Hand editieren -->
 
-# Assumptions
+# Aktive Annahmen
 
-Aktive Annahmen + Confidence + Invalidierungs-Trigger. Annahmen sind klar getrennt von Decisions und Open Questions.
+**Generierte Sicht.** Kanonisch sind die Notizen unter `../knowledge/question/` (D-2026-09-30-04). Neue Eintraege entstehen als Notiz (Vorlage `../templates/knowledge-note.md`), danach `python -m harness.mdmemory index`. Das alte Vollformat liefert `python -m harness.mdmemory export-legacy assumptions`.
 
-## Format pro Eintrag
-
-```text
-- ID: A-YYYY-MM-DD-NN
-- Annahme: <1 satz>
-- Confidence: <high / medium / low>
-- Abhaengige Decisions: <D-IDs, falls anwendbar>
-- Invalidierungs-Trigger: <was wuerde diese annahme widerlegen>
-- Status: <active / invalidated>
-```
-
-## Aktive Eintraege
+## Aktiv
 
 (noch keine)
 
-## Cross-Links
+## Abgeloest, zurueckgezogen, archiviert
 
-- Decisions: `decisions.md`.
-- Risks/Constraints: `risks-and-constraints.md`.
-- Open Questions: `open-questions.md`.
+(keine)

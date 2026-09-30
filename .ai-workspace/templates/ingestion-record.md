@@ -37,7 +37,7 @@ Pro Ingestion-Vorgang ein Eintrag. Dokumentiert, wie eine Binaerdatei in Markdow
 
 ## 3. Open Issues
 
-Verweis auf `Q-IDs` in `state/open-questions.md`.
+Verweis auf Fragen-Notizen unter `knowledge/question/` (ID oder Alias `Q-...`; Sicht `state/open-questions.md`, generiert).
 
 - `[[Q-YYYY-MM-DD-NN]]` — `<frage>`
 

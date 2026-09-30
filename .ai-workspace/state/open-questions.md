@@ -1,33 +1,20 @@
 ---
 id: open-questions
 type: open-questions
-title: "Offene Fragen"
+title: "Offene Fragen (generierte Sicht)"
 status: active
-created: <YYYY-MM-DD>
-updated: <YYYY-MM-DD>
-owner: <user>
+generated: true
 ---
+<!-- GENERIERT von harness.mdmemory index · nicht von Hand editieren -->
 
-# Open Questions
+# Offene Fragen
 
-Single source fuer Unknowns, die Fortschritt blockieren oder beeinflussen. Geloeste Fragen wandern in einen Kommentar/Status `answered` und werden ggf. nach `archive/` migriert.
+**Generierte Sicht.** Kanonisch sind die Notizen unter `../knowledge/question/` (D-2026-09-30-04). Neue Eintraege entstehen als Notiz (Vorlage `../templates/knowledge-note.md`), danach `python -m harness.mdmemory index`. Das alte Vollformat liefert `python -m harness.mdmemory export-legacy open-questions`.
 
-## Format pro Eintrag
-
-- ID: `Q-YYYY-MM-DD-NN`
-- Frage
-- raised-by (User / Assistant / Adapter-Slug)
-- raised-date
-- blockiert-Decision (Verweis auf D-IDs falls anwendbar)
-- Research-Status (`none` / `in_progress` / `answered`)
-- Resolution-Datum (falls geloest)
-
-## Aktive Fragen
+## Aktiv
 
 (noch keine)
 
-## Cross-Links
+## Abgeloest, zurueckgezogen, archiviert
 
-- Decisions: `decisions.md`.
-- Risks/Constraints: `risks-and-constraints.md`.
-- Assumptions: `assumptions.md`.
+(keine)

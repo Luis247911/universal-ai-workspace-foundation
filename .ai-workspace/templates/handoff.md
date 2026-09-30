@@ -32,11 +32,11 @@ Liste der naechsten Schritte, in priorisierter Reihenfolge.
 
 ## Open Questions
 
-Verweis auf relevante `Q-IDs` in `state/open-questions.md`.
+Verweis auf relevante Fragen (Notizen unter `knowledge/question/`, `kind: question`; alte `Q-IDs` gelten als Alias). Sicht: `state/open-questions.md` (generiert).
 
 ## Open Risks
 
-Verweis auf relevante `R-IDs` in `state/risks-and-constraints.md`.
+Verweis auf relevante Risiken (Notizen unter `knowledge/question/`, `kind: risk`/`constraint`; alte `R-IDs` gelten als Alias). Sicht: `state/risks-and-constraints.md` (generiert).
 
 ## Resume-Anweisungen
 

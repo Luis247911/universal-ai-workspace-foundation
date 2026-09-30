@@ -49,7 +49,7 @@ Siehe `adapter-policy.md` Section 2. Kurz:
 
 ## Multi-Adapter-Koexistenz
 
-Konflikte zwischen Adaptern werden in `state/decisions.md` dokumentiert + vom User explizit aufgeloest. Mehrere Adapter teilen sich dieselbe `state/`-Struktur.
+Konflikte zwischen Adaptern werden als Decision-Notiz unter `knowledge/decision/` dokumentiert (`python -m harness.mdmemory new decision "<titel>"`, danach `index`) + vom User explizit aufgeloest. Mehrere Adapter teilen sich dieselbe `state/`-Struktur.
 
 ## Deaktivierung
 

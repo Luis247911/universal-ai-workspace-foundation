@@ -22,9 +22,9 @@ Diese Datei ist eine reine Routing-Funktion. Sie erklaert, was unter `.ai-worksp
 | `adapter-policy.md` | Adapter-Vertrag + Boundaries | statisch | Load on Relevance |
 | `quality-gates.md` | Verifikationsstufen | statisch | Load on Relevance |
 | `knowledge-graph-policy.md` | Markdown-KG, Wiki-Links, Frontmatter, MOC, Document Normalization, Maintenance Blueprints | statisch | Load on Relevance |
-| `state/` | Operativer kanonischer Zustand | live | siehe Subdirektive |
+| `state/` | Operativer Zustand: `project-index.md`, `now.md`, `source-registry.md`, `artifact-index.md`; dazu generierte Register-Sichten (`decisions.md`, `open-questions.md`, `assumptions.md`, `risks-and-constraints.md`) | live | siehe Subdirektive |
 | `templates/` | Markdown-Vorlagen | statisch | Load on Explicit Request |
-| `knowledge/` | Markdown-Knowledge-Graph | durable | MOC-first, dann selektiv |
+| `knowledge/` | Gedaechtnis: eine Notiz pro Datei unter `knowledge/<typ>/` (u.a. Decisions, Fragen/Annahmen/Risiken), generiert `INDEX.md` + `_typen/`; dazu Markdown-Knowledge-Graph mit MOCs | durable | `INDEX.md` beim Boot, dann selektiv |
 | `data-space/` | Manifest-only Mount Point fuer externe Datenraeume | durable Manifest | Load on Relevance bei aktivem Data-Space |
 | `research/` | Geprueftes oder zu pruefendes Material | retentions-getriggert | Load on Explicit Request |
 | `deliverables/` | Kuratierte `.md`-Outputs | durable | Load on Explicit Request |
@@ -39,12 +39,13 @@ Alle Dateien innerhalb dieses Verzeichnisses sind `.md`. Keine `.json`, `.yaml`,
 
 ## Boot-Set
 
-Vier Dateien werden beim Session-Start automatisch wahrgenommen:
+Fuenf Dateien werden beim Session-Start automatisch wahrgenommen:
 
 1. `../AGENTS.md`
 2. `../CLAUDE.md` (falls Tool = Claude)
 3. `state/project-index.md`
 4. `state/now.md` (gitignored, pro Worktree)
+5. `knowledge/INDEX.md` (generiert, Einstieg ins Gedaechtnis)
 
 Alles andere wird auf Relevanz, auf Anfrage oder gar nicht geladen. Siehe `context-policy.md`.
 

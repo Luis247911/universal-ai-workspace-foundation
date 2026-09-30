@@ -28,15 +28,17 @@ Diese Datei ist die operative Verhaltens-Definition fuer jede Session, die auf d
 ## 4. Update-Pflichten
 
 - Vor `/compact`, vor Handoff, vor Task-Wechsel, nach jeder groesseren Aktion: Journal-Eintrag anhaengen und `state/now.md` aktualisieren gemaess `session-contract.md` §3.
-- Bei jeder neuen Erkenntnis, die ein State-Eintrag wird (Decision, Open Question, Annahme, Risiko, Quelle, Artefakt): direkt im richtigen `state/`-File registrieren.
+- Bei jeder neuen Erkenntnis, die ein Eintrag wird: Decision, Open Question, Annahme oder Risiko direkt als Notiz unter `knowledge/decision/` bzw. `knowledge/question/` anlegen (`python -m harness.mdmemory new …`, danach `python -m harness.mdmemory index`); Quelle und Artefakt direkt im richtigen `state/`-File registrieren (`source-registry.md`, `artifact-index.md`).
 - Bei Erstellung eines Artefakts in `research/`, `deliverables/`, `knowledge/` oder `data-space/`: Eintrag in `state/artifact-index.md`.
 
 ## 5. Ungewissheits-Behandlung
 
-- Offene Fragen → `state/open-questions.md` mit ID `Q-YYYY-MM-DD-NN`.
-- Annahmen → `state/assumptions.md` mit ID `A-YYYY-MM-DD-NN`, inkl. Invalidierungs-Trigger.
-- Risiken → `state/risks-and-constraints.md` mit ID `R-YYYY-MM-DD-NN`.
-- Bei einer Aufgabe mit unklarem Scope: erst eine Decision in `state/decisions.md` herbeifuehren, dann arbeiten — keine "weichen" Pivots ohne Decision.
+Jeder Eintrag ist eine eigene Notiz (D-2026-09-30-04): `python -m harness.mdmemory new question "<titel>" --kind question|assumption|risk|constraint` bzw. `new decision "<titel>"`, danach `python -m harness.mdmemory index`. Die Sichten `state/open-questions.md`, `state/assumptions.md`, `state/risks-and-constraints.md` und `state/decisions.md` sind generiert und werden nie von Hand editiert. Alte IDs (`Q-`/`A-`/`R-`/`D-YYYY-MM-DD-NN`) bleiben als `aliases` gueltig.
+
+- Offene Fragen → Notiz unter `knowledge/question/` mit `kind: question`.
+- Annahmen → Notiz unter `knowledge/question/` mit `kind: assumption`, inkl. Invalidierungs-Trigger.
+- Risiken → Notiz unter `knowledge/question/` mit `kind: risk` (Constraints: `kind: constraint`).
+- Bei einer Aufgabe mit unklarem Scope: erst eine Decision (Notiz unter `knowledge/decision/`) herbeifuehren, dann arbeiten — keine "weichen" Pivots ohne Decision.
 
 ## 6. Foundation-Self-Limit
 

@@ -1,4 +1,4 @@
-"""Markdown memory of the workspace: journal, live state, (later) notes and generated indexes.
+"""Markdown memory of the workspace: journal, live state, atomic notes and generated indexes.
 
 Stdlib only. This package manages the *workspace* memory under ``.ai-workspace/`` (Markdown in
 git). It is unrelated to ``harness.memory``, the in-memory demo store for agents you build.

@@ -1,47 +1,20 @@
 ---
 id: risks-and-constraints
 type: risks-and-constraints
-title: "Risiken und Constraints"
+title: "Risiken und Constraints (generierte Sicht)"
 status: active
-created: <YYYY-MM-DD>
-updated: <YYYY-MM-DD>
-owner: <user>
+generated: true
 ---
+<!-- GENERIERT von harness.mdmemory index · nicht von Hand editieren -->
 
-# Risks and Constraints
+# Risiken und Constraints
 
-Aktive Risiken + harte Constraints. Klar getrennt: **Risks** sind potenzielle, mitigierbare Probleme; **Constraints** sind nicht verhandelbare Begrenzungen.
+**Generierte Sicht.** Kanonisch sind die Notizen unter `../knowledge/question/` (D-2026-09-30-04). Neue Eintraege entstehen als Notiz (Vorlage `../templates/knowledge-note.md`), danach `python -m harness.mdmemory index`. Das alte Vollformat liefert `python -m harness.mdmemory export-legacy risks-and-constraints`.
 
-## A. Risks
-
-Format pro Eintrag:
-
-```text
-- ID: R-YYYY-MM-DD-NN
-- Risiko: <beschreibung>
-- Severity: <low / medium / high>
-- Probability: <low / medium / high>
-- Mitigation: <was wird oder wurde getan>
-- Owner: <wer>
-- Review-Date: <YYYY-MM-DD>
-```
+## Aktiv
 
 (noch keine)
 
-## B. Constraints
+## Abgeloest, zurueckgezogen, archiviert
 
-Format pro Eintrag:
-
-```text
-- Constraint: <beschreibung>
-- Quelle: <gesetz / vertrag / tech-limit / user-vorgabe / sonstiges>
-- Konsequenz bei Verletzung: <was passiert>
-```
-
-(noch keine)
-
-## Cross-Links
-
-- Decisions: `decisions.md`.
-- Sicherheit: `../security-policy.md`.
-- Annahmen: `assumptions.md`.
+(keine)

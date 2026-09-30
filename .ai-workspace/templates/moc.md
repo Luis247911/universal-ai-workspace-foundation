@@ -80,4 +80,4 @@ Verweise auf `Q-IDs`, die noch nicht beantwortet sind.
 ## Cross-Links
 
 - KG-Policy: `../knowledge-graph-policy.md`.
-- Knowledge-Note-Template: `knowledge-note.md`.
+- Topic-Note-Template: `topic-note.md` (Langform); atomare Notizen: `knowledge-note.md`.

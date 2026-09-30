@@ -45,7 +45,7 @@ Wenn eine archivierte Datei wieder aktiv werden soll:
 
 ## Kein Silent-Delete
 
-`archive/`-Dateien werden niemals automatisch geloescht. Loeschungen erfordern explizite Hauptsession-Aktion und Begruendung in `state/decisions.md`.
+`archive/`-Dateien werden niemals automatisch geloescht. Loeschungen erfordern explizite Hauptsession-Aktion und Begruendung als Decision-Notiz unter `knowledge/decision/` (`python -m harness.mdmemory new decision "<titel>"`, danach `index`).
 
 ## Cross-Links
 

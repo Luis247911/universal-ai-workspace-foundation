@@ -13,10 +13,10 @@ Zwei Dateien tragen den Zustand einer Session:
 
 Beim Start einer Session:
 
-1. Lies die vier Boot-Dateien in der vorgegebenen Reihenfolge: `AGENTS.md`, `CLAUDE.md` (falls Tool=Claude), `state/project-index.md`, `state/now.md`. Fehlt `now.md`, legt der SessionStart-Hook `now_init` sie aus `templates/session-state.md` an; ohne Hook: selbst aus der Vorlage anlegen.
+1. Lies die fuenf Boot-Dateien in der vorgegebenen Reihenfolge: `AGENTS.md`, `CLAUDE.md` (falls Tool=Claude), `state/project-index.md`, `state/now.md`, `knowledge/INDEX.md`. Fehlt `now.md`, legt der SessionStart-Hook `now_init` sie aus `templates/session-state.md` an; ohne Hook: selbst aus der Vorlage anlegen.
 2. Fuehre den Reboot-Test mental durch (Section 2).
 3. Pruefe `state/now.md` auf "Offene Handoffs". Falls vorhanden: erst entscheiden, ob diese fortgesetzt werden oder zurueckgestellt.
-4. **Index lesen, dann gezielt greppen.** Lies den Index (`knowledge/INDEX.md`, sobald vorhanden) und suche dann per Textsuche gezielt nach Thema oder ID der Aufgabe (in `knowledge/`, `state/decisions.md`, `state/open-questions.md`). **Dateien ueber 1.000 Zeilen nie vollstaendig lesen**; nur die Treffer samt Umgebung.
+4. **Index lesen, dann gezielt greppen.** Der Index `knowledge/INDEX.md` ist geladen; suche dann per Textsuche gezielt nach Thema, ID oder Alias der Aufgabe (in `knowledge/`, auch in den Unterindizes `knowledge/_typen/`). **Dateien ueber 1.000 Zeilen nie vollstaendig lesen**; nur die Treffer samt Umgebung.
 5. Merke dir Session-Kurz-ID und Journal-Pfad (der Hook `now_init` nennt beides).
 6. Beginne erst danach mit produktiver Arbeit.
 
@@ -55,7 +55,16 @@ Update-Inhalte: `updated`, Aktive Aufgabe, Status (`in_progress` / `blocked` / `
 
 **Warum gitignored und pro Worktree?** Eine geteilte, getrackte Live-Datei erzeugt bei zwei parallelen Sessions in jedem Fall einen Merge-Konflikt und verliert zwischen zwei Commits jede ueberschriebene Fassung. `now.md` bleibt deshalb lokal; was erhalten bleiben soll, steht im Journal (committet, eine Datei pro Session, konfliktfrei). Siehe D-2026-09-30-01 (ersetzt D-2026-06-07-01).
 
-### 3.3 Recitation-Rationale (warum laufend fortschreiben)
+### 3.3 Dauerhaftes Wissen: Notizen
+
+Was die Session ueberdauern soll (eine Decision, ein bestaetigter Fakt, eine Praeferenz, eine offene Frage, ein Risiko), wird zusaetzlich zum Journal-Eintrag eine Notiz unter `knowledge/<typ>/` (Schema `templates/knowledge-note.md`, D-2026-09-30-04):
+
+- Anlegen: `python -m harness.mdmemory new <typ> "<titel>" --source journal:<pfad-des-journals>`; jede Notiz braucht mindestens eine Quelle.
+- Ersetzt sie eine fruehere Notiz: `supersedes` in der neuen, `superseded_by` + `status: superseded` in der alten setzen. Nichts loeschen.
+- Danach `python -m harness.mdmemory index` (Index, Unterindizes, Sichten) und `python -m harness.mdmemory lint`.
+- Die Register `state/decisions.md`, `open-questions.md`, `assumptions.md`, `risks-and-constraints.md` sind generierte Sichten und werden nie von Hand editiert.
+
+### 3.4 Recitation-Rationale (warum laufend fortschreiben)
 
 `now.md` ist das Datei-als-Gedaechtnis des laufenden Worktrees. Der Grund fuer die laufende Fortschreibung ist nicht Buchhaltung, sondern Robustheit gegen Kontext-Drift: Ein lang laufender Agent verliert das Ziel aus dem Fokus, und eine Compaction kann Zwischenkontext verwerfen. Wird der Live-State kontinuierlich frischgehalten und bei jedem Session-Start neu gelesen (Boot-Order §1), ueberlebt er -- nicht weil ein Mechanismus den Compaction-Moment abfaengt, sondern weil der State selbst aktuell ist und beim Boot wieder eingespeist wird. Das Journal sorgt dafuer, dass auch das Ueberschriebene nicht verloren geht.
 
@@ -76,7 +85,7 @@ Wenn eine Session resumed wird:
 
 1. Boot-Order durchgehen.
 2. Reboot-Test gegen `now.md` mental beantworten.
-3. **Index lesen, dann gezielt greppen**: `knowledge/INDEX.md` (sobald vorhanden), danach gezielt nach Thema/ID in `state/decisions.md` und `state/open-questions.md` suchen, besonders wenn andere Sessions zwischenzeitlich aktiv waren. Neue Journale anderer Sessions zeigt die Versionshistorie des Ordners `journal/` (nur Dateinamen und `Ziel` lesen, nicht die ganzen Dateien). **Dateien ueber 1.000 Zeilen nie vollstaendig lesen.**
+3. **Index lesen, dann gezielt greppen**: `knowledge/INDEX.md`, danach gezielt nach Thema/ID in `knowledge/` suchen (Unterindizes `knowledge/_typen/decision.md`, `question.md`), besonders wenn andere Sessions zwischenzeitlich aktiv waren. Neue Journale anderer Sessions zeigt die Versionshistorie des Ordners `journal/` (nur Dateinamen und `Ziel` lesen, nicht die ganzen Dateien). **Dateien ueber 1.000 Zeilen nie vollstaendig lesen.**
 4. Falls Open Handoffs in `now.md`: explizit entscheiden, was zu tun ist.
 5. Falls `now.md` aelter als 7 Tage und kein Handoff dokumentiert: Stale-Session-Detection (Section 6) ausloesen.
 
@@ -95,4 +104,4 @@ Wenn `now.md` (`updated`) aelter als 7 Tage ist und keine explizite Pause oder H
 - Live-Zustand: `state/now.md` (lokal). Historie: `journal/`.
 - Templates: `templates/session-state.md`, `templates/journal-entry.md`, `templates/handoff.md`.
 - Lifecycle: `file-lifecycle.md`.
-- Entscheidungen: `state/decisions.md` D-2026-09-30-01 bis -03.
+- Entscheidungen: D-2026-09-30-01 bis -05 (`knowledge/decision/`, Sicht `state/decisions.md`).

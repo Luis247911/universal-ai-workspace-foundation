@@ -14,16 +14,16 @@ Diese Datei definiert generische Quality-Gates fuer jeden Artefakttyp. Foundatio
 
 - `unverified` -> `verified`: zweite unabhaengige Pruefung; oder User-Verifikation; oder erfolgreiche Konsistenzpruefung gegen vorhandene `state/`-Eintraege.
 - `verified` -> `trusted`: erfolgreiche Promotion in `deliverables/` und mindestens einmal aktive Verwendung ohne Korrektur.
-- Bei Konflikt mit neuen Erkenntnissen: Status zuruecksetzen + Eintrag in `state/decisions.md` mit Begruendung.
+- Bei Konflikt mit neuen Erkenntnissen: Status zuruecksetzen + Decision-Notiz unter `knowledge/decision/` mit Begruendung (`python -m harness.mdmemory new decision "<titel>"`, danach `python -m harness.mdmemory index`).
 
 ## 3. Failure-Handling
 
 Wenn ein Artefakt eine Stufe verliert (z.B. Quelle wird stale, Aussage widerlegt, normalisierte Markdown-Datei zeigt sich als falsch):
 
 1. Verification-Status zuruecksetzen.
-2. Eintrag in `state/decisions.md` (warum, ab wann, durch welche Beobachtung).
+2. Decision-Notiz unter `knowledge/decision/` (warum, ab wann, durch welche Beobachtung); danach `python -m harness.mdmemory index`.
 3. Pointer in `state/artifact-index.md` aktualisieren.
-4. Falls schwerwiegend (z.B. Aussage in Decisions oder Deliverables eingeflossen): zusaetzlich `state/risks-and-constraints.md`-Eintrag.
+4. Falls schwerwiegend (z.B. Aussage in Decisions oder Deliverables eingeflossen): zusaetzlich eine Notiz unter `knowledge/question/` mit `kind: risk` (`python -m harness.mdmemory new question "<titel>" --kind risk`, danach `index`).
 
 ## 4. Foundation-Domain-Neutralitaet
 
@@ -37,11 +37,11 @@ Jedes Foundation-Template enthaelt ein Frontmatter-Feld:
 verification_status: unverified  # unverified / verified / trusted
 ```
 
-Pflicht in: `templates/research-report.md`, `templates/decision-record.md`, `templates/knowledge-note.md`, `templates/source-note.md`, `templates/normalized-document.md`, `templates/normalization-review.md`, `templates/maintenance-routine.md` (Output), `templates/delegated-work-report.md`.
+Pflicht in: `templates/research-report.md`, `templates/decision-record.md`, `templates/topic-note.md`, `templates/source-note.md`, `templates/normalized-document.md`, `templates/normalization-review.md`, `templates/maintenance-routine.md` (Output), `templates/delegated-work-report.md`.
 
 ## 6. Knowledge-Note-Verification-Spezifika
 
-Knowledge-Notes haben zusaetzliche Felder im Frontmatter:
+Knowledge-Notes im Langformat (Themen-Notizen unter `knowledge/<topic>/`, `templates/topic-note.md`; atomare Gedaechtnis-Notizen unter `knowledge/<typ>/` folgen stattdessen dem Schema in `templates/knowledge-note.md`) haben zusaetzliche Felder im Frontmatter:
 
 - `link_validity` — `ok` / `partial` / `broken`. Alle `[[wiki-links]]` zeigen auf existierende oder als `status: planned` markierte Notes.
 - `freshness` — Datum, wann die Note zuletzt gegen Quellen verifiziert wurde.
@@ -67,7 +67,7 @@ Vor Promotion einer Normalized-Markdown-Datei in `knowledge/` muss `verification
 
 ## 10. Tool- und Command-Begriffe
 
-In der **Governance-Schicht** erscheinen Tool-/Command-Namen **ausschliesslich** in `security-policy.md` als Beispiele fuer verbotene oder genehmigungspflichtige Ausfuehrung. Sie erscheinen nicht in `quality-gates.md` als Lint-Tool-Empfehlung, nicht in anderen Governance-Policies als Setup-/Workflow-Default. Domain-spezifische Tool-Empfehlungen leben in Adaptern. **Ausnahme: die mitgelieferte Harness-Schicht** (`pyproject.toml`, `src/`, `.claude/`, `tests/`, `.github/`, `install-harness.md`) — dort sind Tool-Namen legitim, weil es ein echtes Paket ist (siehe `security-policy.md` §12).
+In der **Governance-Schicht** erscheinen Tool-/Command-Namen **ausschliesslich** in `security-policy.md` als Beispiele fuer verbotene oder genehmigungspflichtige Ausfuehrung. Sie erscheinen nicht in `quality-gates.md` als Lint-Tool-Empfehlung, nicht in anderen Governance-Policies als Setup-/Workflow-Default. Domain-spezifische Tool-Empfehlungen leben in Adaptern. **Ausnahme: die mitgelieferte Harness-Schicht** (`pyproject.toml`, `src/`, `.claude/`, `tests/`, `.github/`, `install-harness.md`) — dort sind Tool-Namen legitim, weil es ein echtes Paket ist (siehe `security-policy.md` §12). Governance-Dateien duerfen ausserdem die `harness.mdmemory`-Befehle nennen, mit denen Notizen angelegt und GENERIERT-Dateien abgeleitet werden (D-2026-09-30-05).
 
 ## 11. CI als Verification-Gate (Harness-Schicht)
 
@@ -84,5 +84,5 @@ Foundation-Core ohne mitgelieferten Harness hat keine CI — dann gelten nur die
 
 - Lifecycle: `file-lifecycle.md`.
 - Delegation: `delegation-policy.md`.
-- Templates: `templates/research-report.md`, `templates/decision-record.md`, `templates/knowledge-note.md`, `templates/source-note.md`, `templates/normalized-document.md`, `templates/normalization-review.md`, `templates/maintenance-routine.md`, `templates/delegated-work-report.md`.
+- Templates: `templates/research-report.md`, `templates/decision-record.md`, `templates/topic-note.md`, `templates/knowledge-note.md`, `templates/source-note.md`, `templates/normalized-document.md`, `templates/normalization-review.md`, `templates/maintenance-routine.md`, `templates/delegated-work-report.md`.
 - KG + Document-Normalization: `knowledge-graph-policy.md`.

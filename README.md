@@ -80,11 +80,11 @@ Eine Referenz, **kein** zweiter Regeltext: jede Zeile zeigt nur, *was* ein Begri
 |---------|-----------|-----------|-------------|
 | **Governance** | Die Schicht, die *persistiert*: Regeln, Zustand, Wissen (Markdown) | `.ai-workspace/` | `AGENTS.md` §2.5 |
 | **Execution** | Die Schicht, die *läuft*: Skills + Engine (Code) | `.claude/` + `src/harness/` | `AGENTS.md` §2.5 |
-| **State** | Operativer kanonischer Projektzustand — das **Gedächtnis dieses Workspaces** | `.ai-workspace/state/` | `protocol.md` §4, `security-policy.md` §11 |
+| **State** | Operativer Projektzustand: Projekt-Index, `now.md`, Quellen- und Artefakt-Tabellen, generierte Register-Sichten | `.ai-workspace/state/` | `protocol.md` §4, `security-policy.md` §11 |
 | **Memory** (Engine) | **Baukasten**, um einem Agenten, den *du baust*, ein Gedächtnis zu geben (Typ × Scope, in-context/archival). **Nicht** `state/` | `src/harness/memory/`, Skill `memory-architect` | `skills-authoring-policy.md` |
 | **Now** | Live-Zustand *dieses* Worktrees: klein (≤ 4 KB), gitignored, überschrieben | `.ai-workspace/state/now.md` (lokal) | `session-contract.md` §3 |
 | **Journal** | Episodisches Gedächtnis: eine Datei pro Session, nur ergänzt, während der Arbeit geschrieben | `.ai-workspace/journal/YYYY/MM/` | `journal/README.md`, `session-contract.md` §3 |
-| **Knowledge** | Dauerhaftes, verlinktes Langzeitwissen (`[[wiki-links]]`, MOCs) | `.ai-workspace/knowledge/` | `knowledge-graph-policy.md` |
+| **Knowledge** | Langzeitgedächtnis: eine Notiz pro Datei (Decisions, Fragen, Präferenzen, Wissen), generierter `INDEX.md` als fünfte Boot-Datei; optional Themen-Graph mit MOCs | `.ai-workspace/knowledge/<typ>/` | `knowledge-graph-policy.md`, `templates/knowledge-note.md` |
 | **Data-Space** | Manifest-only: Pointer auf *externe* Originaldaten, nie die Rohdaten selbst | `.ai-workspace/data-space/` | `knowledge-graph-policy.md`, `security-policy.md` §11 |
 | **Source** | Registrierte externe Quelle (Datei/URL/Binär) mit Trust-Level | Eintrag in `state/source-registry.md` | `source-policy.md` |
 | **Artifact** | Erzeugtes Output (Research/Deliverable/Note), getrackt per Index | Eintrag in `state/artifact-index.md` | `file-lifecycle.md` |
@@ -124,7 +124,7 @@ Eine Referenz, **kein** zweiter Regeltext: jede Zeile zeigt nur, *was* ein Begri
 
 ## Skill-Katalog
 
-Skills laden in Claude Code **bei Bedarf** über ihre `description` (nicht in den 4-File-Boot-Context). Einstieg immer über `agent-pattern-selector` — der sagt dir in einem Satz, welcher Skill zu deinem Problem passt. Es gibt zwei Sorten:
+Skills laden in Claude Code **bei Bedarf** über ihre `description` (nicht in den 5-File-Boot-Context). Einstieg immer über `agent-pattern-selector` — der sagt dir in einem Satz, welcher Skill zu deinem Problem passt. Es gibt zwei Sorten:
 
 **Engine-gestützte Skills** — ein dünner Wrapper, der an die Engine `src/harness/` weiterreicht (kein doppelter Code):
 

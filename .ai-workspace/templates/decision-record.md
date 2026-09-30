@@ -11,11 +11,11 @@ verification_status: unverified
 
 # Decision Record
 
-Vorlage fuer einen einzelnen Decision-Eintrag, bereit fuer Append in `state/decisions.md`. Per-Decision-Files sind in v2 nicht Pflicht — die kanonische Quelle ist `state/decisions.md`. Dieses Template kann genutzt werden, wenn ein Adapter Per-Decision-Files einbringt.
+Denkhilfe fuer eine Entscheidung. Seit v3.3 ist jede Decision eine eigene Notiz unter `knowledge/decision/` (D-2026-09-30-04); `state/decisions.md` ist nur noch eine generierte Sicht. Anlegen: `python -m harness.mdmemory new decision "<titel>"`, die Abschnitte unten in den Koerper der Notiz uebernehmen (Alternativen ins Feld `alternatives`, Reversibilitaet ins Feld `reversibility`, Follow-up-Date ins Feld `review_after`), danach `python -m harness.mdmemory index`. Eine Decision, die eine fruehere ersetzt, setzt `supersedes`; die alte bekommt `superseded_by` und `status: superseded`.
 
 ## ID-Vorschlag
 
-`D-YYYY-MM-DD-NN`
+Notiz-ID `dec-YYYY-MM-DD-<slug>-<4hex>` (vergibt `new`); optionaler Alias `D-YYYY-MM-DD-NN` (`--alias auto`).
 
 ## Datum
 
@@ -46,6 +46,6 @@ Vorlage fuer einen einzelnen Decision-Eintrag, bereit fuer Append in `state/deci
 
 ## Cross-Links
 
-- Decisions-Log: `../state/decisions.md`.
-- Annahmen: `../state/assumptions.md`.
-- Open Questions: `../state/open-questions.md`.
+- Schema: `knowledge-note.md` (Typ `decision`).
+- Decision-Notizen: `../knowledge/decision/`, Sicht `../state/decisions.md` (generiert).
+- Annahmen und offene Fragen: `../knowledge/question/`, Sichten `../state/assumptions.md`, `../state/open-questions.md`.

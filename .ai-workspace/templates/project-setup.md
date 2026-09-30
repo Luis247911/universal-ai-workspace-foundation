@@ -33,32 +33,33 @@ Schritt-fuer-Schritt-Checkliste, die in der ersten Arbeitssession auf einem neu 
 
 ## Schritt 3: Setup-Decisions
 
-- [ ] Initiale Setup-Decisions in `state/decisions.md` festhalten (z.B. "Wir starten ohne Adapter", "PII-Policy bleibt Default", "Datenraum extern").
+- [ ] Initiale Setup-Decisions als Notizen unter `knowledge/decision/` anlegen, eine pro Entscheidung (z.B. "Wir starten ohne Adapter", "PII-Policy bleibt Default", "Datenraum extern"): `python -m harness.mdmemory new decision "<titel>"`.
 
 ## Schritt 4: Setup-Open-Questions und -Risks
 
-- [ ] Offene Fragen in `state/open-questions.md`.
-- [ ] Risiken in `state/risks-and-constraints.md`.
-- [ ] Annahmen in `state/assumptions.md`.
+- [ ] Offene Fragen als Notizen unter `knowledge/question/` mit `kind: question` (`python -m harness.mdmemory new question "<titel>"`).
+- [ ] Risiken als Notizen unter `knowledge/question/` mit `kind: risk` bzw. `kind: constraint`.
+- [ ] Annahmen als Notizen unter `knowledge/question/` mit `kind: assumption`.
 
 ## Schritt 5: Vier Setup-Fragen aus `setup-protocol.md`
 
 - [ ] **Frage 1:** Markdown-Knowledge-Graph aktivieren?
   - Ja -> `knowledge/_index.md` aus `templates/moc.md` anlegen + in `state/project-index.md` Sektion 9 als aktiv markieren.
-  - Nein -> Verzicht in `state/decisions.md`.
+  - Nein -> Verzicht als Decision-Notiz unter `knowledge/decision/`.
 - [ ] **Frage 2:** Project-Data-Space deklarieren?
   - Ja -> Manifest unter `data-space/<datum>-<slug>.md` aus `templates/data-space.md` + Eintrag in `state/source-registry.md` mit `type: data-space` + Eintrag in `state/project-index.md` Sektion 10.
-  - Nein -> Verzicht in `state/decisions.md`.
+  - Nein -> Verzicht als Decision-Notiz unter `knowledge/decision/`.
 - [ ] **Frage 3:** Maintenance-Routine-Blueprints adoptieren?
   - Ja -> Adapter anlegen + Spezifikationen aus `templates/maintenance-routine.md` ableiten + in `state/project-index.md` Sektion 11.
-  - Nein -> Verzicht in `state/decisions.md`.
+  - Nein -> Verzicht als Decision-Notiz unter `knowledge/decision/`.
 - [ ] **Frage 4:** Externe Binaerinputs erwartet?
-  - Ja -> Document-Normalization-Plan in `state/decisions.md` festhalten; Default-Sensitivity definieren.
-  - Nein -> Verzicht in `state/decisions.md`.
+  - Ja -> Document-Normalization-Plan als Decision-Notiz festhalten; Default-Sensitivity definieren.
+  - Nein -> Verzicht als Decision-Notiz unter `knowledge/decision/`.
 
 ## Schritt 6: Setup-Artefakte registrieren
 
-- [ ] Alle erzeugten Setup-Artefakte (project-index, decisions Eintraege, evtl. Root-MOC, evtl. Data-Space-Manifest, evtl. Adapter-README) in `state/artifact-index.md` mit Status `active` eintragen.
+- [ ] `python -m harness.mdmemory index` ausfuehren, nachdem alle Notizen aus Schritt 3-5 angelegt sind (erzeugt `knowledge/INDEX.md` und die Sichten `state/decisions.md`, `state/open-questions.md`, `state/assumptions.md`, `state/risks-and-constraints.md`; nie von Hand editieren).
+- [ ] Alle erzeugten Setup-Artefakte (project-index, Decision-Notizen, evtl. Root-MOC, evtl. Data-Space-Manifest, evtl. Adapter-README) in `state/artifact-index.md` mit Status `active` eintragen.
 
 ## Schritt 7: Ignore-Files
 
@@ -73,6 +74,6 @@ Schritt-fuer-Schritt-Checkliste, die in der ersten Arbeitssession auf einem neu 
 ## Cross-Links
 
 - Setup-Protokoll: `../setup-protocol.md`.
-- State-Templates: `session-state.md`, `decision-record.md`.
+- State-Templates: `session-state.md`, `knowledge-note.md` (Notiz-Schema), `decision-record.md`.
 - Adapter: `adapter-readme.md`.
 - Projekt-Brief: `project-brief.md`.

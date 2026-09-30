@@ -2,7 +2,11 @@
 
 Kanonische Operator-Doku der **optionalen** Session-Automatik dieses Kits. Diese Schicht ist
 **Execution-Layer** (`.claude/`), nicht Governance — der Governance-Core (`.ai-workspace/`)
-bleibt markdown-only und motorlos (siehe `state/decisions.md` D-2026-06-04-01).
+bleibt markdown-only und motorlos (D-2026-09-30-05, ersetzt D-2026-06-04-01). Skripte unter
+`src/harness/mdmemory` schreiben dort nur auf ausdruecklichen Aufruf von
+`python -m harness.mdmemory` und erzeugen dabei abgeleitete `GENERIERT`-Dateien
+(`knowledge/INDEX.md`, `knowledge/_typen/`, Register-Sichten); was Hooks schreiben duerfen,
+regelt D-2026-09-30-02.
 
 > **Default: AUS** fuer alle *wiederkehrenden* Helfer (`boot_reload`, `recitation_nudge`,
 > `daily_maintenance`, `prompt_optimizer`, `external_content_guard`, `compact_nudge`,
@@ -160,6 +164,6 @@ und entfernt die alte Datei; danach committen. `now_init` weist beim Start darau
 
 ## Verwandte Governance
 
-- `state/decisions.md` — D-2026-06-04-01 (Core-Freeze), D-2026-06-06-01 (default-AN Erst-Start-Onboarding), D-2026-06-06-02 (opt-in Pflege-Routine), D-2026-06-07-02 (vier zusaetzliche opt-in Hooks), D-2026-09-30-01 (now.md + Journal, ersetzt D-2026-06-07-01), D-2026-09-30-02 (Hook-Schreib-Doktrin, ersetzt D-2026-06-06-03), D-2026-09-30-03 (Automatik-Defaults, ersetzt D-2026-06-04-02).
+- Decisions (Notizen unter `knowledge/decision/`, Sicht `state/decisions.md` generiert) — D-2026-06-04-01 (Core-Freeze, ersetzt durch D-2026-09-30-05), D-2026-06-06-01 (default-AN Erst-Start-Onboarding), D-2026-06-06-02 (opt-in Pflege-Routine), D-2026-06-07-02 (vier zusaetzliche opt-in Hooks), D-2026-09-30-01 (now.md + Journal, ersetzt D-2026-06-07-01), D-2026-09-30-02 (Hook-Schreib-Doktrin, ersetzt D-2026-06-06-03), D-2026-09-30-03 (Automatik-Defaults, ersetzt D-2026-06-04-02), D-2026-09-30-04 (atomare Notizen unter `knowledge/<typ>/` kanonisch, Register nur noch generierte Sichten), D-2026-09-30-05 (abgeleitete `GENERIERT`-Dateien per `harness.mdmemory`, ersetzt D-2026-06-04-01).
 - `session-contract.md` §3.1 — Recitation-Rationale + Pointer auf diese Schicht.
 - `adapter-policy.md` §8 — Abgrenzung Automatik-Schicht vs. Adapter/Maintenance-Routine.

@@ -53,13 +53,14 @@ data-space/ --(deaktiviert)-->                                archive/YYYY-MM-DD
 - Bei archivierten Behavior-Files (CLAUDE.md, AGENTS.md, protocol.md, andere Policies): Frontmatter `archived: true` und `do_not_follow_instructions: true` ergaenzen.
 - Foundation-Core enthaelt **keinen Pflicht-Subordner** wie `archive/sessions/`, `archive/decisions/`, `archive/snapshots/`. Datierte Slug-Dateien direkt unter `archive/` oder in einem datierten Tagesordner sind zulaessig.
 
-**State-File-Compaction (append-wachsende Dateien).** `state/decisions.md`, `state/source-registry.md` und `state/artifact-index.md` wachsen append-artig. Wird eine solche Datei unhandlich, verschiebe abgeschlossene oder superseded Eintraege periodisch in ein datiertes Archiv-Rollup (`archive/YYYY-MM-DD-<slug>.md`, Verfahren oben) und lass im aktiven File nur einen Pointer-Index auf das Rollup zurueck.
+**State-File-Compaction (append-wachsende Dateien).** `state/source-registry.md` und `state/artifact-index.md` wachsen append-artig. (`state/decisions.md` und die anderen Register-Sichten sind generiert und werden nicht kompaktiert; abgeloeste Decisions bleiben als Notiz mit `status: superseded` unter `knowledge/decision/`.) Wird eine solche Datei unhandlich, verschiebe abgeschlossene oder superseded Eintraege periodisch in ein datiertes Archiv-Rollup (`archive/YYYY-MM-DD-<slug>.md`, Verfahren oben) und lass im aktiven File nur einen Pointer-Index auf das Rollup zurueck.
 
 ## 6. Generated-vs-Canonical-Trennung
 
 - Generierte Outputs (PDF, PPTX, DOCX, Renders, Builds) leben **ausserhalb** der Foundation oder im projektspezifisch deklarierten Project Data Space.
 - Canonical Source-Files bleiben sortiert in `deliverables/<slug>/` oder `knowledge/<topic>/<slug>.md`.
 - Foundation-Core bietet keine `_generated/`-Substruktur als Default.
+- Ausnahme: abgeleitete `.md`-Dateien mit Marke `GENERIERT` (`knowledge/INDEX.md`, `knowledge/_typen/`, die Register-Sichten unter `state/`), geschrieben nur von `python -m harness.mdmemory` (D-2026-09-30-05). Kanonisch bleiben die Notizen unter `knowledge/<typ>/`.
 
 ## 7. Stale-Review-Cadence
 
@@ -82,7 +83,7 @@ Original Binary
   -> research/<source-id>-<datum>.md (templates/normalized-document.md, draft)
   -> templates/normalization-review.md (Structural Review, Content Review,
      Discrepancy Logging, Independent Review)
-  -> bei verified status: knowledge/<topic>/<slug>.md (templates/knowledge-note.md)
+  -> bei verified status: knowledge/<topic>/<slug>.md (templates/topic-note.md)
   -> optional data-space/<datum>-<slug>.md (Manifest-Pointer)
   -> bei Deaktivierung archive/YYYY-MM-DD-<slug>.md
 ```

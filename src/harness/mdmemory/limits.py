@@ -16,11 +16,12 @@ NOW_MAX_BYTES = 4096
 BOOT_TARGET_TOKENS = 5_000
 BOOT_HARD_TOKENS = 12_000
 
-#: Generated boot index ``knowledge/INDEX.md``.
-INDEX_MAX_LINES = 150
-INDEX_MAX_BYTES = 16_384
-INDEX_MAX_PINNED = 40
-INDEX_MAX_RECENT = 30
+#: Generated boot index ``knowledge/INDEX.md``. The renderer drops the oldest "recent" lines until
+#: both caps hold, so the boot budget has a fixed worst case (``budget.measure``).
+INDEX_MAX_LINES = 80
+INDEX_MAX_BYTES = 8_192
+INDEX_MAX_PINNED = 20
+INDEX_MAX_RECENT = 25
 
 #: Entries per generated sub index part ``knowledge/_typen/<typ>.md`` (more -> split into parts).
 SUBINDEX_MAX_ENTRIES = 50

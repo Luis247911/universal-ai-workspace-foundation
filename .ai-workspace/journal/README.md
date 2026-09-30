@@ -79,4 +79,4 @@ journal/YYYY/MM/YYYY-MM-DD-migration.md    # Sonderfall: Migrations-Journal
 - Session-Vertrag: `../session-contract.md`.
 - Vorlage: `../templates/journal-entry.md`.
 - Lade-Regeln: `../context-policy.md`.
-- Entscheidung: `../state/decisions.md` D-2026-09-30-01.
+- Entscheidung: D-2026-09-30-01 (Notiz unter `../knowledge/decision/`, Sicht `../state/decisions.md` generiert).

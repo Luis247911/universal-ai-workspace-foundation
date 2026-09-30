@@ -94,7 +94,9 @@ Danach **warte auf die ausdrueckliche Bestaetigung des Users.** Ohne ein explizi
 - Arbeite den Plan Schritt fuer Schritt ab. Vor jedem Schreib-/Verschiebe-/Loesch-Schritt kurz ankuendigen.
 - **Governance zuerst:** `.ai-workspace/state/project-index.md` + `now.md` aus den Templates
   befuellen; bestehende Notizen/Docs/Wissen in die passenden Mount-Points migrieren (`knowledge/`,
-  `research/`, `deliverables/`, …); Entscheidungen in `state/decisions.md` festhalten; die vier
+  `research/`, `deliverables/`, …); Entscheidungen als Notizen unter `knowledge/decision/` anlegen
+  (`python -m harness.mdmemory new decision "<titel>"`, danach `python -m harness.mdmemory index`;
+  `state/decisions.md` ist nur eine generierte Sicht); die vier
   Setup-Fragen (`setup-protocol.md` §2) beantworten.
 - **Execution nur, falls in Schritt 3 gewaehlt:** `.claude/` + `src/harness/` + `pyproject.toml` etc.
   uebernehmen, gemaess `install-harness.md` `pip install -e .`, danach `python -m harness.skills lint

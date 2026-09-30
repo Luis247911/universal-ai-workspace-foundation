@@ -10,95 +10,66 @@ owner: <user>
 
 # Project Index
 
-Projekt-Identitaet. Wird beim Setup ausgefuellt und nur bei strukturellen Aenderungen geaendert. Diese Datei ist eine der vier Boot-Dateien.
+Projekt-Identitaet, Boot-Datei (`AGENTS.md` §1). Beim Setup ausfuellen, danach nur bei strukturellen Aenderungen aendern.
 
 ## 1. Projekt-Slug + Name + Zweck
 
-- **Slug:** `<projekt-slug>` (kebab-case, ASCII).
-- **Name:** `<voller projekt-name>`.
-- **Zweck (1 Satz):** `<beschreibung>`.
+- **Slug:** `<projekt-slug>` · **Name:** `<voller projekt-name>`
+- **Zweck (1 Satz):** `<beschreibung>`
 
 ## 2. Scope-Statement
 
-- **In scope:** `<was ist drin>`.
-- **Nicht in scope:** `<was ist explizit drausen>`.
+- **In scope:** `<was ist drin>` · **Nicht in scope:** `<was ist explizit draussen>`
 
 ## 3. Goals
 
-Priorisierte Liste (3-7 Eintraege):
-
-1. `<goal-1>`
-2. `<goal-2>`
-3. `<goal-3>`
+1. `<goal-1>` (3-7 Eintraege, priorisiert)
 
 ## 4. Owner + Stakeholder
 
-- **Owner:** `<owner-identifier>`.
-- **Stakeholder:** `<liste>`.
+- **Owner:** `<owner-identifier>` · **Stakeholder:** `<liste>`
 
 ## 5. Aktive Adapter
 
-Eintraege werden hier nur dann hinzugefuegt, wenn ein Adapter aktiv geschaltet wird. Format:
-
-```text
-- <adapter-slug-1> | aktiviert <YYYY-MM-DD> | <zweck-1-satz> | Pfad: adapters/<adapter-slug-1>/adapter.md
-```
+Format: `- <slug> | aktiviert <YYYY-MM-DD> | <zweck> | Pfad: adapters/<slug>/adapter.md`
 
 (noch keine)
 
 ## 6. Kanonische Pfade
 
-Falls von der Foundation-Default-Struktur abweichend, hier dokumentieren. Sonst leer.
-
 (unveraendert gegenueber Foundation-Default)
 
 ## 7. Externe Systeme
 
-Liste der Plattformen oder Systeme, mit denen das Projekt interagiert (als Strings, ohne Credentials, ohne Endpoints).
+Nur Namen, keine Credentials oder Endpoints.
 
 (noch keine)
 
 ## 8. Setup-Datum + Letzte Strukturaenderung
 
-- **Setup-Datum:** `<YYYY-MM-DD>`.
-- **Letzte Strukturaenderung:** `<YYYY-MM-DD>`.
+- **Setup:** `<YYYY-MM-DD>` · **Letzte Strukturaenderung:** `<YYYY-MM-DD>`
 
 ## 9. Knowledge-Graph-Aktivierung
 
-- **Aktiv:** `<yes/no>`.
-- **Root-MOC:** `knowledge/_index.md` (falls aktiv).
+- **Gedaechtnis-Notizen:** immer aktiv (`knowledge/<typ>/`, Index `knowledge/INDEX.md`).
+- **Topic-MOCs:** `<yes/no>`, Root-MOC `knowledge/_index.md` (falls aktiv).
 
 ## 10. Project-Data-Space-Aktivierung
 
-Liste der aktiven Data-Spaces. Format:
-
-```text
-- <data-space-slug> | aktiviert <YYYY-MM-DD> | <kurzbeschreibung> | Manifest: data-space/<datum>-<slug>.md
-```
+Format: `- <slug> | aktiviert <YYYY-MM-DD> | <kurzbeschreibung> | Manifest: data-space/<datum>-<slug>.md`
 
 (noch keine)
 
 ## 11. Maintenance-Routines aktiv
 
-Liste der registrierten Maintenance-Routines. Format:
-
-```text
-- <routine-name> | adapter: <adapter-slug> | Spezifikation: adapters/<adapter-slug>/maintenance/<routine-name>.md
-```
+Format: `- <routine> | adapter: <slug> | Spezifikation: adapters/<slug>/maintenance/<routine>.md`
 
 (noch keine)
 
 ## 12. Document-Normalization aktiv
 
-- **Aktiv:** `<yes/no>`.
-- **Erwartete Binaer-Inputs:** `<typen, falls bekannt>`.
-- **Default-Sensitivity:** `<low/medium/high>`.
-- **Default-Allowed-Processing:** `<manual / automated-with-approval / none>`.
+- **Aktiv:** `<yes/no>` · **Binaer-Inputs:** `<typen>` · **Default-Sensitivity:** `<low/medium/high>` · **Processing:** `<manual / automated-with-approval / none>`
 
 ## Cross-Links
 
-- Live-Zustand: `now.md` (lokal, gitignored). Historie: `../journal/`.
-- Setup: `../setup-protocol.md`.
-- Adapter: `../adapter-policy.md`, `../adapters/README.md`.
-- KG: `../knowledge/README.md`.
-- Data-Space: `../data-space/README.md`.
+Live-Zustand `now.md` (lokal) · Historie `../journal/` · Gedaechtnis `../knowledge/INDEX.md` · Setup `../setup-protocol.md` · Adapter `../adapter-policy.md` · Data-Space `../data-space/README.md`

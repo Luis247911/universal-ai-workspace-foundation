@@ -41,7 +41,7 @@ Globale Confidence-Einschaetzung des Reports.
 
 ## Open Sub-Questions
 
-Verweis auf neue oder verbleibende `Q-IDs` in `state/open-questions.md`.
+Verweis auf neue oder verbleibende Fragen (Notizen unter `knowledge/question/`; Sicht `state/open-questions.md`, generiert). Neue Fragen legt die Hauptsession als Notiz an (`python -m harness.mdmemory new question "<titel>"`, danach `index`).
 
 ## Stale-Risk
 

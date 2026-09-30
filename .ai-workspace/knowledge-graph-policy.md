@@ -20,7 +20,10 @@ Foundation darf `[[wiki-links]]`, YAML-Frontmatter und MOC-Dateien (Map of Conte
 
 ## 4. Frontmatter-Regeln
 
-Jede dauerhafte Knowledge-Graph-Datei (Knowledge-Note, MOC, Source-Note, Research-Report, Normalized-Document, Normalization-Review, Decision-Record, Data-Space-Manifest, Ingestion-Record) sollte Frontmatter mit folgenden Feldern enthalten:
+Seit v3.3 gibt es zwei Arten von Knowledge-Dateien:
+
+1. **Atomare Gedaechtnis-Notizen** unter `knowledge/<typ>/<id>.md` (Typen `person`, `preference`, `project`, `decision`, `reference`, `concept`, `question`). Schema v1 steht in `templates/knowledge-note.md` und ist in `src/harness/mdmemory/notes.py` festgelegt. `python -m harness.mdmemory lint` prueft es: alle Schluessel vorhanden, Enums, Daten, `id` gleich Dateiname, mindestens eine Quelle in `sources`, `summary` hoechstens 120 Zeichen ohne URL, `supersedes`/`superseded_by` symmetrisch und zyklenfrei, hoechstens eine aktive Notiz je Typ und Titel.
+2. **Langform-Dateien** des Themen-Graphen (Topic-Note, MOC, Source-Note, Research-Report, Normalized-Document, Normalization-Review, Decision-Record, Data-Space-Manifest, Ingestion-Record). Sie behalten dieses Frontmatter:
 
 ```yaml
 id: <slug>                       # eindeutig im Projekt
@@ -36,44 +39,53 @@ lifecycle: <zone>                # scratch / research / knowledge / deliverable 
 review_after: YYYY-MM-DD         # optional
 ```
 
-Erweiterte Felder fuer normalized-document und normalization-review siehe `templates/normalized-document.md` und `templates/normalization-review.md`.
+Erweiterte Felder fuer normalized-document und normalization-review siehe `templates/normalized-document.md` und `templates/normalization-review.md`. Langform-Themen-Notizen nutzen `templates/topic-note.md`. Die Typ-Ordnernamen (`person/`, `decision/` …) und `_typen/` sind fuer Gedaechtnis-Notizen reserviert und keine Topic-Namen.
 
 ## 5. MOC-/Index-Regeln
 
-Eine MOC-Datei (Map of Content) ist Einstiegspunkt fuer ein Topic. MOCs **duerfen Links sammeln, aber keine zweite State-Quelle werden**. MOCs referenzieren State-Dateien (z.B. `[[D-2026-04-17-NN]]` fuer eine Decision aus `state/decisions.md`), ersetzen sie aber nicht.
+**Generierte Indizes** (D-2026-09-30-04, D-2026-09-30-05) werden nie von Hand editiert, sondern mit `python -m harness.mdmemory index` erzeugt. Ein zweiter Lauf ergibt keinen Diff.
 
-- Root-MOC: `knowledge/_index.md`.
+- `knowledge/INDEX.md` ist die Boot-Datei: angeheftete Notizen (hoechstens 20) und die zuletzt geaenderten aktiven Notizen, gedeckelt auf 8 KB und 80 Zeilen. Aeltere Eintraege fallen heraus, nicht der Deckel.
+- `knowledge/_typen/<typ>.md` enthaelt eine Zeile je Notiz, aktive zuerst. Bei mehr als 50 Eintraegen wird in Teile `<typ>-001.md` … gesplittet, `<typ>.md` wird dann zum Inhaltsverzeichnis.
+- Sichten unter `state/` sind `decisions.md` (Typ decision), `open-questions.md` (question mit kind question/conflict), `assumptions.md` (kind assumption) und `risks-and-constraints.md` (kind risk/constraint).
+- Notizen mit `sensitivity: personal/restricted` oder `origin: external` erscheinen in allen generierten Dateien nur mit ihrer ID.
+
+**MOCs** (Map of Content) sind handgepflegte Einstiegspunkte fuer Langform-Themen. Sie **duerfen Links sammeln, aber keine zweite State-Quelle werden**. Sie verweisen auf Notizen, zum Beispiel `[[D-2026-04-17-NN]]` oder den Notiz-Pfad, ersetzen sie aber nicht.
+
+- Root-MOC: `knowledge/_index.md` (optional, nur wenn ein Themen-Graph aktiv ist).
 - Topic-MOCs: `knowledge/<topic>/_moc.md`.
 - Adapter-spezifische MOCs leben unter `adapters/<slug>/<sub>/_moc.md` und werden ggf. vom Root-MOC verlinkt mit Adapter-Hinweis.
 
-## 6. Kein Parallel-State
+## 6. Eine Quelle je Aussage (kein Parallel-State)
 
-Der Knowledge Graph darf **nicht** `now.md`, `journal/`, `decisions.md`, `source-registry.md`, `artifact-index.md` oder andere State-Dateien ersetzen. Er darf sie nur referenzieren.
+Bis v3.2 lebten Decisions, offene Fragen, Annahmen und Risiken nur in den Register-Dateien unter `state/`, und der Knowledge Graph durfte sie nur referenzieren. Seit v3.3 (D-2026-09-30-04) sind die **Notizen unter `knowledge/<typ>/` selbst die kanonische Quelle**. Die Register sind generierte Sichten darauf. Es bleibt die Regel, dass jede Aussage genau eine kanonische Quelle hat:
 
-Beispiel: Eine Decision lebt als Zeile in `state/decisions.md` mit ID `D-YYYY-MM-DD-NN`. Eine Knowledge-Note kann diese Decision via `[[D-YYYY-MM-DD-NN]]` referenzieren und in narrativem Kontext einordnen, aber den Decision-Inhalt nicht duplizieren.
+- Eine Decision lebt als `knowledge/decision/<id>.md`, ihre Alt-ID `D-YYYY-MM-DD-NN` steht in `aliases`. Topic-Notizen und MOCs verlinken sie, statt ihren Inhalt zu kopieren.
+- `state/now.md` (Live-Zustand), `journal/` (Episoden), `state/source-registry.md` und `state/artifact-index.md` (Tabellen) bleiben eigene Quellen. Notizen verweisen darauf ueber `sources` (z. B. `journal:2031/03/2031-03-04-1a2b3c4d.md`), ersetzen sie aber nicht.
+- Operative Daten (Tasks, Status, KPIs) liegen in externen Systemen. Notizen vom Typ `project` halten nur einen Verweis (`external_ref`).
 
 ## 7. Pflege-Regeln
 
 Es muss moeglich sein:
 
-- Tote `[[wiki-links]]` zu erkennen.
-- Veraltete Notes zu markieren.
-- Unverbundene Notes (keine eingehenden Links, kein MOC-Eintrag) zu melden.
-- Widerspruechliche Notes zu melden.
-- Alte Notes nicht automatisch zu loeschen.
+- Schema- und Verweisfehler zu erkennen (`python -m harness.mdmemory lint`, in CI).
+- Veraltete Notizen zu markieren (`review_after`, `last_confirmed`; lint warnt bei Ueberfaelligem).
+- Tote `[[wiki-links]]` und unverbundene Notes zu melden.
+- Widerspruechliche Notes zu melden (Notiz vom Typ `question` mit `kind: conflict`, automatisch angeheftet).
+- Alte Notes nicht automatisch zu loeschen: Status `superseded`, `retracted` oder `archived` setzen.
 - Aenderungen ueber `templates/cleanup-review.md` und `state/artifact-index.md` nachvollziehbar zu machen.
 
-Die Foundation-Governance-Schicht selbst bleibt **motorlos** und liefert das Pflege-Protokoll + das Maintenance-Routine-Template (siehe Section 11 + `templates/maintenance-routine.md`). Seit v3.1 liegt jedoch eine **optionale aktive Pflege-Routine** (opt-in, default AUS) in der Execution-Schicht (`.claude/`): der `daily_maintenance`-Hook stupst einmal pro Tag einen Pflege-Pass an und schlaegt vor — er mutiert nichts von selbst (Details `.claude/AUTOMATION.md`; Entscheidung D-2026-06-06-02). Der Governance-Core selbst feuert weiterhin nichts.
+Die Governance-Schicht bleibt **motorlos**: Sie feuert nichts von selbst (D-2026-09-30-05). Generierte Dateien entstehen nur, wenn ein Mensch, ein Skill oder CI den Befehl aufruft. Seit v3.1 gibt es zusaetzlich eine **optionale aktive Pflege-Routine** in der Execution-Schicht (`.claude/`, opt-in, default AUS): Der Hook `daily_maintenance` stupst einmal pro Tag einen Pflege-Pass an und macht Vorschlaege, veraendert aber nichts selbst (Details `.claude/AUTOMATION.md`, D-2026-06-06-02). Der Monats-Rollup der Journale entsteht mit `python -m harness.mdmemory rollup`.
 
 ## 8. Retrieval-Regel
 
-Bei Wissens- oder Konzept-Anfragen navigiert die Hauptsession den KG **agentisch**:
+Bei Wissens- oder Konzept-Anfragen navigiert die Hauptsession **agentisch** (Details `context-policy.md` §3):
 
-1. Lies zuerst `knowledge/_index.md` (Root-MOC) oder das thematisch naechste MOC.
-2. Folge selektiv relevante `[[wiki-links]]`.
-3. Lade nicht den ganzen Graphen blind.
-4. `archive/`, `scratch/` oder inaktive Adapter werden nicht automatisch traversiert.
-5. Bei grossen MOCs (>50 Eintraege): pruefe nur die thematisch passenden Subsektionen.
+1. `knowledge/INDEX.md` ist geladen: passende Notiz direkt oeffnen.
+2. Sonst den Unterindex `knowledge/_typen/<typ>.md` lesen oder gezielt per `grep` nach Begriff, ID oder Alias in `knowledge/` suchen.
+3. Fuer Langform-Themen: Root-MOC, dann Topic-MOC, dann selektiv `[[wiki-links]]`.
+4. Nie den ganzen Ordner oder Graphen blind laden. `archive/`, `scratch/` und inaktive Adapter werden nicht automatisch durchsucht.
+5. Bei grossen MOCs (mehr als 50 Eintraege) nur die thematisch passenden Abschnitte pruefen.
 
 ## 9. Beziehung zu RAG
 
@@ -255,5 +267,5 @@ Notes mit `updated > 180 Tage` und keinem Maintenance-Touch werden im naechsten 
 - Adapter: `adapter-policy.md`.
 - Quality-Gates: `quality-gates.md`.
 - Delegation: `delegation-policy.md`.
-- Templates: `templates/knowledge-note.md`, `templates/moc.md`, `templates/source-note.md`, `templates/research-report.md`, `templates/data-space.md`, `templates/ingestion-record.md`, `templates/normalized-document.md`, `templates/normalization-review.md`, `templates/maintenance-routine.md`, `templates/cleanup-review.md`.
+- Templates: `templates/knowledge-note.md` (Schema v1), `templates/topic-note.md`, `templates/moc.md`, `templates/source-note.md`, `templates/research-report.md`, `templates/data-space.md`, `templates/ingestion-record.md`, `templates/normalized-document.md`, `templates/normalization-review.md`, `templates/maintenance-routine.md`, `templates/cleanup-review.md`.
 - Subdirectory-READMEs: `knowledge/README.md`, `data-space/README.md`, `archive/README.md`.

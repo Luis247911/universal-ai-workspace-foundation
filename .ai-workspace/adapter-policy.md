@@ -70,7 +70,7 @@ Adapter erben Foundation-Policies. Sie koennen nichts lockern, nur ergaenzen.
 Zwei Adapter teilen sich `state/`. Konflikte zwischen Adaptern (z.B. zwei Adapter wollen denselben Hook registrieren, oder zwei Adapter haben widerspruechliche MOC-Topics):
 
 1. Aufgedeckt durch Setup-Check oder Periodic Review.
-2. In `state/decisions.md` als Konflikt-Entry dokumentiert.
+2. Als Decision-Notiz unter `knowledge/decision/` dokumentiert (`python -m harness.mdmemory new decision "<titel>"`, danach `index`).
 3. Vom User explizit aufgeloest (welcher Adapter Vorrang).
 
 ## 7. Adapter-Deaktivierung

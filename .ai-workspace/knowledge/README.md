@@ -1,72 +1,75 @@
-# knowledge/ — Markdown-Knowledge-Graph
+# knowledge/ — Langzeitgedaechtnis
 
-Dieses Verzeichnis ist der primaere Mount Point fuer das menschenlesbare Langzeitgedaechtnis des Projekts. **Alle Inhalte sind `.md`** — verbunden ueber `[[wiki-links]]`, navigierbar ueber MOC-Dateien, durch YAML-Frontmatter maschinenlesbar.
+Primaerer Mount Point fuer das dauerhafte, menschenlesbare Gedaechtnis des Projekts. **Alle Inhalte sind `.md`**, maschinenlesbar ueber YAML-Frontmatter. Seit v3.3 kanonisch fuer Wissen, Decisions, Praeferenzen, offene Fragen, Annahmen und Risiken (D-2026-09-30-04).
 
 ## Was hier wohnt
 
-- Knowledge-Notes (`.md` aus `templates/knowledge-note.md`).
-- MOCs (Map of Content; `.md` aus `templates/moc.md`):
-  - Root-MOC: `_index.md`.
-  - Topic-MOCs: `<topic>/_moc.md`.
-- Verifizierte Normalized-Documents nach Promotion aus `research/`.
+- **Atomare Notizen**, eine Aussage pro Datei, unter `<typ>/<id>.md`. Schema v1 steht in `../templates/knowledge-note.md`.
+- **Generierte Indizes**, nie von Hand editieren: `INDEX.md` (Boot-Datei) und `_typen/<typ>.md`.
+- **Optional ein Themen-Graph in Langform**: Topic-Notizen (`../templates/topic-note.md`), MOCs (`../templates/moc.md`) und verifizierte Normalized-Documents nach Promotion aus `research/`.
 
 ## Verzeichnis-Struktur
 
 ```text
 knowledge/
   README.md                 # diese Datei
-  _index.md                 # Root-MOC (falls KG aktiv)
-  <topic-1>/
-    _moc.md                 # Topic-MOC
-    <slug-1>.md             # Knowledge-Note
-    <slug-2>.md
-  <topic-2>/
-    _moc.md
-    ...
+  INDEX.md                  # GENERIERT: angeheftet + zuletzt geaendert (Boot, max. 8 KB)
+  _typen/<typ>.md           # GENERIERT: eine Zeile je Notiz (<= 50 je Teil)
+  person/ preference/ project/ decision/ reference/ concept/ question/
+    <praefix>-<datum>-<slug>-<4hex>.md   # eine Notiz
+  _index.md                 # optional: Root-MOC des Themen-Graphen
+  <topic>/_moc.md           # optional: Topic-MOC
+  <topic>/<slug>.md         # optional: Topic-Notiz (Langform)
 ```
+
+Typ-Ordner und `_typen/` sind reserviert und keine Topic-Namen.
+
+## Arbeitsweise
+
+```text
+python -m harness.mdmemory new decision "Fiktive Entscheidung" --source journal:<pfad>   # Skelett
+python -m harness.mdmemory index     # INDEX.md, _typen/, Sichten unter state/ neu erzeugen
+python -m harness.mdmemory lint      # Schema, Supersede-Ketten, Aktualitaet, Boot-Budget
+```
+
+- Jede Notiz hat mindestens eine Quelle (`sources`). Eine Aussage aus einer Session verweist auf das Journal.
+- `summary` wird 1:1 in den Index kopiert, deshalb ein Satz mit hoechstens 120 Zeichen und ohne URL.
+- Ersetzen statt Ueberschreiben: Die neue Notiz setzt `supersedes`, die alte bekommt `superseded_by` und `status: superseded`. Mit `change: korrigiert` war die alte falsch, mit `veraendert` hat sich die Welt geaendert.
+- Personenbezogenes: `sensitivity: personal` (Standard bei `person`). Titel und Summary erscheinen dann in keinem Index. Private Inhalte gehoeren besser in ein separates Repo, weil Daten aus der git-Historie kaum zu loeschen sind.
+- Alt-IDs aus den frueheren Registern (`D-…`, `Q-…`, `A-…`, `R-…`) bleiben als `aliases` gueltig.
+
+Ohne installierten Harness lassen sich Notizen von Hand aus der Vorlage anlegen. `INDEX.md`, `_typen/` und die Sichten unter `state/` veralten dann, bis jemand `python -m harness.mdmemory index` ausfuehrt. Die Notizen selbst bleiben die gueltige Quelle.
 
 ## Naming-Konvention
 
-ASCII, kebab-case, ohne Whitespaces, ohne Umlaute. Topic-Verzeichnisse mit kurzen, generischen Namen.
+ASCII, kebab-case, ohne Leerzeichen und ohne Umlaute. Die Notiz-ID vergibt `new`. Das Zufalls-Suffix verhindert, dass zwei parallele Worktrees dieselbe Datei anlegen. Topic-Verzeichnisse bekommen kurze, generische Namen.
 
 ## Link-Disziplin
 
-- `[[wiki-link]]` fuer KG-interne Verbindungen.
-- `[label](pfad)` fuer Verweise auf Nicht-KG-Knoten (z.B. State-Dateien, Adapter-Inhalte).
-- Semantischer Beziehungs-Kontext begleitet jeden bedeutungstragenden Link.
-- Geplante, aber noch nicht existierende Links: Ziel-Note als Stub mit Frontmatter `status: planned` anlegen.
-- Tote Links nicht stillschweigend entfernen — als `status: planned` markieren oder im naechsten Cleanup-Review erfassen.
+- `links:` im Frontmatter fuer Notiz-zu-Notiz-Verweise (IDs oder Aliase; lint prueft, dass sie existieren).
+- `[[wiki-link]]` fuer Verbindungen im Themen-Graphen, `[label](pfad)` fuer Verweise auf Nicht-KG-Knoten.
+- Geplante, noch fehlende Topic-Links: Ziel als Stub mit `status: planned` anlegen. Tote Links nicht stillschweigend entfernen.
 
 ## Lifecycle
 
-- Knowledge-Notes werden **updated, nicht promoted**. Status `superseded` oder `archived` markieren statt loeschen.
-- Archivierte Notes wandern nach `archive/YYYY-MM-DD-<slug>.md`.
-- Stale-Trigger: 180 Tage ohne Maintenance-Touch -> im naechsten Cleanup-Review pruefen.
+- Notizen werden aktualisiert oder ersetzt, **nie geloescht**: `superseded`, `retracted`, `archived`.
+- Langform-Notizen, die veraltet sind, wandern nach `archive/YYYY-MM-DD-<slug>.md`.
+- Pruef-Trigger: `review_after` ueberschritten oder 180 Tage ohne `last_confirmed`. Die Pflege meldet beides.
 
-## Lade-Regel (`Load on Relevance` fuer MOCs, `Load on Explicit Request` fuer einzelne Notes)
+## Lade-Regel
 
-Bei Wissens- oder Konzept-Anfragen:
-
-1. Lies zuerst `_index.md` (Root-MOC).
-2. Identifiziere relevante Topic-MOCs (`<topic>/_moc.md`).
-3. Folge selektiv `[[wiki-links]]` zu konkreten Knowledge-Notes.
-4. Lade nicht den ganzen Graphen blind.
-
-Siehe `context-policy.md` Section 3 und `knowledge-graph-policy.md` Section 8.
+`INDEX.md` wird beim Boot geladen. Danach nur gezielt einen Unterindex oder eine Notiz lesen, nie den ganzen Ordner. Siehe `../context-policy.md` §3 und `../knowledge-graph-policy.md` §8.
 
 ## Beziehung zu State-Dateien
 
-KG referenziert State (z.B. `[[D-YYYY-MM-DD-NN]]` fuer Decisions, `[[Q-YYYY-MM-DD-NN]]` fuer Open-Questions), **ersetzt** State aber niemals. State-Dateien sind kanonisch.
+Die Register `state/decisions.md`, `open-questions.md`, `assumptions.md` und `risks-and-constraints.md` sind generierte Sichten auf die Notizen hier. `state/now.md`, `journal/`, `state/source-registry.md` und `state/artifact-index.md` bleiben eigene Quellen, auf die Notizen verweisen.
 
 ## Beziehung zu Project Data Space und RAG
 
-Knowledge-Notes koennen Pointer auf Original-Binaerdateien (via Source-Registry-IDs) und auf Data-Space-Manifeste enthalten. **RAG ist (falls existent) nur Suchlayer ueber dem KG**, niemals Source of Truth.
+Notizen koennen auf Original-Binaerdateien (ueber Source-Registry-IDs) und auf Data-Space-Manifeste zeigen. **RAG oder Volltextsuche ist, falls vorhanden, nur eine Suchschicht** und niemals Source of Truth.
 
 ## Cross-Links
 
-- KG-Policy: `../knowledge-graph-policy.md`.
-- Knowledge-Note-Template: `../templates/knowledge-note.md`.
-- MOC-Template: `../templates/moc.md`.
-- Source-Note-Template: `../templates/source-note.md`.
-- Quality-Gates: `../quality-gates.md`.
-- Source-Registry: `../state/source-registry.md`.
+- Schema: `../templates/knowledge-note.md` · Langform: `../templates/topic-note.md` · MOC: `../templates/moc.md`
+- KG-Policy: `../knowledge-graph-policy.md` · Lade-Regeln: `../context-policy.md` · Quality-Gates: `../quality-gates.md`
+- Source-Registry: `../state/source-registry.md`

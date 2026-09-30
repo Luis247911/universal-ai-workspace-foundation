@@ -4,6 +4,55 @@ All notable changes to this project are documented here. Format based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); this project follows
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.3.0a2] — 2026-09-30
+
+Phase 2 of the long-term memory: one note per file, a generated and capped boot index, the four
+registers become generated views. Boot cost drops from ~7.1k to ~5.0k tokens and has a tested
+worst case.
+
+### Added
+
+- **Atomic notes** `knowledge/<typ>/<id>.md` (types person, preference, project, decision,
+  reference, concept, question), schema v1 in `templates/knowledge-note.md` and
+  `harness.mdmemory.notes`: validity (`valid_from/valid_until`), symmetric
+  `supersedes/superseded_by`, `change` (veraendert/korrigiert), `sources` (required),
+  `scope`, `sensitivity`, `origin`, `pinned`, review dates. Old IDs stay valid as `aliases`.
+- **Generated, tiered index** — `knowledge/INDEX.md` (pinned + recently changed, capped at 8 KB /
+  80 lines, now the fifth boot file, imported by `CLAUDE.md`) and `knowledge/_typen/<typ>.md`
+  (<= 50 entries per part, split beyond). Sensitive or external notes appear with their id only.
+- **`harness.mdmemory` commands** — `index [--check]`, `lint`, `budget`, `new`,
+  `split-decisions`, `export-legacy`, `rollup` (`journal/YYYY/MM/_rollup.md`),
+  `import-automemory` (Claude auto-memory files -> one journal with candidates; the source is
+  never changed; idempotent by content hash).
+- **Boot budget test** — AGENTS + CLAUDE + project-index + now + INDEX: target 5,000 tokens
+  (lint warning), hard 12,000 including the worst case of now.md (4 KB) and INDEX.md (8 KB).
+- **Merge test for parallel decisions** — two worktrees each record a decision: legacy register
+  conflicts every time, notes + generated views merge cleanly (`merge=union` in
+  `.gitattributes`, then `mdmemory index`).
+- Decisions D-2026-09-30-04 (atomic notes canonical, registers generated) and D-2026-09-30-05
+  (scripts may write derived Markdown; supersedes D-2026-06-04-01).
+
+### Changed
+
+- `state/decisions.md`, `open-questions.md`, `assumptions.md`, `risks-and-constraints.md` are
+  generated views. The 10 decisions are notes under `knowledge/decision/`; the pre-migration
+  registers are archived byte for byte in `archive/2026-09-30/state-*.md`. Round trip register
+  -> notes -> register is tested; `export-legacy` rebuilds the old format.
+- `templates/knowledge-note.md` is now schema v1; the long-form template lives on as
+  `templates/topic-note.md` (topic graph with MOCs stays optional).
+- `AGENTS.md` (boot order with five files, §2 mounts, §9 memory), `CLAUDE.md` (duplicates of
+  AGENTS/policies removed, content kept in the policies), `state/project-index.md` tightened;
+  `context-policy.md`, `session-contract.md` §3.3, `knowledge-graph-policy.md` §4–§8,
+  `skills-authoring-policy.md` §6 and the references in the other policies follow.
+- New note ids carry a random 4-hex suffix and no automatic counter alias, so parallel
+  worktrees never create the same file or alias (`new --alias auto` on request).
+
+### Migration
+
+Existing projects: `python -m harness.mdmemory split-decisions` (archives each register byte for
+byte, converts entries, checks the round trip before writing, idempotent), then
+`python -m harness.mdmemory lint`.
+
 ## [3.3.0a1] — 2026-09-30
 
 Phase 1 of the long-term memory (3.3.0 line): episodes are kept, parallel sessions no longer

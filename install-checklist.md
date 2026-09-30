@@ -30,8 +30,8 @@ Dieses Repo kann die Execution-Schicht mitliefern (siehe `AGENTS.md` §2.5): `.c
 - [ ] `.ai-workspace/state/project-index.md` ausfüllen unter Verwendung von `.ai-workspace/templates/project-brief.md` als Vorlage. Mindestens Slug, Zweck, Scope, Goals, Owner.
 - [ ] `.ai-workspace/state/now.md` anlegen aus `.ai-workspace/templates/session-state.md` (gitignored; mit Harness legt der Hook `now_init` sie beim ersten Start an). Aktive Aufgabe = "Initial setup", Status = `in_progress`.
 - [ ] `.ai-workspace/state/now.md` in das projektspezifische `.gitignore` aufnehmen (siehe `gitignore-template.md`).
-- [ ] `.ai-workspace/state/decisions.md` als leeren Append-only-Log mit Kopfzeile vorbereiten.
-- [ ] `.ai-workspace/state/open-questions.md`, `assumptions.md`, `risks-and-constraints.md`, `source-registry.md`, `artifact-index.md` als leere Stubs vorbereiten.
+- [ ] `.ai-workspace/state/source-registry.md` und `artifact-index.md` als leere Stubs vorbereiten.
+- [ ] Entscheidungen, offene Fragen, Annahmen und Risiken entstehen als eine Notiz pro Datei unter `.ai-workspace/knowledge/decision/` bzw. `knowledge/question/` (`python -m harness.mdmemory new decision "<titel>"` bzw. `new question "<titel>"`; ohne Harness von Hand aus `.ai-workspace/templates/knowledge-note.md`). `state/decisions.md`, `open-questions.md`, `assumptions.md`, `risks-and-constraints.md` sowie `knowledge/INDEX.md` und `knowledge/_typen/` werden **nicht** von Hand angelegt — sie sind generiert (`python -m harness.mdmemory index`).
 
 ## Ignore-Files (manuell)
 
@@ -43,7 +43,7 @@ Dieses Repo kann die Execution-Schicht mitliefern (siehe `AGENTS.md` §2.5): `.c
 
 - [ ] Entscheide, ob das Projekt sofort einen Adapter braucht.
 - [ ] Wenn ja: lege `.ai-workspace/adapters/<slug>/adapter.md` aus `.ai-workspace/templates/adapter-readme.md` an. Trage in `.ai-workspace/state/project-index.md` Sektion "Aktive Adapter" ein.
-- [ ] Wenn nein: dokumentiere die Verzichts-Entscheidung in `.ai-workspace/state/decisions.md`.
+- [ ] Wenn nein: dokumentiere die Verzichts-Entscheidung als Decision-Notiz unter `.ai-workspace/knowledge/decision/`.
 
 ## Vier Setup-Fragen aus `setup-protocol.md`
 
@@ -51,29 +51,30 @@ Dieses Repo kann die Execution-Schicht mitliefern (siehe `AGENTS.md` §2.5): `.c
 
 - [ ] Antwort entschieden (ja / nein).
 - [ ] Bei ja: `.ai-workspace/knowledge/_index.md` aus `.ai-workspace/templates/moc.md` als Root-MOC anlegen. In `state/project-index.md` Sektion "Knowledge-Graph-Aktivierung" als aktiv markieren.
-- [ ] Bei nein: Verzicht in `state/decisions.md` festhalten.
+- [ ] Bei nein: Verzicht als Decision-Notiz unter `.ai-workspace/knowledge/decision/` festhalten.
 
 ### Frage 2: Project Data Space deklarieren?
 
 - [ ] Antwort entschieden (ja / nein, ggf. mehrere Spaces).
 - [ ] Bei ja: pro Data Space ein `.ai-workspace/data-space/<datum>-<slug>.md` aus `.ai-workspace/templates/data-space.md` anlegen. Eintrag in `state/source-registry.md` mit `type: data-space`.
-- [ ] Bei nein: Verzicht in `state/decisions.md` festhalten.
+- [ ] Bei nein: Verzicht als Decision-Notiz unter `.ai-workspace/knowledge/decision/` festhalten.
 
 ### Frage 3: Maintenance Routine Blueprints adoptieren?
 
 - [ ] Antwort entschieden (ja / nein, ggf. welche).
 - [ ] Bei ja: in einem Adapter (`adapters/<slug>/maintenance/<routine-name>.md`) mit `.ai-workspace/templates/maintenance-routine.md` registrieren. Als Auswahl-Hilfe dienen die universellen Blueprints im Plan (Section 5.6.5: knowledge-graph-lint, knowledge-graph-sync, session-memory-review, source-artifact-hygiene, adapter-lifecycle-review, document-normalization-review, optional session-snapshot-export).
-- [ ] Bei nein: Verzicht in `state/decisions.md` festhalten.
+- [ ] Bei nein: Verzicht als Decision-Notiz unter `.ai-workspace/knowledge/decision/` festhalten.
 
 ### Frage 4: Externe Binärinputs erwartet, die normalisiert werden müssen?
 
 - [ ] Antwort entschieden (ja / nein).
-- [ ] Bei ja: Document-Normalization-Plan in `state/decisions.md` festhalten. Erste Normalization-Records vorbereiten via `.ai-workspace/templates/normalized-document.md` und `.ai-workspace/templates/normalization-review.md` (sobald erste Binären vorliegen).
-- [ ] Bei nein: Verzicht in `state/decisions.md` festhalten.
+- [ ] Bei ja: Document-Normalization-Plan als Decision-Notiz unter `.ai-workspace/knowledge/decision/` festhalten. Erste Normalization-Records vorbereiten via `.ai-workspace/templates/normalized-document.md` und `.ai-workspace/templates/normalization-review.md` (sobald erste Binären vorliegen).
+- [ ] Bei nein: Verzicht als Decision-Notiz unter `.ai-workspace/knowledge/decision/` festhalten.
 
 ## Setup-Artefakte registrieren
 
-- [ ] Alle erzeugten Setup-Artefakte (project-index.md, decisions.md erste Einträge, evtl. neu erzeugte MOCs/Data-Space-Manifeste) in `.ai-workspace/state/artifact-index.md` mit Status `active` eintragen.
+- [ ] `python -m harness.mdmemory index` ausführen, nachdem alle Setup-Notizen angelegt sind (erzeugt `knowledge/INDEX.md` und die Register-Sichten unter `state/`).
+- [ ] Alle erzeugten Setup-Artefakte (project-index.md, erste Decision-Notizen, evtl. neu erzeugte MOCs/Data-Space-Manifeste) in `.ai-workspace/state/artifact-index.md` mit Status `active` eintragen.
 
 ## Setup-Session-Summary
 
@@ -90,7 +91,7 @@ Dieses Repo kann die Execution-Schicht mitliefern (siehe `AGENTS.md` §2.5): `.c
 
 ## Verifikation
 
-- [ ] `AGENTS.md` und `CLAUDE.md` als Boot-Dateien vorhanden.
+- [ ] Die fünf Boot-Dateien vorhanden: `AGENTS.md`, `CLAUDE.md`, `state/project-index.md`, `state/now.md`, `knowledge/INDEX.md` (generiert).
 - [ ] `state/project-index.md` befüllt; `state/now.md` lokal vorhanden und gitignored.
 - [ ] Keine Parallelstruktur ausserhalb der Foundation-Mount-Points entstanden (Harness-Ausnahme `.claude/` + Infra-Allowlist siehe `setup-protocol.md` §4).
 - [ ] Alle Dateien innerhalb `.ai-workspace/` haben `.md`-Endung (Governance-Schicht markdown-only).

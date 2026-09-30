@@ -40,7 +40,7 @@ Adapter duerfen Subagents/Skills/Hooks/MCP-Configs/Maintenance-Routines/Normaliz
 - Persistente Subagent-Mailboxes ohne Approval-Gate.
 - "Latest-Run"-Auto-Resume ohne kanonischen Pointer in `state/now.md` bzw. im Session-Journal.
 - Subagent-Outputs ohne `templates/delegated-work-report.md`-Schema.
-- Auto-Promote-zu-State (z.B. ein delegated Call der direkt `state/decisions.md` schreibt).
+- Auto-Promote-zu-State (z.B. ein delegated Call der direkt eine Decision-Notiz unter `knowledge/decision/` anlegt oder eine generierte Sicht wie `state/decisions.md` beschreibt).
 - Maintenance-Routines, die durable State direkt mutieren.
 - RAG-Calls, die `do_not_load`-Direktiven ignorieren.
 - Binaer-Verarbeitung ohne Sensitivity-Check.

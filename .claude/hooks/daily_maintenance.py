@@ -5,14 +5,14 @@ day it reminds the model to run a maintenance pass, then records today's date in
 marker so it fires at most once per day. It only SUGGESTS -- it never edits files; the model
 proposes and the user confirms (same "hook reminds, model writes" stance as ``recitation_nudge``).
 
-Self-marker rule (decisions.md D-2026-06-06-03): a hook may write its own ephemeral, gitignored
-run-marker under ``.claude/``; it never writes governance state (``.ai-workspace/**``) or config
-(``automation.flags.json``). Today's date is written BEFORE the nudge is emitted, so a later crash
-cannot cause a repeat nudge. If the marker cannot be written (e.g. a read-only sandbox) the hook
-stays silent rather than nag every session. Any error resolves to inert (return 0, no output).
-A "day" is the local calendar day of the executing machine; on multiple machines this may nudge
-once per machine per day -- accepted by design. Reads only repo-relative paths; never touches
-``~/.claude/``.
+Self-marker rule (Decision D-2026-06-06-03, superseded by D-2026-09-30-02): a hook may write its
+own ephemeral, gitignored run-marker under ``.claude/``; this hook never writes governance state
+(``.ai-workspace/**``) or config (``automation.flags.json``). Today's date is written BEFORE the
+nudge is emitted, so a later crash cannot cause a repeat nudge. If the marker cannot be written
+(e.g. a read-only sandbox) the hook stays silent rather than nag every session. Any error resolves
+to inert (return 0, no output). A "day" is the local calendar day of the executing machine; on
+multiple machines this may nudge once per machine per day -- accepted by design. Reads only
+repo-relative paths; never touches ``~/.claude/``.
 """
 
 from __future__ import annotations

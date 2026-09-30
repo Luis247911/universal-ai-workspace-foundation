@@ -19,6 +19,7 @@ Diese Datei definiert pro Pfad die Lade-Regel. Ziel: kleiner stabiler Kontext be
 | `CLAUDE.md` (falls Tool=Claude) | Always Load | Tool-Delta. |
 | `state/project-index.md` | Always Load | Projekt-Identitaet. |
 | `state/now.md` | Always Load | Live-Zustand dieses Worktrees (gitignored, max. 4 KB). |
+| `knowledge/INDEX.md` | Always Load | Generierter Gedaechtnis-Index (angeheftet + zuletzt geaendert), gedeckelt auf 8 KB. Boot-Budget der fuenf Dateien: Ziel 5.000, hart 12.000 Tokens (`python -m harness.mdmemory budget`, CI-Test). |
 | `protocol.md` | Load on Relevance | Operative Verhaltens-Detailregeln. |
 | `setup-protocol.md` | Load on Relevance | Bei Setup oder Strukturentscheidungen. |
 | `session-contract.md` | Load on Relevance | Bei Compact, Handoff, Resume. |
@@ -31,10 +32,12 @@ Diese Datei definiert pro Pfad die Lade-Regel. Ziel: kleiner stabiler Kontext be
 | `skills-authoring-policy.md` | Load on Relevance | Beim Schreiben/Editieren eines Skills. |
 | `quality-gates.md` | Load on Relevance | Bei Promotion-Entscheidungen. |
 | `knowledge-graph-policy.md` | Load on Relevance | Bei KG-Aktion oder Document-Normalization. |
-| `state/open-questions.md` | Load on Relevance | Bei offener Frage oder Resume. |
-| `state/decisions.md` | Load on Relevance | Bei jeder Decision-relevanten Entscheidung. |
-| `state/assumptions.md` | Load on Relevance | Bei Annahme-Pruefung. |
-| `state/risks-and-constraints.md` | Load on Relevance | Bei Risiko-/Constraint-Pruefung. |
+| `knowledge/_typen/<typ>.md` | Load on Relevance | Generierter Unterindex eines Typs (max. 50 Eintraege je Teil), wenn der Boot-Index nicht reicht. |
+| `knowledge/<typ>/<id>.md` | Load on Explicit Request | Einzelne Gedaechtnis-Notiz, ueber Index, Unterindex, `links` oder Alias gefunden. |
+| `state/open-questions.md` | Load on Relevance | Generierte Sicht auf `knowledge/question/` (kind question/conflict). Bei offener Frage oder Resume. |
+| `state/decisions.md` | Load on Relevance | Generierte Sicht auf `knowledge/decision/`. Bei jeder Decision-relevanten Entscheidung. |
+| `state/assumptions.md` | Load on Relevance | Generierte Sicht (kind assumption). Bei Annahme-Pruefung. |
+| `state/risks-and-constraints.md` | Load on Relevance | Generierte Sicht (kind risk/constraint). Bei Risiko-/Constraint-Pruefung. |
 | `state/source-registry.md` | Load on Relevance | Bei Source-Bezug. |
 | `state/artifact-index.md` | Load on Relevance | Bei Artefakt-Bezug. |
 | `knowledge/_index.md` | Load on Relevance | Wenn Knowledge-Graph aktiv. |
@@ -46,23 +49,23 @@ Diese Datei definiert pro Pfad die Lade-Regel. Ziel: kleiner stabiler Kontext be
 | `deliverables/*` | Load on Explicit Request | Bei Auslieferung-Vorbereitung. |
 | `scratch/*` | Never Auto-Load | Ephemer, untrusted. |
 | `archive/*` | Never Auto-Load | Inerte Historie. |
-| `journal/**` | Never Auto-Load | Episoden, eine Datei pro Session. Gezielt ueber `sources`-Verweise oder Suche lesen, nie den Ordner durchlesen. |
+| `journal/**` | Never Auto-Load | Episoden, eine Datei pro Session. Gezielt ueber `sources`-Verweise oder Suche lesen, nie den Ordner durchlesen. Der generierte Monats-Rollup `journal/YYYY/MM/_rollup.md` ist Load on Explicit Request (Pflege, Konsolidierung). |
 | `adapters/<aktiv>/adapter.md` | Load on Relevance | Wenn Adapter aktiviert + Aufgabe im Adapter-Scope. |
 | `adapters/<aktiv>/<sonstige>.md` | Load on Explicit Request | Adapter-Inhalte jenseits adapter.md. |
 | `adapters/<inaktiv>/**` | Never Auto-Load | Inaktive Adapter werden ignoriert. |
 | Quellen mit `do_not_load: true` in `state/source-registry.md` | Never Auto-Load | Direktive blockiert Auto-Inject. |
 | Original-Binaerdateien | Never Auto-Load | Werden nie automatisch geladen — Document-Normalization-Pipeline siehe `knowledge-graph-policy.md`. |
-| `.claude/**` (Skills, Hooks, Commands, Agents) | Never Auto-Load | Tool-nativer Execution-Mount. Claude Code laedt einen Skill ueber sein eigenes Trigger-/Description-Mechanik bei Bedarf — **nicht** in den 4-File-Boot-Context. |
+| `.claude/**` (Skills, Hooks, Commands, Agents) | Never Auto-Load | Tool-nativer Execution-Mount. Claude Code laedt einen Skill ueber sein eigenes Trigger-/Description-Mechanik bei Bedarf — **nicht** in den 5-File-Boot-Context. |
 | `src/**`, `tests/**`, `examples/**`, `sources/**`, `.github/**`, `pyproject.toml` | Never Auto-Load / On Explicit Request | Harness-Engine + Infra. Bei Code-Arbeit gezielt lesen, nie automatisch in den Governance-Boot-Context. |
 
 ## 3. KG-Navigations-Regel
 
 Bei Wissens- oder Konzept-Anfragen:
 
-1. Lies zuerst `knowledge/_index.md` (Root-MOC).
-2. Identifiziere relevante Topic-MOCs (`knowledge/<topic>/_moc.md`).
-3. Folge selektiv `[[wiki-links]]` zu konkreten Knowledge-Notes.
-4. Lade nicht den ganzen Graphen blind.
+1. `knowledge/INDEX.md` ist bereits geladen: passende Notiz direkt oeffnen.
+2. Reicht der Index nicht: den Unterindex `knowledge/_typen/<typ>.md` des passenden Typs lesen, dann gezielt die Notiz. Alt-IDs (`D-…`, `Q-…`) stehen als Alias im Unterindex und in den Sichten unter `state/`.
+3. Fuer Themen-Notizen in Langform (falls ein Topic-Graph aktiv ist): `knowledge/_index.md` (Root-MOC), dann Topic-MOCs, dann selektiv `[[wiki-links]]`.
+4. Lade nicht den ganzen Ordner oder Graphen blind; bei Suche `grep` ueber `knowledge/` statt Volltext-Lesen.
 5. Beruehre `archive/`, `scratch/`, inaktive Adapter nicht automatisch.
 6. Bei grossen MOCs (>50 Eintraege): pruefe nur die thematisch passenden Subsektionen.
 
@@ -86,14 +89,14 @@ Wenn ein Adapter ein RAG-System anbindet:
 
 ## 7. Lazy-Load-Default
 
-Alles, was nicht in "Always Load" steht, ist Lazy-Load. Beim Session-Start werden ausschliesslich die vier Boot-Dateien wahrgenommen. Alles weitere wird ueber explizite Pfad-Referenzen oder ueber den Workflow erschlossen.
+Alles, was nicht in "Always Load" steht, ist Lazy-Load. Beim Session-Start werden ausschliesslich die fuenf Boot-Dateien wahrgenommen. Alles weitere wird ueber explizite Pfad-Referenzen oder ueber den Workflow erschlossen.
 
 ## 8. Harness-Schicht-Lade-Regel (Boot-Context schlank halten)
 
 Die Execution-Schicht (`AGENTS.md` §2.5) bleibt **ausserhalb** des automatischen Boot-Contexts — das ist eine harte Invariante, kein Komfort:
 
 - Die 12+ Skills, ihre `reference.md`/`evaluate.md`, die Hooks und die Engine unter `src/harness/` werden **nie** zusammen geladen. Claude Code aktiviert einen Skill anhand seiner `description` bei Bedarf; die Engine wird nur gelesen, wenn an ihr gearbeitet wird.
-- So bleibt der Start-Context auf die vier Boot-Dateien begrenzt, egal wie gross die Harness-Schicht waechst. Ein Skill-Body ist per Vertrag < 500 Zeilen (`skills-authoring-policy.md` §2), damit eine Aktivierung den Context nicht sprengt.
+- So bleibt der Start-Context auf die fuenf Boot-Dateien begrenzt, egal wie gross die Harness-Schicht waechst. Ein Skill-Body ist per Vertrag < 500 Zeilen (`skills-authoring-policy.md` §2), damit eine Aktivierung den Context nicht sprengt.
 - Niemals den gesamten `.claude/skills/`-Baum "zur Sicherheit" vorladen — das ist das Gegenstueck zur "Knowledge-Graph nicht blind laden"-Regel (§3).
 
 ## Cross-Links

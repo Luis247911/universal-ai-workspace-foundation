@@ -5,10 +5,11 @@ gitignored marker (``.claude/.compact_nudge_state``) and, every ``THRESHOLD`` ca
 "consider compacting at the next task boundary" reminder -- the opt-in companion to
 .claude/skills/strategic-compact/SKILL.md. Between thresholds it stays silent -- it never nags.
 
-Marker rule (decisions.md D-2026-06-06-03): a hook may write its own gitignored run-marker
-under ``.claude/``; never governance state or config. The threshold is tunable via
-``UAW_COMPACT_NUDGE_THRESHOLD`` (default 60). Any error -> inert (exit 0, no output). If the marker
-is unwritable it stays silent rather than nag. Reads only repo-relative paths; never ``~/.claude/``.
+Marker rule (Decision D-2026-06-06-03, superseded by D-2026-09-30-02): a hook may write its own
+gitignored run-marker under ``.claude/``; this hook never writes governance state or config. The
+threshold is tunable via ``UAW_COMPACT_NUDGE_THRESHOLD`` (default 60). Any error -> inert (exit 0,
+no output). If the marker is unwritable it stays silent rather than nag. Reads only repo-relative
+paths; never ``~/.claude/``.
 """
 
 from __future__ import annotations

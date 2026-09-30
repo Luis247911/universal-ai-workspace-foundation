@@ -2,3 +2,13 @@
 # Sonst macht der Checkout CRLF daraus und zerstoert die Shebang: "#!/bin/sh\r: bad interpreter".
 .githooks/** text eol=lf
 *.sh text eol=lf
+
+# Generated memory files (D-2026-09-30-05): on a merge conflict keep both sides' lines, then
+# regenerate with `python -m harness.mdmemory index` / `rollup` (lint fails until that ran).
+.ai-workspace/knowledge/INDEX.md merge=union
+.ai-workspace/knowledge/_typen/*.md merge=union
+.ai-workspace/state/decisions.md merge=union
+.ai-workspace/state/open-questions.md merge=union
+.ai-workspace/state/assumptions.md merge=union
+.ai-workspace/state/risks-and-constraints.md merge=union
+.ai-workspace/journal/*/*/_rollup.md merge=union

@@ -1,8 +1,9 @@
 <!-- GENERIERT von harness.mdmemory index · nicht von Hand editieren -->
 # decision
 
-14 Notizen, aktive zuerst.
+15 Notizen, aktive zuerst.
 
+- [Memory-Vertrag: Besitz, Ladevertrag, Schreibwege und fuenf Festlegungen](../decision/dec-2026-09-30-memory-vertrag-besitz-ladevertrag-2a34.md) — D-2026-09-30-08 · Markdown kanonisch, Auto-Memory aus, scope/sensitivity, nur lokal, merken fragt bei heiklen Faellen · 2026-09-30
 - [Gedaechtnis-Hooks default AN; Hooks duerfen einen Abschluss-Eintrag ins eigene Journal schreiben](../decision/dec-2026-09-30-gedaechtnis-hooks-sind-default-an-hooks-ec11.md) — D-2026-09-30-06 · memory_boot, journal_stub und precompact_reminder laufen standardmaessig; alles andere bleibt opt-in · 2026-09-30
 - [.codex/ ist zweiter Execution-Mount, nur fuer die Hook-Konfiguration von Codex](../decision/dec-2026-09-30-codex-ist-zweiter-execution-mount-nur-6a3b.md) — D-2026-09-30-07 · Codex ruft dieselben Hook-Skripte aus .claude/hooks/ auf; .codex/ enthaelt keinen eigenen Code · 2026-09-30
 - [Skripte unter src/ duerfen abgeleitete Markdown-Dateien in .ai-workspace/ schreiben](../decision/dec-2026-09-30-05-skripte-unter-src-duerfen.md) — D-2026-09-30-05 · Generierte Indizes, Sichten und Rollups entstehen per Skript; der Core bleibt markdown-only und ohne eigenen Motor · 2026-09-30

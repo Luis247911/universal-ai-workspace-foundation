@@ -190,7 +190,7 @@ Verifizierte Normalized Markdown darf als bevorzugte Arbeitsfassung genutzt werd
 
 Eine Maintenance Routine ist ein **optionaler**, projektspezifisch oder global definierter Wartungsprozess, der den Markdown-Knowledge-Graph, die Source Registry, den Artifact Index, Adapter, Lifecycle-Dateien oder Normalized-Documents prueft und Reports erzeugt.
 
-**Foundation-Status:** Der Governance-Core (`.ai-workspace/`) enthaelt **keine aktive Maintenance Routine** und bleibt motorlos. Seit v3.1 liefert die Execution-Schicht (`.claude/`) jedoch eine **optionale, opt-in Pflege-Routine** (`daily_maintenance`-Hook, default AUS, nur Vorschlag nie auto-apply, siehe `.claude/AUTOMATION.md` + D-2026-06-06-02), die genau diese Blueprints einmal pro Tag anstupst. Der Core selbst enthaelt:
+**Foundation-Status:** Der Governance-Core (`.ai-workspace/`) enthaelt **keine aktive Maintenance Routine** und bleibt motorlos. Fuer das Gedaechtnis setzt der Skill `pflege` (Execution-Schicht, manuell oder vom User geplant) die Blueprints 1 und 3 um: Lint, Veraltetes, Waisen, Duplikate, offene Journale, Budget und Monats-Rollup. Ergebnis ist ein Bericht oder PR, nie ein Auto-Merge (`memory-contract.md`). Seit v3.1 liefert die Execution-Schicht (`.claude/`) jedoch eine **optionale, opt-in Pflege-Routine** (`daily_maintenance`-Hook, default AUS, nur Vorschlag nie auto-apply, siehe `.claude/AUTOMATION.md` + D-2026-06-06-02), die genau diese Blueprints einmal pro Tag anstupst. Der Core selbst enthaelt:
 
 - Das **Konzept** (diese Sektion).
 - Die **Spezifikations-Vorlage** (`templates/maintenance-routine.md`).

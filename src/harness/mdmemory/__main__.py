@@ -19,8 +19,12 @@
     confirm ID                      NOOP with confirmation: last_confirmed = today
     conflict A B TITLE --source S   pinned question note (kind conflict) linking A and B
     consolidated JOURNAL IDS...     freeze a journal: konsolidiert true + konsolidiert_zu
+    report [--write] [--no-rollup]  weekly maintenance report (skill pflege); writes rollups
 
-All commands take ``--root`` (default: nearest parent with ``.ai-workspace/``). Pure stdlib.
+All commands take ``--root`` (default: nearest parent with ``.ai-workspace/``) or ``--global``
+(the optional global namespace from $UAW_GLOBAL_MEMORY_DIR; off by default).
+
+Pure stdlib.
 """
 
 from __future__ import annotations
@@ -30,16 +34,21 @@ import sys
 from datetime import date
 from pathlib import Path
 
-from . import automemory, budget, consolidate, create, journal, lint, now, rollup, split
+from . import automemory, budget, consolidate, create, journal, lint, now, report, rollup, split
 from . import index as index_mod
 from .frontmatter import FrontmatterError
 from .legacy import REGISTERS
 from .limits import NOW_MAX_BYTES
 from .notes import TYPES
-from .workspace import find_root, journal_dir, legacy_session_path, rel
+from .workspace import GLOBAL_ENV, find_root, global_root, journal_dir, legacy_session_path, rel
 
 
 def _root(args: argparse.Namespace) -> Path:
+    if getattr(args, "use_global", False):
+        root = global_root()
+        if root is None:
+            raise SystemExit(f"global namespace is off: set {GLOBAL_ENV} to a workspace root")
+        return root
     return find_root(args.root)
 
 
@@ -254,9 +263,26 @@ def _cmd_consolidated(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_report(args: argparse.Namespace) -> int:
+    root = _root(args)
+    rep = report.build(root, today=args.date, write_rollups=not args.no_rollup)
+    text = report.render(root, rep)
+    if args.write:
+        path = report.default_path(root, rep.today)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(text, encoding="utf-8", newline="\n")
+        print(f"report: {rel(root, path)}")
+    else:
+        sys.stdout.write(text)
+    return 1 if any(f.level == "E" for f in rep.findings) else 0
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="harness.mdmemory")
     parser.add_argument("--root", default=None, help="workspace root (default: auto-detect)")
+    parser.add_argument(
+        "--global", dest="use_global", action="store_true", help=f"use ${GLOBAL_ENV}"
+    )
     sub = parser.add_subparsers(dest="cmd", required=True)
 
     np_ = sub.add_parser("now", help="Per-worktree live state state/now.md.")
@@ -327,6 +353,13 @@ def main(argv: list[str] | None = None) -> int:
     cdp.add_argument("journal")
     cdp.add_argument("ids", nargs="*")
 
+    rpp = sub.add_parser("report", help="Weekly maintenance report (skill pflege).")
+    rpp.add_argument(
+        "--write", action="store_true", help="to scratch/maintenance/<datum>-pflege.md"
+    )
+    rpp.add_argument("--no-rollup", action="store_true", help="do not (re)write journal rollups")
+    rpp.add_argument("--date", default=None)
+
     args = parser.parse_args(argv)
     if args.cmd == "journal" and args.action == "append" and not (args.path and args.text):
         parser.error("journal append needs PATH KIND TEXT")
@@ -347,6 +380,7 @@ def main(argv: list[str] | None = None) -> int:
         "confirm": _cmd_confirm,
         "conflict": _cmd_conflict,
         "consolidated": _cmd_consolidated,
+        "report": _cmd_report,
     }
     try:
         return handlers[args.cmd](args)

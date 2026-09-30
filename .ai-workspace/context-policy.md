@@ -30,6 +30,7 @@ Diese Datei definiert pro Pfad die Lade-Regel. Ziel: kleiner stabiler Kontext be
 | `delegation-policy.md` | Load on Relevance | Bei Subagent-Spawn, Maintenance-Routine, externer Analyse. |
 | `adapter-policy.md` | Load on Relevance | Bei Adapter-Aktivierung/Deaktivierung. |
 | `skills-authoring-policy.md` | Load on Relevance | Beim Schreiben/Editieren eines Skills. |
+| `memory-contract.md` | Load on Relevance | Bei Fragen, wer welches Gedaechtnis besitzt, laedt oder schreibt; bei `merken`/`pflege`. |
 | `quality-gates.md` | Load on Relevance | Bei Promotion-Entscheidungen. |
 | `knowledge-graph-policy.md` | Load on Relevance | Bei KG-Aktion oder Document-Normalization. |
 | `knowledge/_typen/<typ>.md` | Load on Relevance | Generierter Unterindex eines Typs (max. 50 Eintraege je Teil), wenn der Boot-Index nicht reicht. |
@@ -44,7 +45,7 @@ Diese Datei definiert pro Pfad die Lade-Regel. Ziel: kleiner stabiler Kontext be
 | `knowledge/<topic>/_moc.md` | Load on Relevance | Wenn Topic relevant. |
 | `knowledge/<topic>/<slug>.md` | Load on Explicit Request | Ueber `[[wiki-link]]`-Verfolgung. |
 | `data-space/<manifest>.md` | Load on Relevance | Wenn Data-Space aktiv und relevant. |
-| `templates/*` | Load on Explicit Request | Beim Anlegen neuer Artefakte. |
+| `templates/*` | Load on Explicit Request | Beim Anlegen neuer Artefakte (u. a. `recall-set.md` fuer die Recall-Messung). |
 | `research/*` | Load on Explicit Request | Bei konkreter Recherche-Referenz. |
 | `deliverables/*` | Load on Explicit Request | Bei Auslieferung-Vorbereitung. |
 | `scratch/*` | Never Auto-Load | Ephemer, untrusted. |

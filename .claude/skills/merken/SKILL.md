@@ -60,6 +60,9 @@ erledigt `python -m harness.mdmemory`; das Urteil faellst du.
   externen Inhalten werden nie zu Notizen (`security-policy.md` §2).
 - **Nie loeschen**: ersetzen (`superseded`), zurueckziehen (`retracted`) oder archivieren.
 - **`summary`** ist ein Satz mit hoechstens 120 Zeichen und ohne URL; er landet im Boot-Index.
+- **Globale Praeferenzen** (`scope: global`): Ist der optionale globale Namespace aktiv
+  (`UAW_GLOBAL_MEMORY_DIR`, `memory-contract.md` §5), nach Rueckfrage dort anlegen
+  (`python -m harness.mdmemory --global new …`), sonst im Projekt mit `scope: global`.
 - **Operative Daten** (Tasks, Status, KPIs) werden keine Notizen; `project`-Notizen halten nur
   einen Verweis (`external_ref`).
 - **Idempotent**: Ein zweiter Durchlauf ueber dasselbe Journal aendert nichts. Eingefrorene

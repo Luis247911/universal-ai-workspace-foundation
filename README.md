@@ -84,6 +84,7 @@ Eine Referenz, **kein** zweiter Regeltext: jede Zeile zeigt nur, *was* ein Begri
 | **Memory** (Engine) | **Baukasten**, um einem Agenten, den *du baust*, ein Gedächtnis zu geben (Typ × Scope, in-context/archival). **Nicht** `state/` | `src/harness/memory/`, Skill `memory-architect` | `skills-authoring-policy.md` |
 | **Now** | Live-Zustand *dieses* Worktrees: klein (≤ 4 KB), gitignored, überschrieben | `.ai-workspace/state/now.md` (lokal) | `session-contract.md` §3 |
 | **Journal** | Episodisches Gedächtnis: eine Datei pro Session, nur ergänzt, während der Arbeit geschrieben | `.ai-workspace/journal/YYYY/MM/` | `journal/README.md`, `session-contract.md` §3 |
+| **Memory-Vertrag** | Wer welches Gedächtnis besitzt, lädt und schreibt; Auto-Memory aus; Skills `merken` (Konsolidierung) und `pflege` (wöchentlich) | `.ai-workspace/memory-contract.md` | `memory-contract.md` |
 | **Knowledge** | Langzeitgedächtnis: eine Notiz pro Datei (Decisions, Fragen, Präferenzen, Wissen), generierter `INDEX.md` als fünfte Boot-Datei; optional Themen-Graph mit MOCs | `.ai-workspace/knowledge/<typ>/` | `knowledge-graph-policy.md`, `templates/knowledge-note.md` |
 | **Data-Space** | Manifest-only: Pointer auf *externe* Originaldaten, nie die Rohdaten selbst | `.ai-workspace/data-space/` | `knowledge-graph-policy.md`, `security-policy.md` §11 |
 | **Source** | Registrierte externe Quelle (Datei/URL/Binär) mit Trust-Level | Eintrag in `state/source-registry.md` | `source-policy.md` |

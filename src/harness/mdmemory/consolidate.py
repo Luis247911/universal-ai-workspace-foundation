@@ -78,17 +78,17 @@ def pending(
 # --- similar notes -------------------------------------------------------------------------------
 
 
-def _tokens(text: str) -> set[str]:
+def tokens(text: str) -> set[str]:
     words = re.findall(r"[a-z0-9äöüß]+", text.lower())
     return {w for w in words if len(w) > 2 and w not in STOPWORDS}
 
 
 def candidates(root: Path, text: str, limit: int = 5) -> list[tuple[float, Note]]:
     """Notes ranked by Jaccard overlap of title/summary/aliases with ``text`` (score > 0)."""
-    want = _tokens(text)
+    want = tokens(text)
     scored: list[tuple[float, Note]] = []
     for n in load_notes(root):
-        have = _tokens(" ".join([n.get("title"), n.get("summary"), *n.items("aliases")]))
+        have = tokens(" ".join([n.get("title"), n.get("summary"), *n.items("aliases")]))
         if want and have:
             score = len(want & have) / len(want | have)
             if score > 0:

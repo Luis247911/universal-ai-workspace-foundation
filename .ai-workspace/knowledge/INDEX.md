@@ -1,7 +1,7 @@
 <!-- GENERIERT von harness.mdmemory index · nicht von Hand editieren -->
 # INDEX
 
-8 aktive von 14 Notizen, Stand 2026-09-30. Lade-Regel: AGENTS.md §9.
+9 aktive von 15 Notizen, Stand 2026-09-30. Lade-Regel: AGENTS.md §9.
 
 ## Angeheftet
 
@@ -9,8 +9,9 @@
 - [Generierte Indizes, Sichten und Rollups entstehen per Skript; der Core bleibt markdown-only und ohne eigenen Motor](decision/dec-2026-09-30-05-skripte-unter-src-duerfen.md) · D-2026-09-30-05 · 2026-09-30
 - [memory_boot, journal_stub und precompact_reminder laufen standardmaessig; alles andere bleibt opt-in](decision/dec-2026-09-30-gedaechtnis-hooks-sind-default-an-hooks-ec11.md) · D-2026-09-30-06 · 2026-09-30
 
-## Zuletzt geaendert (5 neueste, ohne angeheftete)
+## Zuletzt geaendert (6 neueste, ohne angeheftete)
 
+- [Markdown kanonisch, Auto-Memory aus, scope/sensitivity, nur lokal, merken fragt bei heiklen Faellen](decision/dec-2026-09-30-memory-vertrag-besitz-ladevertrag-2a34.md) · D-2026-09-30-08 · 2026-09-30
 - [Codex ruft dieselben Hook-Skripte aus .claude/hooks/ auf; .codex/ enthaelt keinen eigenen Code](decision/dec-2026-09-30-codex-ist-zweiter-execution-mount-nur-6a3b.md) · D-2026-09-30-07 · 2026-09-30
 - [Der Live-Zustand liegt in state/now.md (gitignored, pro Worktree, harte Grenze 4 KB, Trim ins Journal)](decision/dec-2026-09-30-01-der-live-zustand-liegt-in-state.md) · D-2026-09-30-01 · 2026-09-30
 - [Vier zusaetzliche opt-in Execution-Hooks unter .claude/ (default AUS): prompt_optimizer (UserPromptSubmit…](decision/dec-2026-06-07-02-vier-zusaetzliche-opt-in.md) · D-2026-06-07-02 · 2026-06-07
@@ -19,4 +20,4 @@
 
 ## Typen
 
-Aktiv/gesamt: person 0/0 · preference 0/0 · project 0/0 · decision 8/14 · reference 0/0 · concept 0/0 · question 0/0. Unterindex je Typ: `_typen/<typ>.md`.
+Aktiv/gesamt: decision 9/15. Unterindex je Typ: `_typen/<typ>.md` (Typen: person, preference, project, decision, reference, concept, question).

@@ -6,6 +6,21 @@ from pathlib import Path
 
 WORKSPACE_DIR = ".ai-workspace"
 
+#: Optional global namespace (memory contract, default 4): a SEPARATE workspace, ideally its own
+#: private repo, for notes with ``scope: global``. Off unless this variable names a directory.
+GLOBAL_ENV = "UAW_GLOBAL_MEMORY_DIR"
+
+
+def global_root(environ: dict[str, str] | None = None) -> Path | None:
+    """The global namespace's root (contains ``.ai-workspace/``), or None when switched off."""
+    import os
+
+    value = (environ if environ is not None else os.environ).get(GLOBAL_ENV, "").strip()
+    if not value:
+        return None
+    path = Path(value).expanduser()
+    return path if (path / WORKSPACE_DIR).is_dir() else None
+
 
 def find_root(start: Path | str | None = None) -> Path:
     """Walk up from ``start`` (default: cwd) to the directory holding ``.ai-workspace/``."""

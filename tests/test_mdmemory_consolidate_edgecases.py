@@ -139,3 +139,20 @@ def test_memory_boot_compact_reminder_needs_no_engine(tmp_path):
         check=True,
     )
     assert "kompaktiert" in proc.stdout
+
+
+def test_index_refresh_heals_a_stale_index_at_start_and_names_broken_notes(tmp_path):
+    root = _ws(tmp_path, {"index_refresh": True})
+    note = root / ".ai-workspace/knowledge/preference" / (_note(root, "Beispiel kurz") + ".md")
+    index_file = root / ".ai-workspace/knowledge/INDEX.md"
+    assert not index_file.exists()
+    start = {"hook_event_name": "SessionStart", "source": "startup"}
+    assert _hook("index_refresh.py", root, start) == ""
+    assert note.stem in index_file.read_text("utf-8")
+    other = {"hook_event_name": "PostToolUse", "tool_input": {"file_path": str(root / "x.md")}}
+    before = index_file.read_bytes()
+    assert _hook("index_refresh.py", root, other) == "" and index_file.read_bytes() == before
+    note.write_text("---\nid: a\nid: b\n---\n", "utf-8")
+    edit = {"hook_event_name": "PostToolUse", "tool_input": {"file_path": str(note)}}
+    out = json.loads(_hook("index_refresh.py", root, edit))
+    assert note.name in out["hookSpecificOutput"]["additionalContext"]

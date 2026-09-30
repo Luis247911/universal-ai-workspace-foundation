@@ -12,9 +12,9 @@ GitHub-Repo laeuft. Die genauen Optionen stehen in der Claude-Code-Doku; die Rou
 - **Auftrag** (als Prompt der Routine):
 
 ```text
-Fuehre den Skill pflege aus: python -m harness.mdmemory report --write, dann den Bericht
+Fuehre den Skill pflege aus: python3 .claude/uaw/mdm.py report --write, dann den Bericht
 auswerten. Aendere keine Notizen. Wenn Rollups neu erzeugt wurden oder lint Fehler zeigt, die
-sich mit "python -m harness.mdmemory index" beheben lassen: Branch pflege/<datum>, commit,
+sich mit "python3 .claude/uaw/mdm.py index" beheben lassen: Branch pflege/<datum>, commit,
 PR oeffnen mit dem Bericht als Beschreibung. Nie mergen.
 ```
 
@@ -34,8 +34,8 @@ nicht aus, weil `.ai-workspace/` markdown-only ist und der Pfad maschinenabhaeng
   <key>Label</key><string>local.uaw.pflege</string>
   <key>ProgramArguments</key>
   <array>
-    <string>/PFAD/ZUM/REPO/.venv/bin/python</string>
-    <string>-m</string><string>harness.mdmemory</string>
+    <string>/usr/bin/python3</string>
+    <string>/PFAD/ZUM/REPO/.claude/uaw/mdm.py</string>
     <string>--root</string><string>/PFAD/ZUM/REPO</string>
     <string>report</string><string>--write</string>
   </array>
@@ -54,11 +54,11 @@ mit dem Skill `pflege` (Schritt 2).
 
 ## Variante C: manuell
 
-`python -m harness.mdmemory report` (stdout, schreibt nichts) oder mit `--write` (Bericht +
+`python3 .claude/uaw/mdm.py report` (stdout, schreibt nichts) oder mit `--write` (Bericht +
 Rollups). Exit-Code 1 bei Lint-Fehlern oder gerissener harter Boot-Grenze, damit ein eigener Cron
 oder CI-Job darauf reagieren kann.
 
-## Schwellen (in `src/harness/mdmemory/report.py`)
+## Schwellen (in `harness/mdmemory/report.py`)
 
 - veraltet: `review_after` ueberschritten oder `last_confirmed` (leer: `updated`) aelter als
   180 Tage,

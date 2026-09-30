@@ -5,6 +5,7 @@
     now migrate [--remove-legacy]   state/current-session.md -> migration journal + local now.md
     journal new --session ID        create the session journal (never overwrites), print its path
     journal append PATH KIND TEXT   append one entry at the end of a journal
+    journal add KIND TEXT --session ID  append to this session's journal, creating it if needed
     index [--check]                 regenerate knowledge/INDEX.md, _typen/, register views
     lint [--no-budget]              check notes, supersede chains, generated files, boot budget
     budget                          boot budget in estimated tokens (per file, worst case)
@@ -19,6 +20,7 @@
     confirm ID                      NOOP with confirmation: last_confirmed = today
     conflict A B TITLE --source S   pinned question note (kind conflict) linking A and B
     consolidated JOURNAL IDS...     freeze a journal: konsolidiert true + konsolidiert_zu
+    adopt TARGET [--dry-run]        bring the memory into another project (idempotent, merges only)
     report [--write] [--no-rollup]  weekly maintenance report (skill pflege); stdout only reads,
                                     --write stores it in scratch/ and refreshes journal rollups
 
@@ -35,6 +37,7 @@ import sys
 from datetime import date
 from pathlib import Path
 
+from . import adopt as adopt_mod
 from . import automemory, budget, consolidate, create, journal, lint, now, report, rollup, split
 from . import index as index_mod
 from .frontmatter import FrontmatterError
@@ -49,6 +52,7 @@ from .workspace import (
     journal_dir,
     legacy_session_path,
     rel,
+    write_lf,
 )
 
 
@@ -109,8 +113,14 @@ def _cmd_journal(args: argparse.Namespace) -> int:
         print(rel(root, path))
         return 0
     if args.action == "append":
-        path = _journal_file(root, args.path)
-        journal.append(path, args.kind, args.text)
+        path_arg, kind, text = args.rest
+        journal.append(_journal_file(root, path_arg), kind, text)
+        return 0
+    if args.action == "add":
+        kind, text = args.rest
+        path, _ = journal.ensure(root, session_id=args.session, tool=args.tool)
+        journal.append(path, kind, text)
+        print(rel(root, path))
         return 0
     return 2
 
@@ -285,11 +295,51 @@ def _cmd_report(args: argparse.Namespace) -> int:
     if args.write:
         path = report.default_path(root, rep.today)
         path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(text, encoding="utf-8", newline="\n")
+        write_lf(path, text)
         print(f"report: {rel(root, path)}")
     else:
         sys.stdout.write(text)
     return 0 if rep.ok else 1
+
+
+def _cmd_adopt(args: argparse.Namespace) -> int:
+    target = Path(args.target)
+    res = adopt_mod.adopt(
+        target,
+        source=Path(args.source) if args.source else None,
+        dry_run=args.dry_run,
+        import_automemory=args.import_automemory,
+        ci=args.ci,
+    )
+    sys.stdout.write(adopt_mod.render(res, target.resolve()))
+    return 0 if res.ok else 1
+
+
+def _journal_options_last(argv: list[str]) -> list[str]:
+    """Move ``journal`` options behind its positionals (``journal add --session X art text``).
+
+    Before Python 3.12, argparse fills an ``nargs="*"`` positional with nothing when an option
+    comes first and then rejects the rest; the hooks may run on 3.9.
+    """
+    if "journal" not in argv:
+        return argv
+    i = argv.index("journal") + 1
+    head, tail = argv[:i], argv[i:]
+    opts: list[str] = []
+    rest: list[str] = []
+    k = 0
+    while k < len(tail):
+        tok = tail[k]
+        if tok in ("--session", "--tool", "--worktree") and k + 1 < len(tail):
+            opts += tail[k : k + 2]
+            k += 2
+        elif tok.startswith(("--session=", "--tool=", "--worktree=")):
+            opts.append(tok)
+            k += 1
+        else:
+            rest.append(tok)
+            k += 1
+    return head + rest + opts
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -310,10 +360,8 @@ def main(argv: list[str] | None = None) -> int:
     np_.add_argument("--remove-legacy", action="store_true")
 
     jp = sub.add_parser("journal", help="Append-only session journal.")
-    jp.add_argument("action", choices=["new", "append"])
-    jp.add_argument("path", nargs="?", help="journal file (append)")
-    jp.add_argument("kind", nargs="?", choices=journal.KINDS, help="entry kind (append)")
-    jp.add_argument("text", nargs="?", help="entry text (append)")
+    jp.add_argument("action", choices=["new", "append", "add"])
+    jp.add_argument("rest", nargs="*", help="append: PATH KIND TEXT · add: KIND TEXT (--session)")
     jp.add_argument("--session", default=None, help="session id (default: random)")
     jp.add_argument("--tool", default="unbekannt")
     jp.add_argument("--worktree", default="")
@@ -377,9 +425,28 @@ def main(argv: list[str] | None = None) -> int:
     )
     rpp.add_argument("--date", type=_iso_date, default=None)
 
-    args = parser.parse_args(argv)
-    if args.cmd == "journal" and args.action == "append" and not (args.path and args.text):
-        parser.error("journal append needs PATH KIND TEXT")
+    adp = sub.add_parser("adopt", help="Bring the workspace memory into another project.")
+    adp.add_argument("target", help="project directory")
+    adp.add_argument("--dry-run", action="store_true", help="only show what would change")
+    adp.add_argument("--source", default=None, help="foundation checkout (default: this one)")
+    adp.add_argument(
+        "--import-automemory", action="store_true", help="import Claude auto-memory once"
+    )
+    ci = adp.add_mutually_exclusive_group()
+    ci.add_argument("--ci", dest="ci", action="store_true", default=None, help="write CI template")
+    ci.add_argument("--no-ci", dest="ci", action="store_false", help="no CI template")
+
+    args = parser.parse_args(_journal_options_last(sys.argv[1:] if argv is None else argv))
+    if args.cmd == "journal":
+        want = {"new": 0, "append": 3, "add": 2}[args.action]
+        if len(args.rest) != want:
+            usage = {"new": "", "append": " PATH KIND TEXT", "add": " KIND TEXT --session ID"}
+            parser.error(f"journal {args.action}{usage[args.action]}")
+        if args.action == "add" and not args.session:
+            parser.error("journal add needs --session ID (the hook now_init names it)")
+        kind = args.rest[-2] if want else ""
+        if want and kind not in journal.KINDS:
+            parser.error(f"entry kind {kind!r} not in {', '.join(journal.KINDS)}")
     handlers = {
         "now": _cmd_now,
         "journal": _cmd_journal,
@@ -398,10 +465,11 @@ def main(argv: list[str] | None = None) -> int:
         "conflict": _cmd_conflict,
         "consolidated": _cmd_consolidated,
         "report": _cmd_report,
+        "adopt": _cmd_adopt,
     }
     try:
         return handlers[args.cmd](args)
-    except (FrontmatterError, KeyError, ValueError) as exc:
+    except (FrontmatterError, KeyError, ValueError, adopt_mod.AdoptError) as exc:
         msg = exc.args[0] if isinstance(exc, KeyError) and exc.args else exc
         print(f"error: {msg}", file=sys.stderr)
         return 2

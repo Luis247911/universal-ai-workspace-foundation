@@ -1,6 +1,8 @@
 # Install-Checklist — Foundation in ein neues Projekt kopieren
 
-Diese Checkliste ist für den Menschen gedacht, der die Foundation kopiert und ein neues Projekt initialisiert. Sie enthält keinen ausführbaren Code. Jeder Schritt wird manuell ausgeführt und bestätigt.
+**Der automatische Weg ist `adopt`** (README, Weg B): Der Starter-Prompt holt die Foundation in ein Temp-Verzeichnis und ruft `python3 <klon>/.claude/uaw/mdm.py adopt <projekt> [--dry-run]` auf. Alle mit **[adopt]** markierten Schritte unten erledigt dieser Befehl idempotent. Er überschreibt nichts, was das Projekt besitzt, und meldet Abweichungen. Diese Checkliste bleibt die manuelle Referenz, und die übrigen Schritte (Setup-Fragen, Adapter, Projekt-Index) führt das Onboarding mit dir durch.
+
+Sie ist für den Menschen gedacht, der die Foundation kopiert und ein neues Projekt initialisiert. Jeder Schritt wird manuell ausgeführt und bestätigt.
 
 ## Pre-Copy-Checks
 
@@ -10,7 +12,7 @@ Diese Checkliste ist für den Menschen gedacht, der die Foundation kopiert und e
 
 ## Copy-Schritte
 
-- [ ] Kopiere den Inhalt des Foundation-Verzeichnisses in das Zielprojektverzeichnis.
+- [ ] **[adopt]** Kopiere den Inhalt des Foundation-Verzeichnisses in das Zielprojektverzeichnis (adopt: nur Policies, Vorlagen, Mount-READMEs und State-Stubs; nicht die Notizen, Journale und das Archiv der Foundation selbst).
 - [ ] Verzeichnisstruktur:
   - `AGENTS.md`, `CLAUDE.md`, `README.md`, `install-checklist.md` im Root.
   - `.ai-workspace/` mit Subdirektoren `state/`, `templates/`, `knowledge/`, `data-space/`, `research/`, `deliverables/`, `scratch/`, `archive/`, `adapters/`.
@@ -28,9 +30,10 @@ Dieses Repo kann die Execution-Schicht mitliefern (siehe `AGENTS.md` §2.5): `.c
 ## Initiale Befüllung
 
 - [ ] `.ai-workspace/state/project-index.md` ausfüllen unter Verwendung von `.ai-workspace/templates/project-brief.md` als Vorlage. Mindestens Slug, Zweck, Scope, Goals, Owner.
-- [ ] `.ai-workspace/state/now.md` anlegen aus `.ai-workspace/templates/session-state.md` (gitignored; mit Harness legt der Hook `now_init` sie beim ersten Start an). Aktive Aufgabe = "Initial setup", Status = `in_progress`.
-- [ ] `.ai-workspace/state/now.md` in das projektspezifische `.gitignore` aufnehmen (siehe `gitignore-template.md`).
-- [ ] `.ai-workspace/state/source-registry.md` und `artifact-index.md` als leere Stubs vorbereiten.
+- [ ] **[Hook]** `.ai-workspace/state/now.md` anlegen aus `.ai-workspace/templates/session-state.md` (gitignored; der Hook `now_init` legt sie beim ersten Start an; eine alte `current-session.md` uebernimmt **[adopt]** per `now migrate`). Aktive Aufgabe = "Initial setup", Status = `in_progress`.
+- [ ] **[adopt]** `.ai-workspace/state/now.md` in das projektspezifische `.gitignore` aufnehmen (siehe `gitignore-template.md`); dazu `merge=union` fuer die generierten Dateien in `.gitattributes`.
+- [ ] **[adopt]** `.ai-workspace/state/source-registry.md` und `artifact-index.md` als leere Stubs vorbereiten.
+- [ ] **[adopt]** Gedaechtnis-Hooks, Skills `merken`/`pflege`, Engine-Kopie `.claude/uaw/` und `"autoMemoryEnabled": false` in `.claude/settings.json` (zusammengefuehrt, eigene Hooks bleiben). Alte Register (`state/decisions.md` usw.) werden Notizen (**[adopt]** `split-decisions`, Original im Archiv), Auto-Memory kommt auf Wunsch als Journal-Kandidat (`--import-automemory`).
 - [ ] Entscheidungen, offene Fragen, Annahmen und Risiken entstehen als eine Notiz pro Datei unter `.ai-workspace/knowledge/decision/` bzw. `knowledge/question/` (`python -m harness.mdmemory new decision "<titel>"` bzw. `new question "<titel>"`; ohne Harness von Hand aus `.ai-workspace/templates/knowledge-note.md`). `state/decisions.md`, `open-questions.md`, `assumptions.md`, `risks-and-constraints.md` sowie `knowledge/INDEX.md` und `knowledge/_typen/` werden **nicht** von Hand angelegt — sie sind generiert (`python -m harness.mdmemory index`).
 
 ## Ignore-Files (manuell)
@@ -73,7 +76,7 @@ Dieses Repo kann die Execution-Schicht mitliefern (siehe `AGENTS.md` §2.5): `.c
 
 ## Setup-Artefakte registrieren
 
-- [ ] `python -m harness.mdmemory index` ausführen, nachdem alle Setup-Notizen angelegt sind (erzeugt `knowledge/INDEX.md` und die Register-Sichten unter `state/`).
+- [ ] **[Hook]** `python3 .claude/uaw/mdm.py index` ausführen, nachdem alle Setup-Notizen angelegt sind (mit Hooks erledigt das `index_refresh` nach jeder Notiz) (erzeugt `knowledge/INDEX.md` und die Register-Sichten unter `state/`).
 - [ ] Alle erzeugten Setup-Artefakte (project-index.md, erste Decision-Notizen, evtl. neu erzeugte MOCs/Data-Space-Manifeste) in `.ai-workspace/state/artifact-index.md` mit Status `active` eintragen.
 
 ## Setup-Session-Summary

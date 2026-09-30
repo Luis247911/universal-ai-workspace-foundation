@@ -10,5 +10,6 @@
   "session_state_guard": false,
   "memory_boot": true,
   "journal_stub": true,
-  "precompact_reminder": true
+  "precompact_reminder": true,
+  "index_refresh": true
 }

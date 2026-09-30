@@ -34,9 +34,9 @@ Vor jeder Strukturerstellung den Mount-Point-Decision-Tree in `.ai-workspace/set
 ## 2.5 Zwei-Schichten-Modell: Governance vs. Execution
 
 - **`.ai-workspace/` = GOVERNANCE + STATE + MEMORY.** Markdown-only (§8). Hier persistiert die Wahrheit: Regeln, Zustand, Wissen.
-- **`.claude/` = EXECUTION.** Tool-nativer Code, der läuft: Skills (`.claude/skills/<slug>/`), Hooks, Commands. Die Engine liegt als pip-Paket unter `src/harness/`; Skills sind dünne Wrapper darum.
+- **`.claude/` = EXECUTION.** Tool-nativer Code, der läuft: Skills (`.claude/skills/<slug>/`), Hooks, Commands. Die Engine liegt unter `src/harness/`; adoptierte Projekte nur `harness.mdmemory` als Kopie in `.claude/uaw/` (D-2026-09-30-10).
 
-Grenze: **Code, der läuft, lebt in `.claude/` und `src/`. Wahrheit, die persistiert, lebt in `.ai-workspace/`.** Skill-Outputs sind delegierte Arbeit (§5) und ändern `state/` nur über den State-Write-Contract in `.ai-workspace/skills-authoring-policy.md`. Ausnahme: `harness.mdmemory` schreibt abgeleitete, als GENERIERT markierte `.md`-Dateien (D-2026-09-30-05).
+Grenze: **Code, der läuft, lebt in `.claude/` und `src/`. Wahrheit, die persistiert, lebt in `.ai-workspace/`.** Skill-Outputs sind delegierte Arbeit (§5) und ändern `state/` nur über den State-Write-Contract in `.ai-workspace/skills-authoring-policy.md`. Ausnahme: `harness.mdmemory` schreibt abgeleitete, als GENERIERT markierte `.md`-Dateien (D-2026-09-30-10).
 
 `.claude/` ist Claude-spezifisch; `AGENTS.md`, `.ai-workspace/` und `src/harness/` bleiben tool-neutral (`python -m harness.<area>`).
 
@@ -63,7 +63,7 @@ Skills und Hooks unter `.claude/` dürfen ausgeführt werden; ihre Outputs bleib
 
 ## 6. Pflicht-Updates
 
-Nach jedem relevanten Ergebnis einen Eintrag ans Journal dieser Session anhängen (`.ai-workspace/journal/`). Vor `/compact`, Handoff, Task-Wechsel und nach größeren Aktionen zusätzlich `state/now.md` aktualisieren (max. 4 KB). Dauerhaftes überführt das Verfahren `merken` (NOOP/ADD/UPDATE/SUPERSEDE/CONFLICT) in Notizen unter `knowledge/<typ>/`, für jedes Tool gleich. Details: `.ai-workspace/session-contract.md` §3.3.
+Nach jedem relevanten Ergebnis einen Eintrag ans Journal dieser Session anhängen (`journal add`, den Befehl nennt der Start-Hook). Vor `/compact`, Handoff, Task-Wechsel und nach größeren Aktionen zusätzlich `state/now.md` aktualisieren (max. 4 KB). Dauerhaftes überführt das Verfahren `merken` (NOOP/ADD/UPDATE/SUPERSEDE/CONFLICT) in Notizen unter `knowledge/<typ>/`, für jedes Tool gleich. Details: `.ai-workspace/session-contract.md` §3.3.
 
 ## 7. Domain-Spezifika
 

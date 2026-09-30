@@ -63,3 +63,28 @@ def tool() -> str:
     if "--tool" in args and args.index("--tool") + 1 < len(args):
         return args[args.index("--tool") + 1]
     return "claude-code"
+
+
+def load_engine(root: Path) -> bool:
+    """Put the memory engine ``harness.mdmemory`` on ``sys.path``. True if it can be imported.
+
+    Order: ``<root>/src`` (the foundation itself, or a project that adopted the whole harness),
+    then the vendored copy ``<root>/.claude/uaw`` (written by ``adopt``), then an installed
+    ``uaw-harness``. Missing everywhere -> False, and the hook stays silent.
+    """
+    import sys
+
+    for base in (root / "src", root / ".claude" / "uaw"):
+        if (base / "harness" / "mdmemory" / "__init__.py").is_file():
+            sys.path.insert(0, str(base))
+            break
+    try:
+        import harness.mdmemory  # noqa: F401
+    except Exception:
+        return False
+    return True
+
+
+def mdm_command() -> str:
+    """How the model should call the engine here: the interpreter ``run.sh`` picked + the shim."""
+    return f"{os.environ.get('UAW_PY') or 'python3'} .claude/uaw/mdm.py"

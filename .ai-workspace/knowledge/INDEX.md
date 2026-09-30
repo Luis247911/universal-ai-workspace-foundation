@@ -1,13 +1,13 @@
 <!-- GENERIERT von harness.mdmemory index · nicht von Hand editieren -->
 # INDEX
 
-9 aktive von 15 Notizen, Stand 2026-09-30. Lade-Regel: AGENTS.md §9.
+9 aktive von 17 Notizen, Stand 2026-09-30. Lade-Regel: AGENTS.md §9.
 
 ## Angeheftet
 
 - [Wissen, Decisions und Fragen leben als eine Notiz pro Datei; INDEX.md ist die fuenfte Boot-Datei](decision/dec-2026-09-30-04-atomare-notizen-unter-knowledge.md) · D-2026-09-30-04 · 2026-09-30
-- [Generierte Indizes, Sichten und Rollups entstehen per Skript; der Core bleibt markdown-only und ohne eigenen Motor](decision/dec-2026-09-30-05-skripte-unter-src-duerfen.md) · D-2026-09-30-05 · 2026-09-30
-- [memory_boot, journal_stub und precompact_reminder laufen standardmaessig; alles andere bleibt opt-in](decision/dec-2026-09-30-gedaechtnis-hooks-sind-default-an-hooks-ec11.md) · D-2026-09-30-06 · 2026-09-30
+- [adopt vendort harness.mdmemory nach .claude/uaw, verschmilzt Boot-Dateien per Block und migriert idempotent](decision/dec-2026-09-30-die-gedaechtnis-engine-kommt-per-adopt-66bd.md) · D-2026-09-30-10 · 2026-09-30
+- [index_refresh erneuert generierte Dateien nach Notiz-Aenderungen und beim Start; memory_boot erinnert an pflege](decision/dec-2026-09-30-hooks-halten-den-gedaechtnis-index-c464.md) · D-2026-09-30-09 · 2026-09-30
 
 ## Zuletzt geaendert (6 neueste, ohne angeheftete)
 
@@ -20,4 +20,4 @@
 
 ## Typen
 
-Aktiv/gesamt: decision 9/15. Unterindex je Typ: `_typen/<typ>.md` (Typen: person, preference, project, decision, reference, concept, question).
+Aktiv/gesamt: decision 9/17. Unterindex je Typ: `_typen/<typ>.md` (Typen: person, preference, project, decision, reference, concept, question).

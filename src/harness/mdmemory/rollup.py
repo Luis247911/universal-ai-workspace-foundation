@@ -15,7 +15,7 @@ from pathlib import Path
 from . import frontmatter
 from .index import GENERATED
 from .journal import iter_journals
-from .workspace import journal_dir, rel
+from .workspace import journal_dir, rel, write_lf
 
 ENTRY_HEAD = re.compile(r"^### (\d{2}:\d{2}) · (\w+)\s*$")
 
@@ -82,7 +82,7 @@ def write(root: Path, month: str | None = None) -> list[Path]:
         text = render(root, m)
         if not path.exists() or path.read_text(encoding="utf-8") != text:
             path.parent.mkdir(parents=True, exist_ok=True)
-            path.write_text(text, encoding="utf-8", newline="\n")
+            write_lf(path, text)
             changed.append(path)
     return changed
 

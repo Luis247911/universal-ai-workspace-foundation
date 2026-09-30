@@ -4,11 +4,11 @@ type: decision
 title: Skripte unter src/ duerfen abgeleitete Markdown-Dateien in .ai-workspace/ schreiben
 summary: Generierte Indizes, Sichten und Rollups entstehen per Skript; der Core bleibt markdown-only und ohne eigenen Motor
 aliases: [D-2026-09-30-05]
-status: active
+status: superseded
 valid_from: 2026-09-30
-valid_until:
+valid_until: 2026-09-30
 supersedes: [dec-2026-06-04-01-der-governance-core-ai]
-superseded_by:
+superseded_by: dec-2026-09-30-die-gedaechtnis-engine-kommt-per-adopt-66bd
 change: veraendert
 confidence: bestaetigt
 sources: [user:auftrag-2026-09-30-memory-phase-2]
@@ -55,3 +55,4 @@ Der Core feuert weiterhin nichts von selbst. Geschrieben wird nur, wenn ein Mens
 ## Verlauf
 
 - 2026-09-30 · angelegt, ersetzt D-2026-06-04-01
+- 2026-09-30 · abgeloest durch dec-2026-09-30-die-gedaechtnis-engine-kommt-per-adopt-66bd (veraendert)

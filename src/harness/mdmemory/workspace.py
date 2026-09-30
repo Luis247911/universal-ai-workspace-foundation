@@ -84,3 +84,9 @@ def rel(root: Path, path: Path) -> str:
         return path.resolve().relative_to(root.resolve()).as_posix()
     except ValueError:
         return path.as_posix()
+
+
+def write_lf(path: Path, text: str) -> None:
+    """Write ``text`` as UTF-8 with LF line ends (``Path.write_text(newline=)`` needs 3.10)."""
+    with path.open("w", encoding="utf-8", newline="\n") as fh:
+        fh.write(text)

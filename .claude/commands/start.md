@@ -45,7 +45,8 @@ Mount-Point-Decision-Tree (`setup-protocol.md` §3) nutzen, im Zweifel fragen. D
 
 ## Schritt 2 — Helfer-Block (beide Branches, am Ende)
 
-Sag zuerst: *"Das Grundgeruest steht. Zum Schluss drei optionale kleine Helfer — alle sind aus, du
+Das Gedaechtnis (Journal, `now.md`, Index, Erinnerungen an `merken` und `pflege`) laeuft schon von
+selbst; erwaehne das in einem Satz. Sag dann: *"Das Grundgeruest steht. Zum Schluss drei optionale kleine Helfer — alle sind aus, du
 schaltest jeden einzeln ein, alles ist jederzeit umkehrbar. Sie schreiben nichts von allein; sie
 erinnern nur."* Biete dann (eine Frage nach der anderen, Ton wie `/uaw-automation`) an:
 

@@ -18,10 +18,9 @@ repo-relative paths; never touches ``~/.claude/``. Codex can run the same script
 from __future__ import annotations
 
 import json
-import sys
 from datetime import datetime
 
-from _flags import flag, payload, project_dir, tool
+from _flags import flag, load_engine, mdm_command, payload, project_dir, tool
 
 
 def main() -> int:
@@ -30,7 +29,8 @@ def main() -> int:
         return 0  # inert: flag off
 
     root = project_dir()
-    sys.path.insert(0, str(root / "src"))
+    if not load_engine(root):
+        return 0  # engine not shipped in this project -> stay silent
     try:
         from harness.mdmemory import journal, now
         from harness.mdmemory.workspace import legacy_session_path, rel
@@ -53,7 +53,7 @@ def main() -> int:
         if legacy_session_path(root).exists():
             notes.append(
                 "Alte `state/current-session.md` gefunden. Migration: "
-                "`python -m harness.mdmemory now migrate --remove-legacy`, dann committen."
+                f"`{mdm_command()} now migrate --remove-legacy`, dann committen."
             )
         kurzid = journal.short_id(session_id)
         jpath = journal.session_journal(root, kurzid) or journal.journal_path(root, when, kurzid)
@@ -65,9 +65,12 @@ def main() -> int:
         f"- Session-Kurz-ID: `{journal.short_id(session_id)}`",
         f"- Journal dieser Session: `{rel(root, jpath)}`"
         + ("" if jpath.exists() else " (noch nicht angelegt)"),
-        "- Nach jedem relevanten Ergebnis einen Eintrag anhaengen, nicht erst am Ende "
-        f"(`python -m harness.mdmemory journal new --session {session_id} --tool {tool_name}` "
-        "legt die Datei an).",
+        "- Nach jedem relevanten Ergebnis einen Eintrag anhaengen, nicht erst am Ende: "
+        f"`{mdm_command()} journal add --session {session_id} --tool {tool_name} "
+        '<ergebnis|entscheidung|fakt|korrektur|offen|uebergabe|notiz> "<1-5 Zeilen>"` '
+        "(legt das Journal beim ersten Eintrag an).",
+        f"- Gedaechtnis-Befehle hier: `{mdm_command()} <befehl>` "
+        "(gleich `python -m harness.mdmemory`, ohne Installation).",
         *[f"- {n}" for n in notes],
     ]
     out = {

@@ -73,7 +73,7 @@ Ein Skill (bzw. die Engine) mutiert **niemals direkt** die kanonischen `.ai-work
 
 Kurz: Skills *schlagen vor*, die Hauptsession *schreibt*. Keine Hintertuer in den durable State.
 
-**Ausnahme: abgeleitete Dateien** (D-2026-09-30-05, ersetzt D-2026-06-04-01). `harness.mdmemory`
+**Ausnahme: abgeleitete Dateien** (D-2026-09-30-10, ersetzt D-2026-09-30-05). `harness.mdmemory`
 darf generierte `.md`-Dateien schreiben: `knowledge/INDEX.md`, `knowledge/_typen/*.md`, die
 Register-Sichten unter `state/` und `journal/YYYY/MM/_rollup.md`. Voraussetzung: deterministisch
 (zweiter Lauf ohne Diff), Marke `GENERIERT`, jederzeit aus den Notizen bzw. Journalen neu

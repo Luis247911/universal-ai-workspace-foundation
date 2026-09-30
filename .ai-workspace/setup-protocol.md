@@ -50,6 +50,7 @@ Bevor irgendein neues Verzeichnis oder eine neue Datei ausserhalb bestehender Mo
 Frage 0: Ist es lauffaehiger, tool-nativer Harness-Code (Skill, Hook, Command,
          Agent-Definition) oder Engine-Code/Tests?
          -> Skill/Hook/Command/Agent: nach .claude/ (z.B. .claude/skills/<slug>/). Stop.
+         -> Gedaechtnis-Engine im Fremdprojekt: nur per adopt nach .claude/uaw/. Stop.
          -> Engine/Tests/Beispiele: nach src/ , tests/ , examples/ (Infra-Allowlist). Stop.
          -> NUR wenn das Repo den Harness mitliefert; sonst gehoert Code in einen Adapter.
 Frage 1: Gehoert das nach state/?              -> Ja: dorthin. Stop.
@@ -80,7 +81,7 @@ Diese Verzeichnisnamen duerfen nicht als Foundation-Top-Level-Ordner entstehen:
 
 Falls solche Konzepte trotzdem noetig sind: gehoeren in `adapters/<slug>/` als Substruktur, nicht als Projekt-Top-Level-Ordner.
 
-**Ausnahme bei mitgeliefertem Harness.** Wenn das Repo die lauffaehige Harness-Schicht enthaelt (siehe `AGENTS.md` §2.5), sind genau diese Top-Level-Eintraege erlaubt: `.claude/` (Execution-Mount; `skills/`, `hooks/`, `commands/`, `agents/` leben *darunter*, nie nackt im Root) sowie die Infra-Allowlist `src/`, `tests/`, `examples/`, `sources/`, `.github/`, `pyproject.toml`. Alle anderen Namen oben bleiben verboten. `harness/` bleibt als *nackter* Top-Level-Name verboten — die Engine lebt unter `src/harness/`.
+**Ausnahme bei mitgeliefertem Harness.** Wenn das Repo die lauffaehige Harness-Schicht enthaelt (siehe `AGENTS.md` §2.5), sind genau diese Top-Level-Eintraege erlaubt: `.claude/` (Execution-Mount; `skills/`, `hooks/`, `commands/`, `agents/` und die Engine-Kopie `uaw/` aus `adopt` leben *darunter*, nie nackt im Root; D-2026-09-30-10) sowie die Infra-Allowlist `src/`, `tests/`, `examples/`, `sources/`, `.github/`, `pyproject.toml`. Alle anderen Namen oben bleiben verboten. `harness/` bleibt als *nackter* Top-Level-Name verboten — die Engine lebt unter `src/harness/`.
 
 ## 5. Anti-Parallelstruktur-Pflichtregel
 

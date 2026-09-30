@@ -43,7 +43,7 @@ Erweiterte Felder fuer normalized-document und normalization-review siehe `templ
 
 ## 5. MOC-/Index-Regeln
 
-**Generierte Indizes** (D-2026-09-30-04, D-2026-09-30-05) werden nie von Hand editiert, sondern mit `python -m harness.mdmemory index` erzeugt. Ein zweiter Lauf ergibt keinen Diff.
+**Generierte Indizes** (D-2026-09-30-04, D-2026-09-30-10) werden nie von Hand editiert, sondern mit `python -m harness.mdmemory index` erzeugt; der Hook `index_refresh` tut das nach jeder Notiz-Aenderung (D-2026-09-30-09). Ein zweiter Lauf ergibt keinen Diff.
 
 - `knowledge/INDEX.md` ist die Boot-Datei: angeheftete Notizen (hoechstens 20) und die zuletzt geaenderten aktiven Notizen, gedeckelt auf 8 KB und 80 Zeilen. Aeltere Eintraege fallen heraus, nicht der Deckel.
 - `knowledge/_typen/<typ>.md` enthaelt eine Zeile je Notiz, aktive zuerst. Bei mehr als 50 Eintraegen wird in Teile `<typ>-001.md` … gesplittet, `<typ>.md` wird dann zum Inhaltsverzeichnis.
@@ -75,7 +75,7 @@ Es muss moeglich sein:
 - Alte Notes nicht automatisch zu loeschen: Status `superseded`, `retracted` oder `archived` setzen.
 - Aenderungen ueber `templates/cleanup-review.md` und `state/artifact-index.md` nachvollziehbar zu machen.
 
-Die Governance-Schicht bleibt **motorlos**: Sie feuert nichts von selbst (D-2026-09-30-05). Generierte Dateien entstehen nur, wenn ein Mensch, ein Skill oder CI den Befehl aufruft. Seit v3.1 gibt es zusaetzlich eine **optionale aktive Pflege-Routine** in der Execution-Schicht (`.claude/`, opt-in, default AUS): Der Hook `daily_maintenance` stupst einmal pro Tag einen Pflege-Pass an und macht Vorschlaege, veraendert aber nichts selbst (Details `.claude/AUTOMATION.md`, D-2026-06-06-02). Der Monats-Rollup der Journale entsteht mit `python -m harness.mdmemory rollup`.
+Die Governance-Schicht bleibt **motorlos**: Sie feuert nichts von selbst (D-2026-09-30-10). Generierte Dateien entstehen nur, wenn ein Mensch, ein Skill, CI oder der Execution-Hook `index_refresh` den Befehl aufruft (D-2026-09-30-09). Seit v3.1 gibt es zusaetzlich eine **optionale aktive Pflege-Routine** in der Execution-Schicht (`.claude/`, opt-in, default AUS): Der Hook `daily_maintenance` stupst einmal pro Tag einen Pflege-Pass an und macht Vorschlaege, veraendert aber nichts selbst (Details `.claude/AUTOMATION.md`, D-2026-06-06-02). Der Monats-Rollup der Journale entsteht mit `python -m harness.mdmemory rollup`.
 
 ## 8. Retrieval-Regel
 

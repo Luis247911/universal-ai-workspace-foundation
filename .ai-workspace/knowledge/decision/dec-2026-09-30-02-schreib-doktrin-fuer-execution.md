@@ -4,11 +4,11 @@ type: decision
 title: Schreib-Doktrin fuer Execution-Hooks
 summary: Schreib-Doktrin fuer Execution-Hooks
 aliases: [D-2026-09-30-02]
-status: active
+status: superseded
 valid_from: 2026-09-30
-valid_until:
+valid_until: 2026-09-30
 supersedes: [dec-2026-06-06-03-praezisierung-der-hook-liest]
-superseded_by:
+superseded_by: dec-2026-09-30-gedaechtnis-hooks-sind-default-an-hooks-ec11
 change:
 confidence: bestaetigt
 sources: ["legacy:state/decisions.md#D-2026-09-30-02"]
@@ -38,3 +38,4 @@ Schreib-Doktrin fuer Execution-Hooks. Ein Hook darf (a) seinen eigenen ephemeren
 ## Verlauf
 
 - 2026-09-30 · migriert aus `state/decisions.md` (Alt-ID D-2026-09-30-02)
+- 2026-09-30 · abgeloest durch dec-2026-09-30-gedaechtnis-hooks-sind-default-an-hooks-ec11 (veraendert)

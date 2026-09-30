@@ -1,0 +1,43 @@
+{
+  "description": "UAW memory hooks for Codex (D-2026-09-30-07). Same scripts as Claude Code under .claude/hooks/, gated by .claude/automation.flags.json. Codex asks you to review and trust each hook via /hooks before it runs. No matcher: SessionStart fires for startup/resume/clear/compact, PreCompact for manual/auto.",
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"$(git rev-parse --show-toplevel)/.claude/hooks/now_init.py\" --tool codex",
+            "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "python \"$(git rev-parse --show-toplevel)/.claude/hooks/memory_boot.py\" --tool codex",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"$(git rev-parse --show-toplevel)/.claude/hooks/journal_stub.py\" --tool codex",
+            "timeout": 3
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"$(git rev-parse --show-toplevel)/.claude/hooks/precompact_reminder.py\" --tool codex",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -42,3 +42,24 @@ def flag(name: str) -> bool:
     except (OSError, ValueError):
         return False
     return bool(data.get(name, False))
+
+
+def payload() -> dict:
+    """The hook's stdin JSON (Claude Code and Codex send the same shape); {} on any error."""
+    import sys
+
+    try:
+        data = json.loads(sys.stdin.read() or "{}")
+    except Exception:
+        return {}
+    return data if isinstance(data, dict) else {}
+
+
+def tool() -> str:
+    """Caller tool, passed as ``--tool <name>`` (the Codex config passes ``--tool codex``)."""
+    import sys
+
+    args = sys.argv[1:]
+    if "--tool" in args and args.index("--tool") + 1 < len(args):
+        return args[args.index("--tool") + 1]
+    return "claude-code"

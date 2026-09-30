@@ -33,6 +33,9 @@ ALL_HOOKS = [
     "compact_nudge.py",
     "session_state_guard.py",
     "now_init.py",
+    "journal_stub.py",
+    "memory_boot.py",
+    "precompact_reminder.py",
 ]
 
 

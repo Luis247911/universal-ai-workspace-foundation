@@ -21,27 +21,11 @@ import json
 import sys
 from datetime import datetime
 
-from _flags import flag, project_dir
-
-
-def _payload() -> dict:
-    try:
-        data = json.loads(sys.stdin.read() or "{}")
-    except Exception:
-        return {}
-    return data if isinstance(data, dict) else {}
-
-
-def _tool() -> str:
-    """Caller tool, passed as ``--tool <name>`` (Codex config passes ``--tool codex``)."""
-    args = sys.argv[1:]
-    if "--tool" in args and args.index("--tool") + 1 < len(args):
-        return args[args.index("--tool") + 1]
-    return "claude-code"
+from _flags import flag, payload, project_dir, tool
 
 
 def main() -> int:
-    data = _payload()
+    data = payload()
     if not flag("now_init"):
         return 0  # inert: flag off
 
@@ -54,13 +38,13 @@ def main() -> int:
         return 0  # engine not shipped in this project -> stay silent
 
     session_id = str(data.get("session_id") or journal.new_session_id())
-    tool = _tool()
+    tool_name = tool()
     when = datetime.now()
     notes: list[str] = []
     try:
         if now.ensure(root):
             notes.append("`state/now.md` fehlte und wurde aus der Vorlage angelegt.")
-        result = now.trim(root, session_id=session_id, when=when, tool=tool)
+        result = now.trim(root, session_id=session_id, when=when, tool=tool_name)
         if result.changed:
             notes.append(
                 f"`state/now.md` war {result.before} B gross und wurde auf {result.after} B "
@@ -82,7 +66,7 @@ def main() -> int:
         f"- Journal dieser Session: `{rel(root, jpath)}`"
         + ("" if jpath.exists() else " (noch nicht angelegt)"),
         "- Nach jedem relevanten Ergebnis einen Eintrag anhaengen, nicht erst am Ende "
-        f"(`python -m harness.mdmemory journal new --session {session_id} --tool {tool}` "
+        f"(`python -m harness.mdmemory journal new --session {session_id} --tool {tool_name}` "
         "legt die Datei an).",
         *[f"- {n}" for n in notes],
     ]

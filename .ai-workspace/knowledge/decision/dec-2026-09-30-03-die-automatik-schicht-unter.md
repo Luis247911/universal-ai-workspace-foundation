@@ -4,11 +4,11 @@ type: decision
 title: Die Automatik-Schicht unter .claude/ bleibt opt-in und default AUS
 summary: Die Automatik-Schicht unter .claude/ bleibt opt-in und default AUS
 aliases: [D-2026-09-30-03]
-status: active
+status: superseded
 valid_from: 2026-09-30
-valid_until:
+valid_until: 2026-09-30
 supersedes: [dec-2026-06-04-02-eine-optionale-repo-committete]
-superseded_by:
+superseded_by: dec-2026-09-30-gedaechtnis-hooks-sind-default-an-hooks-ec11
 change:
 confidence: bestaetigt
 sources: ["legacy:state/decisions.md#D-2026-09-30-03"]
@@ -38,3 +38,4 @@ Ohne `now_init` fehlt in jedem frischen Clone und jedem neuen Worktree die Boot-
 ## Verlauf
 
 - 2026-09-30 · migriert aus `state/decisions.md` (Alt-ID D-2026-09-30-03)
+- 2026-09-30 · abgeloest durch dec-2026-09-30-gedaechtnis-hooks-sind-default-an-hooks-ec11 (veraendert)

@@ -23,17 +23,27 @@
     "SessionStart": [
       { "matcher": "startup", "hooks": [
         { "type": "command", "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/now_init.py\"" },
+        { "type": "command", "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/memory_boot.py\"" },
         { "type": "command", "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/boot_reload.py\"" },
         { "type": "command", "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/first_run_onboarding.py\"" },
         { "type": "command", "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/daily_maintenance.py\"" }
       ] },
       { "matcher": "resume", "hooks": [
         { "type": "command", "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/now_init.py\"" },
+        { "type": "command", "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/memory_boot.py\"" },
         { "type": "command", "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/boot_reload.py\"" },
         { "type": "command", "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/daily_maintenance.py\"" }
       ] },
-      { "matcher": "clear",   "hooks": [ { "type": "command", "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/now_init.py\"" }, { "type": "command", "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/boot_reload.py\"" } ] },
-      { "matcher": "compact", "hooks": [ { "type": "command", "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/now_init.py\"" }, { "type": "command", "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/boot_reload.py\"" } ] }
+      { "matcher": "clear",   "hooks": [ { "type": "command", "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/now_init.py\"" },
+        { "type": "command", "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/memory_boot.py\"" }, { "type": "command", "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/boot_reload.py\"" } ] },
+      { "matcher": "compact", "hooks": [ { "type": "command", "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/now_init.py\"" },
+        { "type": "command", "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/memory_boot.py\"" }, { "type": "command", "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/boot_reload.py\"" } ] }
+    ],
+    "SessionEnd": [
+      { "hooks": [ { "type": "command", "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/journal_stub.py\"" } ] }
+    ],
+    "PreCompact": [
+      { "hooks": [ { "type": "command", "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/precompact_reminder.py\"" } ] }
     ],
     "PostToolUse": [
       { "matcher": "Write|Edit|NotebookEdit", "hooks": [ { "type": "command", "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/recitation_nudge.py\"" } ] },

@@ -13,6 +13,12 @@
     export-legacy REGISTER          old full register format, rebuilt from the notes (stdout)
     rollup [--month YYYY-MM]        journal/YYYY/MM/_rollup.md
     import-automemory [--source D]  Claude auto-memory files -> one journal with candidates
+    pending                         journals not consolidated yet (skill merken)
+    candidates TEXT                 existing notes similar to TEXT (NOOP/UPDATE/SUPERSEDE check)
+    supersede OLD NEW --change C    link both sides of a supersede chain (idempotent)
+    confirm ID                      NOOP with confirmation: last_confirmed = today
+    conflict A B TITLE --source S   pinned question note (kind conflict) linking A and B
+    consolidated JOURNAL IDS...     freeze a journal: konsolidiert true + konsolidiert_zu
 
 All commands take ``--root`` (default: nearest parent with ``.ai-workspace/``). Pure stdlib.
 """
@@ -24,7 +30,7 @@ import sys
 from datetime import date
 from pathlib import Path
 
-from . import automemory, budget, create, journal, lint, now, rollup, split
+from . import automemory, budget, consolidate, create, journal, lint, now, rollup, split
 from . import index as index_mod
 from .frontmatter import FrontmatterError
 from .legacy import REGISTERS
@@ -96,6 +102,13 @@ def _journal_file(root: Path, given: str) -> Path:
     if not path.is_file():
         raise SystemExit(f"journal not found: {given}")
     return path
+
+
+def _iso_date(value: str) -> str:
+    try:
+        return date.fromisoformat(value).isoformat()
+    except ValueError:
+        raise argparse.ArgumentTypeError(f"not a date YYYY-MM-DD: {value!r}") from None
 
 
 def _limit(value: str) -> int:
@@ -190,6 +203,57 @@ def _cmd_import(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_pending(args: argparse.Namespace) -> int:
+    root = _root(args)
+    items = consolidate.pending(root, include_running=args.all)
+    for p in items:
+        print(f"{rel(root, p.path)} · {p.entries} Eintraege · {', '.join(p.kinds)}")
+    print(f"{len(items)} nicht konsolidierte Journale")
+    return 0
+
+
+def _cmd_candidates(args: argparse.Namespace) -> int:
+    root = _root(args)
+    for score, n in consolidate.candidates(root, args.text, args.limit):
+        alias = f" ({', '.join(n.items('aliases'))})" if n.items("aliases") else ""
+        print(f"{score:.2f} {n.id}{alias} · {n.get('status')} · {n.get('title')}")
+    return 0
+
+
+def _today(args: argparse.Namespace) -> str:
+    return str(args.date or date.today().isoformat())
+
+
+def _cmd_supersede(args: argparse.Namespace) -> int:
+    root = _root(args)
+    changed = consolidate.supersede(root, args.old, args.new, change=args.change, day=_today(args))
+    print("\n".join(f"written: {rel(root, p)}" for p in changed) or "no change")
+    return 0
+
+
+def _cmd_confirm(args: argparse.Namespace) -> int:
+    root = _root(args)
+    changed = consolidate.confirm(root, args.ref, day=_today(args))
+    print("\n".join(f"written: {rel(root, p)}" for p in changed) or "no change")
+    return 0
+
+
+def _cmd_conflict(args: argparse.Namespace) -> int:
+    root = _root(args)
+    path = consolidate.conflict(
+        root, args.a, args.b, title=args.title, source=args.source, day=_today(args)
+    )
+    print(rel(root, path))
+    return 0
+
+
+def _cmd_consolidated(args: argparse.Namespace) -> int:
+    root = _root(args)
+    changed = consolidate.mark(root, _journal_file(root, args.journal), args.ids)
+    print(("marked: " if changed else "unchanged: ") + args.journal)
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="harness.mdmemory")
     parser.add_argument("--root", default=None, help="workspace root (default: auto-detect)")
@@ -229,7 +293,9 @@ def main(argv: list[str] | None = None) -> int:
     )
     sp = sub.add_parser("split-decisions", help="Legacy registers -> atomic notes.")
     sp.add_argument("--register", default="all", choices=["all", *REGISTERS])
-    sp.add_argument("--date", default=date.today().isoformat(), help="migration date")
+    sp.add_argument(
+        "--date", type=_iso_date, default=date.today().isoformat(), help="migration date"
+    )
     ep = sub.add_parser("export-legacy", help="Old register format from the notes.")
     ep.add_argument("register", choices=list(REGISTERS))
     rp = sub.add_parser("rollup", help="Monthly journal rollup.")
@@ -237,6 +303,29 @@ def main(argv: list[str] | None = None) -> int:
     ap = sub.add_parser("import-automemory", help="Auto-memory files -> journal candidates.")
     ap.add_argument("--source", default=None, help="folder (default: Claude's project memory)")
     ap.add_argument("--dry-run", action="store_true")
+
+    pp = sub.add_parser("pending", help="Finished journals not consolidated yet.")
+    pp.add_argument("--all", action="store_true", help="also journals of running sessions")
+    cap = sub.add_parser("candidates", help="Notes similar to a statement.")
+    cap.add_argument("text")
+    cap.add_argument("--limit", type=int, default=5)
+    sup = sub.add_parser("supersede", help="Link NEW as successor of OLD (both sides).")
+    sup.add_argument("old")
+    sup.add_argument("new")
+    sup.add_argument("--change", required=True, choices=sorted(consolidate.CHANGE))
+    sup.add_argument("--date", type=_iso_date, default=None)
+    cfp = sub.add_parser("confirm", help="Set last_confirmed of a note.")
+    cfp.add_argument("ref")
+    cfp.add_argument("--date", type=_iso_date, default=None)
+    cop = sub.add_parser("conflict", help="Record a contradiction as a pinned question.")
+    cop.add_argument("a")
+    cop.add_argument("b")
+    cop.add_argument("title")
+    cop.add_argument("--source", required=True)
+    cop.add_argument("--date", type=_iso_date, default=None)
+    cdp = sub.add_parser("consolidated", help="Freeze a journal after consolidation.")
+    cdp.add_argument("journal")
+    cdp.add_argument("ids", nargs="*")
 
     args = parser.parse_args(argv)
     if args.cmd == "journal" and args.action == "append" and not (args.path and args.text):
@@ -252,11 +341,18 @@ def main(argv: list[str] | None = None) -> int:
         "export-legacy": _cmd_export,
         "rollup": _cmd_rollup,
         "import-automemory": _cmd_import,
+        "pending": _cmd_pending,
+        "candidates": _cmd_candidates,
+        "supersede": _cmd_supersede,
+        "confirm": _cmd_confirm,
+        "conflict": _cmd_conflict,
+        "consolidated": _cmd_consolidated,
     }
     try:
         return handlers[args.cmd](args)
-    except FrontmatterError as exc:
-        print(f"error: {exc}", file=sys.stderr)
+    except (FrontmatterError, KeyError, ValueError) as exc:
+        msg = exc.args[0] if isinstance(exc, KeyError) and exc.args else exc
+        print(f"error: {msg}", file=sys.stderr)
         return 2
 
 

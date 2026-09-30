@@ -55,6 +55,7 @@ Diese Datei definiert pro Pfad die Lade-Regel. Ziel: kleiner stabiler Kontext be
 | `adapters/<inaktiv>/**` | Never Auto-Load | Inaktive Adapter werden ignoriert. |
 | Quellen mit `do_not_load: true` in `state/source-registry.md` | Never Auto-Load | Direktive blockiert Auto-Inject. |
 | Original-Binaerdateien | Never Auto-Load | Werden nie automatisch geladen — Document-Normalization-Pipeline siehe `knowledge-graph-policy.md`. |
+| `.codex/hooks.json` | Never Auto-Load | Hook-Konfiguration fuer Codex (D-2026-09-30-07); ruft die Skripte aus `.claude/hooks/` auf. |
 | `.claude/**` (Skills, Hooks, Commands, Agents) | Never Auto-Load | Tool-nativer Execution-Mount. Claude Code laedt einen Skill ueber sein eigenes Trigger-/Description-Mechanik bei Bedarf — **nicht** in den 5-File-Boot-Context. |
 | `src/**`, `tests/**`, `examples/**`, `sources/**`, `.github/**`, `pyproject.toml` | Never Auto-Load / On Explicit Request | Harness-Engine + Infra. Bei Code-Arbeit gezielt lesen, nie automatisch in den Governance-Boot-Context. |
 

@@ -4,6 +4,38 @@ All notable changes to this project are documented here. Format based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); this project follows
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.3.0a3] — 2026-09-30
+
+Phase 3 of the long-term memory: consolidation. Journal entries become notes through one
+tool-neutral procedure, and three small hooks keep it from being forgotten.
+
+### Added
+
+- **Skill `merken`** (`.claude/skills/merken/`, with `evaluate.md`, 5 scenarios): per candidate
+  NOOP / ADD / UPDATE / SUPERSEDE / CONFLICT against existing notes. Asks first for person notes,
+  global preferences, SUPERSEDE/corrections and CONFLICT; writes everything else directly.
+  External content gets `origin: external` and never shows its summary in the index.
+- **Consolidation helpers** in `harness.mdmemory`: `pending`, `candidates`, `supersede`
+  (both sides, idempotent), `confirm` (NOOP with `last_confirmed`), `conflict` (pinned question
+  of kind conflict), `consolidated` (freezes a journal with `konsolidiert_zu`). Lint checks that
+  every `konsolidiert_zu` id exists.
+- **Hooks, default ON, each behind a flag** in `.claude/automation.flags.json`:
+  `memory_boot` (SessionStart: unconsolidated journals of other sessions, reminder after
+  compact), `journal_stub` (SessionEnd: one fixed closing entry in this session's existing,
+  unconsolidated journal; creates nothing; well below the 1.5 s budget), `precompact_reminder`
+  (PreCompact: `systemMessage` to the user only, never blocks).
+- **Codex**: `.codex/hooks.json` runs the same scripts (`now_init`, `memory_boot`,
+  `journal_stub`, `precompact_reminder`) with `--tool codex`; hooks need trust via `/hooks`.
+- Decisions D-2026-09-30-06 (memory hooks default ON, hook write doctrine (d); supersedes
+  D-2026-09-30-02 and -03) and D-2026-09-30-07 (`.codex/` as config-only execution mount).
+
+### Changed
+
+- `AGENTS.md` §3 (`.codex/`), §6 (procedure `merken`); `session-contract.md` §3.3 describes the
+  procedure tool-neutrally; `context-policy.md`, `.claude/AUTOMATION.md`, README follow.
+- The boot index shows only the summary per line (sub indexes keep title + summary), so new
+  decisions do not push the boot budget; `new` rejects titles over 100 characters.
+
 ## [3.3.0a2] — 2026-09-30
 
 Phase 2 of the long-term memory: one note per file, a generated and capped boot index, the four

@@ -11,6 +11,7 @@ Checks (E = error, W = warning):
   when ``superseded_by`` is set, no cycles
 * E at most one active note per type and title; aliases unique; links/blocks resolve
 * E generated files (INDEX, sub indexes, register views) are up to date
+* E every id in a journal's ``konsolidiert_zu`` exists
 * E/W boot budget: hard limit is an error, above target a warning
 * E ``@path`` tokens in title/summary/aliases (Claude Code imports them from the boot index);
   INDEX.md above its byte/line cap
@@ -27,7 +28,8 @@ from pathlib import Path
 
 from . import budget, frontmatter
 from . import index as index_mod
-from .limits import INDEX_MAX_BYTES, INDEX_MAX_LINES, SUMMARY_MAX_CHARS
+from .consolidate import journal_refs
+from .limits import INDEX_MAX_BYTES, INDEX_MAX_LINES, SUMMARY_MAX_CHARS, TITLE_MAX_CHARS
 from .notes import (
     DATE_FIELDS,
     DATE_RE,
@@ -46,7 +48,6 @@ from .workspace import rel
 
 EXTRA_ALLOWED = {"legacy_keys"}
 NONEMPTY = ("id", "type", "title", "summary", "status", "valid_from", "updated")
-TITLE_MAX_CHARS = 100
 ALIAS_MAX_CHARS = 60
 AT_RE = re.compile(r"(^|\s)@\S")
 NEUTRAL_ID_RE = re.compile(r"^[a-z]{3}-\d{4}-\d{2}-\d{2}-[0-9a-f]{4,8}$")
@@ -208,6 +209,8 @@ def run(root: Path, *, today: str | None = None, check_budget: bool = True) -> l
             out.append(
                 Finding("E", rel(root, index_file), f"larger than {INDEX_MAX_BYTES} B / lines")
             )
+    for jpath, ref in journal_refs(root):
+        out.append(Finding("E", rel(root, jpath), f"konsolidiert_zu: unknown note {ref}"))
     if not any(f.level == "E" for f in out):
         for p in index_mod.stale(root):
             out.append(

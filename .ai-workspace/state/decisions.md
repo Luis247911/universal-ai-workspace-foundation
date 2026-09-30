@@ -13,10 +13,10 @@ generated: true
 
 ## Aktiv
 
+- D-2026-09-30-07 · 2026-09-30 · [.codex/ ist zweiter Execution-Mount, nur fuer die Hook-Konfiguration von Codex](../knowledge/decision/dec-2026-09-30-codex-ist-zweiter-execution-mount-nur-6a3b.md)
+- D-2026-09-30-06 · 2026-09-30 · [Gedaechtnis-Hooks default AN; Hooks duerfen einen Abschluss-Eintrag ins eigene Journal schreiben](../knowledge/decision/dec-2026-09-30-gedaechtnis-hooks-sind-default-an-hooks-ec11.md) · ersetzt D-2026-09-30-02, D-2026-09-30-03
 - D-2026-09-30-05 · 2026-09-30 · [Skripte unter src/ duerfen abgeleitete Markdown-Dateien in .ai-workspace/ schreiben](../knowledge/decision/dec-2026-09-30-05-skripte-unter-src-duerfen.md) · ersetzt D-2026-06-04-01
 - D-2026-09-30-04 · 2026-09-30 · [Atomare Notizen unter knowledge/<typ>/ sind kanonisch; Register und Indizes werden generiert](../knowledge/decision/dec-2026-09-30-04-atomare-notizen-unter-knowledge.md)
-- D-2026-09-30-03 · 2026-09-30 · [Die Automatik-Schicht unter .claude/ bleibt opt-in und default AUS](../knowledge/decision/dec-2026-09-30-03-die-automatik-schicht-unter.md) · ersetzt D-2026-06-04-02
-- D-2026-09-30-02 · 2026-09-30 · [Schreib-Doktrin fuer Execution-Hooks](../knowledge/decision/dec-2026-09-30-02-schreib-doktrin-fuer-execution.md) · ersetzt D-2026-06-06-03
 - D-2026-09-30-01 · 2026-09-30 · [Der Live-Zustand liegt in state/now.md (gitignored, pro Worktree, harte Grenze…](../knowledge/decision/dec-2026-09-30-01-der-live-zustand-liegt-in-state.md) · ersetzt D-2026-06-07-01
 - D-2026-06-07-02 · 2026-06-07 · [Vier zusaetzliche opt-in Execution-Hooks unter .claude/ (default AUS)…](../knowledge/decision/dec-2026-06-07-02-vier-zusaetzliche-opt-in.md)
 - D-2026-06-06-02 · 2026-06-06 · [Eine optionale aktive Pflege-Routine (daily_maintenance) wird als opt-in…](../knowledge/decision/dec-2026-06-06-02-eine-optionale-aktive-pflege.md)
@@ -24,6 +24,8 @@ generated: true
 
 ## Abgeloest, zurueckgezogen, archiviert
 
+- D-2026-09-30-03 · 2026-09-30 · [Die Automatik-Schicht unter .claude/ bleibt opt-in und default AUS](../knowledge/decision/dec-2026-09-30-03-die-automatik-schicht-unter.md) → abgeloest durch D-2026-09-30-06
+- D-2026-09-30-02 · 2026-09-30 · [Schreib-Doktrin fuer Execution-Hooks](../knowledge/decision/dec-2026-09-30-02-schreib-doktrin-fuer-execution.md) → abgeloest durch D-2026-09-30-06
 - D-2026-06-07-01 · 2026-06-07 · [Durability-Modell von current-session.md ist kanonisch die lebende Datei +…](../knowledge/decision/dec-2026-06-07-01-durability-modell-von-current.md) → abgeloest durch D-2026-09-30-01
 - D-2026-06-06-03 · 2026-06-06 · [Praezisierung der "Hook liest nur"-Doktrin: Execution-Hooks unter .claude/…](../knowledge/decision/dec-2026-06-06-03-praezisierung-der-hook-liest.md) → abgeloest durch D-2026-09-30-02
 - D-2026-06-04-02 · 2026-06-04 · [Eine optionale, repo-committete Session-Automatik-Schicht (boot_reload +…](../knowledge/decision/dec-2026-06-04-02-eine-optionale-repo-committete.md) → abgeloest durch D-2026-09-30-03

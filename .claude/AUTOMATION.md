@@ -6,13 +6,14 @@ bleibt markdown-only und motorlos (D-2026-09-30-05, ersetzt D-2026-06-04-01). Sk
 `src/harness/mdmemory` schreiben dort nur auf ausdruecklichen Aufruf von
 `python -m harness.mdmemory` und erzeugen dabei abgeleitete `GENERIERT`-Dateien
 (`knowledge/INDEX.md`, `knowledge/_typen/`, Register-Sichten); was Hooks schreiben duerfen,
-regelt D-2026-09-30-02.
+regelt D-2026-09-30-06 (ersetzt D-2026-09-30-02 und -03).
 
 > **Default: AUS** fuer alle *wiederkehrenden* Helfer (`boot_reload`, `recitation_nudge`,
 > `daily_maintenance`, `prompt_optimizer`, `external_content_guard`, `compact_nudge`,
 > `session_state_guard`). Ausnahmen, default AN: der einmalige Onboarding-Stups beim ersten Start
-> (`first_run_onboarding`, ruft `/start` auf) und `now_init`, das die lokale Live-Datei
-> `state/now.md` anlegt und auf 4 KB haelt (D-2026-09-30-03). Aktivierung/Deaktivierung ist opt-in, reversibel und wird
+> (`first_run_onboarding`, ruft `/start` auf), `now_init` (legt `state/now.md` an, haelt 4 KB)
+> und die drei Gedaechtnis-Hooks `memory_boot`, `journal_stub`, `precompact_reminder`
+> (D-2026-09-30-06). Aktivierung/Deaktivierung ist opt-in, reversibel und wird
 > durch den Begleiter `/uaw-automation` gefuehrt.
 
 ## In einfachen Worten
@@ -43,7 +44,10 @@ externen Abhaengigkeiten, kein API).
 
 | Flag | Event | Was es tut | Prinzip |
 |---|---|---|---|
-| `now_init` | `SessionStart` (alle Quellen) | Legt `.ai-workspace/state/now.md` (gitignored, pro Worktree) aus `templates/session-state.md` an, falls sie fehlt; kuerzt sie ueber 4 KB verlustfrei (Ueberlauf ins Session-Journal); nennt Session-Kurz-ID + Journal-Pfad; meldet eine alte `current-session.md`. **Default AN.** | Hook legt nur die lokale Live-Datei an und haelt ihre Groesse; Inhalte schreibt das Modell (D-2026-09-30-02). |
+| `now_init` | `SessionStart` (alle Quellen) | Legt `.ai-workspace/state/now.md` (gitignored, pro Worktree) aus `templates/session-state.md` an, falls sie fehlt; kuerzt sie ueber 4 KB verlustfrei (Ueberlauf ins Session-Journal); nennt Session-Kurz-ID + Journal-Pfad; meldet eine alte `current-session.md`. **Default AN.** | Hook legt nur die lokale Live-Datei an und haelt ihre Groesse; Inhalte schreibt das Modell (D-2026-09-30-06). |
+| `memory_boot` | `SessionStart` (alle Quellen) | Nennt nicht konsolidierte Journale anderer Sessions (max. 5) und schlaegt `merken` vor; nach `compact` Erinnerung, Journal und `now.md` zu pruefen. **Default AN.** | Liest nur; schweigt ohne Anlass (D-2026-09-30-06). |
+| `journal_stub` | `SessionEnd` | Haengt an das existierende, nicht konsolidierte Journal dieser Session einen festen Abschluss-Eintrag (`uebergabe`). **Default AN.** | Legt nichts an, schreibt keine Inhalte der Arbeit; < 1,5 s (D-2026-09-30-06). |
+| `precompact_reminder` | `PreCompact` | Erinnert den User, vor dem Compact Journal und `now.md` zu sichern. **Default AN.** | Nur `systemMessage`, blockiert nie (D-2026-09-30-06). |
 | `boot_reload` | `SessionStart` | Liest `.ai-workspace/state/now.md` (Legacy-Fallback `current-session.md`) und speist es als `additionalContext` ein -> jede neue/resumte/gecleart/compactete Session bootet mit dem Live-State. Seit v3.2.1 laedt `CLAUDE.md` die Datei bereits per `@`-Import; fuer Claude Code ist der Hook damit weitgehend redundant. | Hook liest nur, was das Modell schrieb. |
 | `recitation_nudge` | `PostToolUse` | Nach Write/Edit/NotebookEdit ein kurzer Reminder: relevantes Ergebnis ins Journal, dann `now.md` fortschreiben (Task + naechster Schritt + Evidenz, `session-contract.md` §3). | Hook erinnert, **Modell schreibt**. |
 | `first_run_onboarding` | `SessionStart` (startup) | Bei frischem, uneingerichtetem Workspace (State-Platzhalter da, kein Onboarding-Marker) speist es einen Stups ein: begruesse den Nutzer + starte `/start`. **Default AN.** Escape: `UAW_DISABLE_ONBOARDING`. | Hook stupst nur an; `/start` + Modell handeln. |
@@ -67,9 +71,13 @@ beschreiben. Alles bleibt `.md`, die Invarianten C1/C2 halten.
 
 ## Dateien
 
-- `.claude/automation.flags.json` — die Toggles. Default: `first_run_onboarding: true`, `now_init: true`, alle uebrigen `false` (`boot_reload`, `recitation_nudge`, `daily_maintenance`, `prompt_optimizer`, `external_content_guard`, `compact_nudge`, `session_state_guard`).
+- `.claude/automation.flags.json` — die Toggles. Default: `first_run_onboarding`, `now_init`, `memory_boot`, `journal_stub`, `precompact_reminder` `true`, alle uebrigen `false` (`boot_reload`, `recitation_nudge`, `daily_maintenance`, `prompt_optimizer`, `external_content_guard`, `compact_nudge`, `session_state_guard`).
 - `.claude/hooks/_flags.py` — stdlib-Helper: Repo-Root (`CLAUDE_PROJECT_DIR`, sonst aus `__file__`) + Flag lesen. Jeder Fehler -> `False` (fail-safe).
 - `.claude/hooks/now_init.py` — SessionStart-Handler (startup/resume/clear/compact), self-gated auf `now_init` (default AN); nutzt `src/harness/mdmemory` (ohne Engine: inert). Codex: `--tool codex` uebergeben.
+- `.claude/hooks/memory_boot.py` — SessionStart-Handler (alle Quellen), self-gated auf `memory_boot` (default AN); liest nur; meldet nicht konsolidierte Journale anderer Sessions (max. 5) und erinnert nach `compact`. Schweigt, wenn nichts offen ist.
+- `.claude/hooks/journal_stub.py` — SessionEnd-Handler, self-gated auf `journal_stub` (default AN); haengt an das *existierende*, nicht konsolidierte Journal dieser Session einen festen `uebergabe`-Eintrag. Legt nichts an, keine Inhalte, keine Pfade; deutlich unter dem 1,5-s-Budget.
+- `.claude/hooks/precompact_reminder.py` — PreCompact-Handler, self-gated auf `precompact_reminder` (default AN); gibt nur `systemMessage` an den User aus (PreCompact kann dem Modell keinen Kontext geben), blockiert nie.
+- `.codex/hooks.json` — dieselben Gedaechtnis-Hooks plus `now_init` fuer Codex (D-2026-09-30-07), Befehl ueber `$(git rev-parse --show-toplevel)` mit `--tool codex`. Codex fuehrt Projekt-Hooks erst aus, nachdem der User sie per `/hooks` geprueft und als vertrauenswuerdig markiert hat; SessionEnd-Timeout hoechstens 3 s.
 - `.claude/hooks/boot_reload.py` — SessionStart-Handler, self-gated auf `boot_reload`.
 - `.claude/hooks/recitation_nudge.py` — PostToolUse-Handler, self-gated auf `recitation_nudge`.
 - `.claude/hooks/first_run_onboarding.py` — SessionStart(startup)-Handler, self-gated auf `first_run_onboarding` (default AN) + Onboarding-Marker + State-Platzhalter + `UAW_DISABLE_ONBOARDING`-Escape.
@@ -79,7 +87,7 @@ beschreiben. Alles bleibt `.md`, die Invarianten C1/C2 halten.
 - `.claude/hooks/compact_nudge.py` — PostToolUse-Handler, self-gated auf `compact_nudge`; schreibt gitignored `.claude/.compact_nudge_state` (Zaehler).
 - `.claude/hooks/session_state_guard.py` — PostToolUse(Write|Edit|NotebookEdit)-Handler, self-gated auf `session_state_guard`; staleness-gegated; schreibt gitignored `.claude/.session_state_guard` (Drossel-Timestamp).
 - `.claude/commands/start.md` — der Erst-Start-Dirigent (`/start`); schreibt den gitignored Onboarding-Marker `.onboarding-state.json` (status done/skipped).
-- `.claude/settings.json` -> `hooks`-Block — registriert die Hooks statisch. **Inert bis Flag true** (ausser `first_run_onboarding`, default AN).
+- `.claude/settings.json` -> `hooks`-Block — registriert die Hooks statisch. **Inert bis Flag true** (die default-AN-Hooks siehe oben).
 
 ## Self-Gating (warum committet sicher ist)
 
@@ -113,6 +121,11 @@ keine Ausgabe = vollstaendig inert). Aktivieren = einen Boolean kippen, nie JSON
   genutzt). `PostToolUse`-Matcher sind beliebige Tool-Namen-Regexes (z.B. `WebFetch|WebSearch`,
   `Read|Grep|Glob|Bash|Task|...`), nicht nur `Write|Edit|NotebookEdit`.
 - Repo-Root im Command via `$CLAUDE_PROJECT_DIR`.
+- `SessionEnd`: alle SessionEnd-Hooks teilen sich 1,5 s; Ausgaben steuern nichts mehr.
+- `PreCompact`: kein `additionalContext`, nur `systemMessage` an den User oder Block
+  (`decision: block` / exit 2, hier nie genutzt). Die Erinnerung ans Modell kommt darum nach dem
+  Compact ueber `memory_boot` (SessionStart-Quelle `compact`).
+- `additionalContext` bzw. stdout: max. 10.000 Zeichen, darueber wird ausgelagert.
 
 ## Selbsttest (ohne echte Session)
 
@@ -164,6 +177,6 @@ und entfernt die alte Datei; danach committen. `now_init` weist beim Start darau
 
 ## Verwandte Governance
 
-- Decisions (Notizen unter `knowledge/decision/`, Sicht `state/decisions.md` generiert) — D-2026-06-04-01 (Core-Freeze, ersetzt durch D-2026-09-30-05), D-2026-06-06-01 (default-AN Erst-Start-Onboarding), D-2026-06-06-02 (opt-in Pflege-Routine), D-2026-06-07-02 (vier zusaetzliche opt-in Hooks), D-2026-09-30-01 (now.md + Journal, ersetzt D-2026-06-07-01), D-2026-09-30-02 (Hook-Schreib-Doktrin, ersetzt D-2026-06-06-03), D-2026-09-30-03 (Automatik-Defaults, ersetzt D-2026-06-04-02), D-2026-09-30-04 (atomare Notizen unter `knowledge/<typ>/` kanonisch, Register nur noch generierte Sichten), D-2026-09-30-05 (abgeleitete `GENERIERT`-Dateien per `harness.mdmemory`, ersetzt D-2026-06-04-01).
+- Decisions (Notizen unter `knowledge/decision/`, Sicht `state/decisions.md` generiert) — D-2026-06-04-01 (Core-Freeze, ersetzt durch D-2026-09-30-05), D-2026-06-06-01 (default-AN Erst-Start-Onboarding), D-2026-06-06-02 (opt-in Pflege-Routine), D-2026-06-07-02 (vier zusaetzliche opt-in Hooks), D-2026-09-30-01 (now.md + Journal, ersetzt D-2026-06-07-01), D-2026-09-30-02 (Hook-Schreib-Doktrin, ersetzt D-2026-06-06-03), D-2026-09-30-03 (Automatik-Defaults, ersetzt D-2026-06-04-02), D-2026-09-30-04 (atomare Notizen unter `knowledge/<typ>/` kanonisch, Register nur noch generierte Sichten), D-2026-09-30-05 (abgeleitete `GENERIERT`-Dateien per `harness.mdmemory`, ersetzt D-2026-06-04-01), D-2026-09-30-06 (Gedaechtnis-Hooks default AN + Schreib-Doktrin, ersetzt D-2026-09-30-02 und -03), D-2026-09-30-07 (`.codex/` fuer Codex-Hooks).
 - `session-contract.md` §3.1 — Recitation-Rationale + Pointer auf diese Schicht.
 - `adapter-policy.md` §8 — Abgrenzung Automatik-Schicht vs. Adapter/Maintenance-Routine.

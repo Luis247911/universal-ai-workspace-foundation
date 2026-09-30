@@ -120,7 +120,7 @@ Eine Referenz, **kein** zweiter Regeltext: jede Zeile zeigt nur, *was* ein Begri
 - Kein RAG-System, keine Vector-Datenbank, kein Crawler (ein optionaler Vector-Memory-Backend ist ein opt-in Extra, niemals Source of Truth).
 - Kein automatisiertes Binary-Parsing (kein PDF-Parser, kein OCR, kein Office-Reader).
 - Kein Datenspeicher für sensible Rohdaten.
-- Kein MCP-Default-Bundle. Hooks sind present-but-advisory (opt-in via `.claude/settings.json`).
+- Kein MCP-Default-Bundle. Hooks sind advisory und per Flag in `.claude/automation.flags.json` schaltbar; default AN sind nur Onboarding, `now_init` und die drei Gedächtnis-Hooks (`.claude/AUTOMATION.md`).
 
 ## Skill-Katalog
 

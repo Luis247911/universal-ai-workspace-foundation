@@ -28,6 +28,7 @@ SUBINDEX_MAX_ENTRIES = 50
 
 #: ``summary`` is copied 1:1 into the index, so it is short and plain.
 SUMMARY_MAX_CHARS = 120
+TITLE_MAX_CHARS = 100
 
 #: Files longer than this are never read in full at session start (grep instead).
 LARGE_FILE_LINES = 1_000

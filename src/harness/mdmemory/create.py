@@ -16,7 +16,7 @@ import secrets
 from datetime import date
 from pathlib import Path
 
-from .limits import SUMMARY_MAX_CHARS
+from .limits import SUMMARY_MAX_CHARS, TITLE_MAX_CHARS
 from .notes import (
     ENUMS,
     PREFIX,
@@ -63,6 +63,8 @@ def skeleton(
 ) -> Note:
     if note_type not in TYPES:
         raise ValueError(f"unknown type {note_type!r}")
+    if len(title) > TITLE_MAX_CHARS:
+        raise ValueError(f"title has {len(title)} > {TITLE_MAX_CHARS} characters")
     day = day or date.today().isoformat()
     suffix = suffix or secrets.token_hex(2)
     note_id = f"{PREFIX[note_type]}-{day}-{slugify(title, 40)}-{suffix}"

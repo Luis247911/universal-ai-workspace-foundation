@@ -62,8 +62,12 @@ def _label(n: Note) -> str:
     return f"{safe(alias)} · " if alias else ""
 
 
-def entry_line(n: Note, link_prefix: str) -> str:
-    """One index line. ``link_prefix`` is the relative path from the index file to knowledge/."""
+def entry_line(n: Note, link_prefix: str, *, brief: bool = False) -> str:
+    """One index line. ``link_prefix`` is the relative path from the index file to knowledge/.
+
+    ``brief`` (boot index): only the summary as link text, to keep the boot budget small.
+    Sub indexes show title and summary.
+    """
     href = f"{link_prefix}{n.type}/{n.id}.md"
     status = "" if n.active else f" · {STATUS_DE.get(n.get('status'), n.get('status'))}"
     date = n.get("updated") or n.get("valid_from")
@@ -71,6 +75,8 @@ def entry_line(n: Note, link_prefix: str) -> str:
         why = "extern" if n.get("origin") == "external" else n.get("sensitivity")
         return f"- [{n.id}]({href}) — ({why}, Inhalt nur in der Notiz) · {date}{status}"
     title, summary = n.get("title"), n.get("summary")
+    if brief:
+        return f"- [{safe(summary)}]({href}) · {_label(n)}{date}{status}"
     same = summary == title or title.endswith("…") and summary.startswith(title[:-1])
     text = "" if same else f"{safe(summary)} · "
     return f"- [{safe(title)}]({href}) — {_label(n)}{text}{date}{status}"
@@ -104,17 +110,16 @@ def _render_index(notes: list[Note], recent: list[Note], pin_limit: int = INDEX_
         "",
         f"{len(active)} aktive von {len(notes)} Notizen"
         + (f", Stand {stand}" if stand else "")
-        + ". Danach gezielt Unterindex oder Notiz lesen, nie den ganzen Ordner"
-        " (Regeln `README.md`).",
+        + ". Lade-Regel: AGENTS.md §9.",
         "",
         "## Angeheftet",
         "",
     ]
-    lines += [entry_line(n, "") for n in pinned[:pin_limit]] or ["(keine)"]
+    lines += [entry_line(n, "", brief=True) for n in pinned[:pin_limit]] or ["(keine)"]
     if len(pinned) > pin_limit:
         lines.append(f"- … {len(pinned) - pin_limit} weitere in den Unterindizes")
     lines += ["", f"## Zuletzt geaendert ({len(recent)} neueste, ohne angeheftete)", ""]
-    lines += [entry_line(n, "") for n in recent] or ["(keine)"]
+    lines += [entry_line(n, "", brief=True) for n in recent] or ["(keine)"]
     counts = []
     for t in TYPES:
         of_type = [n for n in notes if n.type == t]
